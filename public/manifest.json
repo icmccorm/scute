@@ -1,0 +1,8 @@
+{
+    "short_name": "Scalr",
+    "name": "A browser-based language for scalable graphics and animations.",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+  }
