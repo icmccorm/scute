@@ -1,0 +1,39 @@
+/* color palette */
+.black-b {
+    background-color: #1e1e24;
+}
+.black-f {
+    color: #1e1e24;
+}
+
+.gray-b {
+    background-color: #565656;
+}
+
+.gray-f {
+    color: #565656;
+}
+
+.blue-b {
+    background-color: #1d3461;
+}
+
+.blue-f {
+    color: #1d3461;
+}
+
+.turq-b {
+    background-color: #247ba0;
+}
+
+.turq-f {
+    color: #247ba0;
+}
+
+.sky-b {
+    background-color: #a2aebb;
+}
+
+.sky-f {
+    color: #a2aebb;
+}
