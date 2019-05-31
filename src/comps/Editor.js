@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import '../css/design.css';
-import '../css/flex.css';
-import '../css/width.css';
+import '../css/Editor.css';
 
 class Editor extends React.Component { 
     
@@ -14,10 +12,10 @@ class Editor extends React.Component {
         return (
             <div className='flex inner-flex max'>
                 <div className='code-wrapper'>
-                    <textarea className='max'></textarea>
+                    <textarea className='max dark'></textarea>
                 </div>
                 <div className='console-wrapper'>
-                    <textarea className='max'></textarea>
+                    <textarea className='max dark'></textarea>
                 </div>
             </div>
         );

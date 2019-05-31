@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import '../css/design.css';
-import '../css/flex.css';
-import '../css/width.css';
-
+import '../css/Navbar.css';
+import Button from './Button';
 class Navbar extends React.Component { 
     
     constructor(props){
@@ -12,7 +10,13 @@ class Navbar extends React.Component {
 
     render () {
         return (
-            <div className='navbar black-b'></div>
+            <div className='navbar sky-b'>
+                <div className='nav nav-l'>
+                    <Button title='Run'/>
+                    <Button title='Run'/>
+                    <Button title='Run'/>
+                </div>   
+            </div>
         );
     }
 }

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import Editor from './Editor';
 import View from './View';
-import '../css/design.css';
-import '../css/flex.css';
-import '../css/width.css';
-
+import Navbar from './Navbar';
+import '../css/Scalr.css'
 
 class Scalr extends React.Component { 
     
@@ -14,16 +12,20 @@ class Scalr extends React.Component {
     }
 
     render () {
-        return (        
-            <div className='flex outer outer-flex'>
-                <div className='text-wrapper'>
-                    <Editor />
-                </div>
-                <div className='view-wrapper'>
-                    <View />
-                </div>
-
+        return (     
+            
+            <div className= 'root'>
+                <Navbar/>
+                <div className='flex outer outer-flex'>
+                    <div className='text-wrapper'>
+                        <Editor />
+                    </div>
+                    <div className='view-wrapper darkgray-b'>
+                        <View />
+                    </div>
             </div>
+            </div>
+            
         );
     }
 }

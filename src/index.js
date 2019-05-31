@@ -1,9 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Scalr from './comps/Scalr';
-import './css/design.css';
-import './css/flex.css';
-import './css/width.css';
+import './css/Global.css';
 
 //import * as serviceWorker from '../scalr/src/serviceWorker';
 

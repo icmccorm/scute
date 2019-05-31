@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import '../css/design.css';
-import '../css/flex.css';
-import '../css/width.css';
+import Canvas from './Canvas';
+import '../css/View.css';
 
 class View extends React.Component { 
     
@@ -11,7 +10,12 @@ class View extends React.Component {
     }
 
     render () {
-        return ('');
+        return (
+            <div className='frame max inset-shadow'>
+                <Canvas/>
+            </div>
+
+        );
     }
 }
 export default View;
