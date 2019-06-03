@@ -4,7 +4,7 @@ import View from './View';
 import Navbar from './Navbar';
 import '../css/Scalr.css'
 
-class Scalr extends React.Component { 
+class Scalr extends Component { 
     
     constructor(props){
         super(props);

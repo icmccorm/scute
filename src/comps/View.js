@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Canvas from './Canvas';
 import '../css/View.css';
 
-class View extends React.Component { 
+class View extends Component { 
     
     constructor(props){
         super(props);

@@ -1,5 +1,27 @@
 import * as err from './Exceptions';
 //start, current, line, indent, tokens, source
+
+function lex (doc) {
+    if(doc.hasNext()){
+        doc.start = doc.current;
+        scanToken.call(doc);
+        this.lex(doc);
+    }else{
+        doc.addToken('\\n', 'NEWLINE');
+        doc.addToken('\\0', 'EOF');
+    }
+    
+}
+export default {
+    tokenize: function (src) {
+        var doc = new Script(src);
+        lex(doc);
+        return doc.tokens;
+    }
+}
+
+
+
 var types = {
     STRING: 'STRING',
     INTEGER: 'INTEGER',
@@ -463,22 +485,3 @@ function scanToken() {
     }
 }
 
-var Lexer = {
-    lex: function (doc) {
-        if(doc.hasNext()){
-            doc.start = doc.current;
-            scanToken.call(doc);
-            this.lex(doc);
-        }else{
-            doc.addToken('\\n', 'NEWLINE');
-            doc.addToken('\\0', 'EOF');
-        }
-    
-    },
-    tokenize: function (src, id) {
-        var doc = new Script(src);
-        this.lex(doc);
-        return doc.tokens;
-    },
-}
-export default Lexer;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../css/Navbar.css';
 import Button from './Button';
-import Lexer from '../lang/Lexer'
+import Interpreter from '../lang/Interpreter'
 
 class Navbar extends Component { 
     
@@ -22,14 +22,7 @@ class Navbar extends Component {
     }
 
     compile () {
-        console.log("Click");
-        Lexer.run("henlo", 1).then(tokens => {
-            console.log(JSON.stringify(tokens));
-        });
-        Lexer.run("whats up", 2).then(tokens => {
-            console.log(JSON.stringify(tokens));
-        });
-        
+        Interpreter.run();
     }
 }
 export default Navbar;

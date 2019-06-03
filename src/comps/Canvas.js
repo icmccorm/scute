@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../css/Canvas.css';
 
-class Canvas extends React.Component { 
+class Canvas extends Component { 
     
     constructor(props){
         super(props);

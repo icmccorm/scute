@@ -1,5 +1,8 @@
 /* global GlobalScope Map Engine Console*/
-function Item() {
+import * as err from './Exceptions';
+import Interpreter from './InterpreterUtilities';
+
+export function Item() {
     this.global = false;
 }
 Item.prototype.constructor = Item;
@@ -7,19 +10,19 @@ Item.prototype.setGlobal = function (val) {
     this.global = val;
 }
 
-function Statement() {}
+export function Statement() {}
 Statement.prototype = Object.create(Item.prototype);
 Statement.prototype.constructor = Statement;
 Statement.prototype.constructor = Statement;
 
-function Grouping(statements) {
+export function Grouping(statements) {
     this.statements = statements;
     Statement.call(this);
 }
 Grouping.prototype = Object.create(Statement.prototype);
 Grouping.prototype.constructor = Grouping;
 
-function Assignment(id, op, expr) {
+export function Assignment(id, op, expr) {
     Statement.call(this);
     this.id = id;
     this.operator = op;
@@ -45,7 +48,7 @@ Assignment.prototype.eval = function () {
 
 }
 
-function PrintStatement(value) {
+export function PrintStatement(value) {
     Statement.call(this);
     this.value = value;
 }
@@ -64,7 +67,7 @@ PrintStatement.prototype.eval = function () {
     }
 }
 
-function DrawStatement(shape) {
+export function DrawStatement(shape) {
     Statement.call(this);
     this.shape = shape;
 }
@@ -74,7 +77,7 @@ DrawStatement.prototype.eval = function () {
     this.shape.eval();
 }
 
-function If(expr, statements) {
+export function If(expr, statements) {
     Grouping.call(this, statements);
     this.expr = expr;
 
@@ -89,7 +92,7 @@ If.prototype.eval = function () {
     }
 }
 
-function For(args, statements) {
+export function For(args, statements) {
     Grouping.call(this, statements);
     this.declare = args[0];
     this.compare = args[1];
@@ -108,7 +111,7 @@ For.prototype.eval = function () {
     }
 }
 
-function TimeStep(start, end, statements, scope) {
+export function TimeStep(start, end, statements, scope) {
     Grouping.call(this, statements);
     this.global = true;
     this.scope = scope;
@@ -152,7 +155,8 @@ TimeStep.prototype.check = function (index) {
     }
 }
 
-function Shape() {
+
+export function Shape() {
     Statement.call(this);
     this.attrs = {};
 }
@@ -166,7 +170,7 @@ Shape.prototype.getAttributes = function() {
     return finals;
 }
 
-function Rectangle(args) {
+export function Rectangle(args) {
     Shape.call(this);
     this.attrs.x = args[0];
     this.attrs.y = args[1];
@@ -179,7 +183,7 @@ Rectangle.prototype.eval = function () {
     Interpreter.add('rect', null, this.getAttributes());
 };
 
-function Circle(args) {
+export function Circle(args) {
     Shape.call(this);
     this.attrs.cx = args[0];
     this.attrs.cy = args[1];
@@ -191,7 +195,7 @@ Circle.prototype.eval = function () {
     Interpreter.add('circle', null, this.getAttributes());
 };
 
-function Ellipse(args) {
+export function Ellipse(args) {
     Shape.call(this);
     this.attrs.cx = args[0];
     this.attrs.cy = args[1];
@@ -204,7 +208,7 @@ Ellipse.prototype.eval = function () {
     Interpreter.add('ellipse', null, this.getAttributes());
 }
 
-function Text(args) {
+export function Text(args) {
     Shape.call(this);
     this.attrs.x = args[0];
     this.attrs.y = args[1];
@@ -219,7 +223,7 @@ Text.prototype.getString = function () {
     return (this.value != undefined ? this.value.eval() : null);
 };
 
-function Polyline(coords) {
+export function Polyline(coords) {
     Shape.call(this);
     this.coordList = coords;
 }
@@ -237,7 +241,7 @@ Polyline.prototype.eval = function () {
 
 };
 
-function Polygon(coords) {
+export function Polygon(coords) {
     Shape.call(this);
     this.coordList = coords;
 }
@@ -255,7 +259,7 @@ Polygon.prototype.eval = function () {
     Interpreter.add('polygon', null, attr);
 }
 
-function Line(coordOne, coordTwo) {
+export function Line(coordOne, coordTwo) {
     Shape.call(this);
     this.attrs.x1 = coordOne.x;
     this.attrs.y1 = coordOne.y;
@@ -269,12 +273,12 @@ Line.prototype.eval = function () {
     Interpreter.add('line', null, this.getAttributes());
 };
 
-function Expr() {}
+export function Expr() {}
 Expr.prototype = Object.create(Item.prototype);
 Expr.prototype.constructor = Expr();
 Expr.prototype.eval = function () {};
 
-function Literal(a) {
+export function Literal(a) {
     Expr.call(this);
     this.val = a;
 }
@@ -284,7 +288,7 @@ Literal.prototype.eval = function () {
     return this.val;
 };
 
-function Variable(parent, child, scope) {
+export function Variable(parent, child, scope) {
     Expr.call(this);
     this.child = child;
     this.parent = parent;
@@ -301,7 +305,7 @@ Variable.prototype.eval = function () {
             return contents[this.child.text].eval();
 
         } else {
-            throw new RuntimeError(this.child.line, "Property \'" + this.child.text + "\' of variable \'" + this.parent.text + "\' is invalid.");
+            throw new err.RuntimeError(this.child.line, "Property \'" + this.child.text + "\' of variable \'" + this.parent.text + "\' is invalid.");
         }
     } else {
         return this.evalParent();
@@ -339,7 +343,7 @@ Variable.prototype.update = function (input, eager) {
     }
 }
 
-function Unary(op, a, scope) {
+export function Unary(op, a, scope) {
     this.operator = op;
     this.right = a;
     this.scope = scope;
@@ -360,7 +364,7 @@ function Unary(op, a, scope) {
 }
 Unary.prototype.constructor = Unary;
 
-function UnaryExpr(op, a, scope) {
+export function UnaryExpr(op, a, scope) {
     Expr.call(this);
     Unary.call(this, op, a, scope);
 }
@@ -372,7 +376,7 @@ UnaryExpr.prototype.eval = function () {
     return value.eval();
 }
 
-function BinaryExpr(a, op, b) {
+export function BinaryExpr(a, op, b) {
     Expr.call(this);
     this.left = a;
     this.operator = op;
@@ -398,7 +402,7 @@ BinaryExpr.prototype.eval = function () {
     }
 }
 
-function Comparison(a, op, b) {
+export function Comparison(a, op, b) {
     BinaryExpr.call(this, a, op, b);
 }
 Comparison.prototype = Object.create(BinaryExpr.prototype);
@@ -420,7 +424,7 @@ Comparison.prototype.eval = function () {
     }
 }
 
-function TrigExpr(op, a) {
+export function TrigExpr(op, a) {
     Expr.call(this);
     this.operator = op;
     this.expr = a;
@@ -438,7 +442,7 @@ TrigExpr.prototype.eval = function () {
     }
 }
 
-function Point(x, y) {
+export function Point(x, y) {
     Expr.call(this);
     this.x = x;
     this.y = y;
@@ -446,7 +450,7 @@ function Point(x, y) {
 Point.prototype = Object.create(Expr.prototype);
 Point.prototype.constructor = Point;
 
-function Color(r, g, b) {
+export function Color(r, g, b) {
     Expr.call(this);
     this.r = r;
     this.g = g;

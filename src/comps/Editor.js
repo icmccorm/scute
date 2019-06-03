@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../css/Editor.css';
 
-class Editor extends React.Component { 
+class Editor extends Component { 
     
     constructor(props){
         super(props);

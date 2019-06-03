@@ -1,5 +1,5 @@
 /* global Console */
-function Error(line, message) {
+export function Error(line, message) {
     this.line = line;
     this.message = message;
 }
@@ -8,19 +8,19 @@ Error.prototype.printMessage = function () {
     Console.print(this.message + " (line " + this.line + ")");
 }
 
-function ParsingError(line, message) {
+export function ParsingError(line, message) {
     Error.call(this, line, message);
 }
 
 ParsingError.prototype = Object.create(Error.prototype);
 
-function LexingError(line, message) {
+export function LexingError(line, message) {
     Error.call(this, line, message);
 }
 
 LexingError.prototype = Object.create(Error.prototype);
 
-function RuntimeError(line, message) {
+export function RuntimeError(line, message) {
     Error.call(this, line, message);
 }
 
