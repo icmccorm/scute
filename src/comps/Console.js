@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import '../css/Editor.css';
+import '../css/Console.css';
 
-class Editor extends Component { 
+class Console extends Component { 
     
     constructor(props){
         super(props);
@@ -10,8 +10,8 @@ class Editor extends Component {
 
     render () {
         return (
-            <div className='editor-wrapper'>
-                <textarea className='max dark'>{text}</textarea>
+            <div className='console-wrapper'>
+                <textarea className='max dark' disabled>{text}</textarea>
             </div>
         );
     }

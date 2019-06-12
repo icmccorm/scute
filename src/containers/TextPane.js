@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import '../css/Editor.css';
+import '../css/TextPane.css';
+import Console from '../comps/Console';
 
-class Editor extends Component { 
+class TextPane extends Component { 
     
     constructor(props){
         super(props);
@@ -10,8 +11,9 @@ class Editor extends Component {
 
     render () {
         return (
-            <div className='editor-wrapper'>
-                <textarea className='max dark'>{text}</textarea>
+            <div className='flex inner-flex max'>
+                <Editor/>
+                <Console/>
             </div>
         );
     }
