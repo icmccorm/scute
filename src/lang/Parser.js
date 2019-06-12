@@ -92,8 +92,6 @@ class TokenList {
     }
 }
 
-
-
 function evaluate () {
     try {
         var result = expression();

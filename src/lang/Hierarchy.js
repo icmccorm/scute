@@ -2,113 +2,285 @@
 import * as err from './Exceptions';
 import Interpreter from './InterpreterUtilities';
 
+export class Expression {
+   constructor (){
+
+   } 
+}
+
+export class Unary extends Expression {
+    constructor(op, right, scope){
+        this.operator = op;
+        this.right = right;
+        this.scope = scope;
+    }
+}
+
+export class UnaryExpr extends Unary {
+    constructor(op, a, scope){
+        super(op, a, scope);
+
+    }
+    eval(){
+        var initial = new Variable(this.right, null, this.scope);
+        var value;
+        switch (this.operator.text) {
+            case '--':
+                value = new Literal(initial.eval() - 1);
+
+            case '++':
+                value = new Literal(initial.eval() + 1);
+
+            case '!':
+                value = new Literal(!initial.eval());
+            default:
+                break;
+        }
+        this.scope.addVar(this.right, value);
+        return value.eval();
+    }
+}
+
+export class BinaryExpr extends Expression{
+    constructor(a, op, b){
+        this.left = a;
+        this.right = b;
+        this.operator = op;
+    }
+}
+
+export class Arithmetic extends BinaryExpression{
+    constructor(a, op, b){
+        super(a, op, b);
+    }
+    eval() {
+        switch (this.operator) {
+            case '+':
+                return this.left.eval() + this.right.eval();
+            case '-':
+                return this.left.eval() - this.right.eval();
+            case '*':
+                return this.left.eval() * this.right.eval();
+            case '/':
+                return this.left.eval() / this.right.eval();
+            case '%':
+                return this.left.eval() % this.right.eval();
+            case '^':
+                return Math.pow(this.left.eval(), this.right.eval());
+        }
+    }
+}
+
+export class Comparison extends BinaryExpression {
+    constructor(a, op, b){
+        super(a, op, b);
+    }
+    eval(){
+        switch (this.operator) {
+            case '==':
+                return this.left.eval() == this.right.eval();
+            case '!=':
+                return this.left.eval() != this.right.eval();
+            case '>':
+                return this.left.eval() > this.right.eval();
+            case '<':
+                return this.left.eval() < this.right.eval();
+            case '<=':
+                return this.left.eval() <= this.right.eval();
+            case '>=':
+                return this.left.eval() >= this.right.eval();
+        }
+    }
+}
+
+export class TrigExpression extends Unary{
+    constructor(op, a){
+        super(op, a);
+    }
+    eval() {
+        switch (this.operator.text) {
+            case 'sin':
+                return Math.sin(this.expr.eval());
+            case 'cos':
+                return Math.cos(this.expr.eval());
+            case 'tan':
+                return Math.tan(this.expr.eval());
+        }
+    }
+}
+export class Point extends Expression {
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+    }
+}
+
+export class RGBColor extends Expression {
+    constructor(r, g, b){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    eval() {
+        var val = "rgb(";
+        val += this.r.eval() + ",";
+        val += this.g.eval() + ",";
+        val += this.b.eval() + ")";
+        return val;
+    }
+}
+
+export class SVG extends Expression{
+    constructor () {
+
+    }
+}
+
+export class Literal extends Expression{
+    constructor (val) {
+        this.value = val;
+    }
+    eval () {
+        return this.value;
+    }
+}
+
+export class Variable extends Expression {
+    constructor(id, child, scope){
+        this.child = child;
+        this.id = id;
+        this.scope = scope;
+    }
+    eval () {
+        if(this.child){
+            return this.child.eval();
+        }else{
+            return this.scope.getVar(this.id);
+        }
+    }
+    update (input, eager) {
+        if(this.child){
+            this.child.update(input, eager);
+        }else{
+            if (!(input instanceof SVG)) {
+                value = (eager ? new Literal(input.eval()) : input);
+            }else{
+                if(eager) throw new RuntimeError(this.id.line, 'Eager assignment cannot be applied to shapes.');
+                value = input;
+            }
+
+            this.scope.addVar(this.id, value);
+        
+        }
+    }
+}
+
+export class Statement {
+    constructor() {
+
+    }
+}
+
+export class Assignment extends Statement {
+    constructor(id, op, expr){
+        this.id = id;
+        this.operator = op;
+        this.expr = expr;
+    }
+    eval () {
+        switch (this.operator.text) {
+            case '=':
+                this.id.update(this.expr, true);
+                break;
+            case '|=':
+                this.id.update(this.expr, false);
+                break;
+            case '+=':
+                this.id.update(new Literal(this.id.eval() + this.expr.eval()));
+                break;
+            case '-=':
+                this.id.update(new Literal(this.id.eval() - this.expr.eval()));
+                break;
+        }
+    }
+}
+
+
+export class PrintStatement extends Statement {
+    constructor (val) {
+        this.value = val;
+    }
+    eval () {
+        if (Array.isArray(this.value)) {
+            var s = this.value[0].eval() + "";
+            for (var i = 1; i < this.value.length; ++i) {
+                s += ", " + this.value[i].eval();
+            }
+            return s;
+    
+        } else {
+            return this.value.eval();
+        }
+    }
+}
+
+export class DrawStatement extends Statement {
+    constructor(shape){
+        this.shape = shape;
+    }
+
+    eval() {
+        this.shape.eval();
+    }
+}
+
+export class Collection {
+    constructor(statements){
+        this.statements = statements;
+    }
+    evalInner () {
+        for(let i = 0; i < this.statements.length; ++i){
+            this.statements[i].eval();
+        }
+    }
+}
+
+export class If extends Collection {
+    constructor(expr, statements) {
+        super(statements);
+        this.expr = expr
+    }
+    eval () {
+        if(this.expr.eval()){
+            this.evalInner();
+        }
+    }
+}
+
+export class For extends Collection {
+    constructor(args, statements){
+        super(statements);
+        this.declare = args[0];
+        this.compare = args[1];
+        this.increment = args[2];
+    }
+    eval () {
+        this.declare.eval();
+        while(this.compare.eval()){
+            this.evalInner();
+            this.increment.eval();
+        }
+    }
+}
+
+
+/*
 export function Item() {
     this.global = false;
 }
 Item.prototype.constructor = Item;
 Item.prototype.setGlobal = function (val) {
     this.global = val;
-}
-
-export function Statement() {}
-Statement.prototype = Object.create(Item.prototype);
-Statement.prototype.constructor = Statement;
-Statement.prototype.constructor = Statement;
-
-export function Grouping(statements) {
-    this.statements = statements;
-    Statement.call(this);
-}
-Grouping.prototype = Object.create(Statement.prototype);
-Grouping.prototype.constructor = Grouping;
-
-export function Assignment(id, op, expr) {
-    Statement.call(this);
-    this.id = id;
-    this.operator = op;
-    this.expr = expr;
-}
-Assignment.prototype = Object.create(Statement.prototype);
-Assignment.prototype.constructor = Assignment;
-Assignment.prototype.eval = function () {
-    switch (this.operator.text) {
-        case '=':
-            this.id.update(this.expr, true);
-            break;
-        case '|=':
-            this.id.update(this.expr, false);
-            break;
-        case '+=':
-            this.id.update(new Literal(this.id.eval() + this.expr.eval()));
-            break;
-        case '-=':
-            this.id.update(new Literal(this.id.eval() - this.expr.eval()));
-            break;
-    }
-
-}
-
-export function PrintStatement(value) {
-    Statement.call(this);
-    this.value = value;
-}
-PrintStatement.prototype = Object.create(Statement.prototype);
-PrintStatement.prototype.constructor = PrintStatement;
-PrintStatement.prototype.eval = function () {
-    if (Array.isArray(this.value)) {
-        var s = this.value[0].eval() + "";
-        for (var i = 1; i < this.value.length; ++i) {
-            s += ", " + this.value[i].eval();
-        }
-        Console.print(s);
-
-    } else {
-        Console.print(this.value.eval());
-    }
-}
-
-export function DrawStatement(shape) {
-    Statement.call(this);
-    this.shape = shape;
-}
-DrawStatement.prototype = Object.create(Statement.prototype);
-DrawStatement.prototype.constructor = DrawStatement;
-DrawStatement.prototype.eval = function () {
-    this.shape.eval();
-}
-
-export function If(expr, statements) {
-    Grouping.call(this, statements);
-    this.expr = expr;
-
-}
-If.prototype = Object.create(Grouping.prototype);
-If.prototype.constructor = If;
-If.prototype.eval = function () {
-    if (this.expr.eval() == true) {
-        for (var i = 0; i < this.statements.length; ++i) {
-            this.statements[i].eval();
-        }
-    }
-}
-
-export function For(args, statements) {
-    Grouping.call(this, statements);
-    this.declare = args[0];
-    this.compare = args[1];
-    this.increment = args[2];
-}
-For.prototype = Object.create(Grouping.prototype);
-For.prototype.constructor = For;
-For.prototype.eval = function () {
-    this.declare.eval();
-
-    while (this.compare.eval() == true) {
-        for (var i = 0; i < this.statements.length; ++i) {
-            this.statements[i].eval();
-        }
-        this.increment.eval();
-    }
 }
 
 export function TimeStep(start, end, statements, scope) {
@@ -129,6 +301,8 @@ export function TimeStep(start, end, statements, scope) {
     this.statements = statements;
     this.frames = [];
 }
+
+
 TimeStep.prototype = Object.create(Grouping.prototype);
 TimeStep.prototype.constructor = TimeStep;
 TimeStep.prototype.eval = function () {
@@ -272,197 +446,4 @@ Line.prototype.constructor = Line;
 Line.prototype.eval = function () {
     Interpreter.add('line', null, this.getAttributes());
 };
-
-export function Expr() {}
-Expr.prototype = Object.create(Item.prototype);
-Expr.prototype.constructor = Expr();
-Expr.prototype.eval = function () {};
-
-export function Literal(a) {
-    Expr.call(this);
-    this.val = a;
-}
-Literal.prototype = Object.create(Expr.prototype);
-Literal.prototype.constructor = Literal;
-Literal.prototype.eval = function () {
-    return this.val;
-};
-
-export function Variable(parent, child, scope) {
-    Expr.call(this);
-    this.child = child;
-    this.parent = parent;
-    this.scope = scope;
-}
-Variable.prototype = Object.create(Expr.prototype);
-Variable.prototype.constructor = Variable;
-Variable.prototype.eval = function () {
-    if (this.child != undefined) {
-        var contents = this.scope.getVar(this.parent);
-        if(contents instanceof Shape) contents = contents.attrs;
-
-        if (contents[this.child.text] != undefined) {
-            return contents[this.child.text].eval();
-
-        } else {
-            throw new err.RuntimeError(this.child.line, "Property \'" + this.child.text + "\' of variable \'" + this.parent.text + "\' is invalid.");
-        }
-    } else {
-        return this.evalParent();
-    }
-}
-Variable.prototype.evalParent = function () {
-    return this.scope.getVar(this.parent).eval();
-}
-Variable.prototype.update = function (input, eager) {
-    //'value' contains the new value to be assigned to the variable
-    var value;
-    var parentContents;
-
-    if (!(input instanceof Shape)) {
-        value = (eager ? new Literal(input.eval()) : input);
-    }else{
-        //eager and lazy assignment differentiation does not apply to shapes
-        //this is due to the presence and utility of the draw function.
-        value = input;
-    }
-
-    if(this.child != undefined){
-        parentContents = this.scope.getVar(this.parent);
-
-        if(parentContents instanceof Shape){
-            parentContents.attrs[this.child.text] = value;
-        }else{
-            parentContents[this.child.text] = value;
-        }
-
-        this.scope.addVar(this.parent, parentContents);
-
-    }else{
-        this.scope.addVar(this.parent, value);
-    }
-}
-
-export function Unary(op, a, scope) {
-    this.operator = op;
-    this.right = a;
-    this.scope = scope;
-    this.getValue = function () {
-
-        var initial = new Variable(this.right, null, this.scope);
-        switch (this.operator.text) {
-            case '--':
-                return new Literal(initial.eval() - 1);
-
-            case '++':
-                return new Literal(initial.eval() + 1);
-
-            case '!':
-                return new Literal(!initial.eval());
-        }
-    }
-}
-Unary.prototype.constructor = Unary;
-
-export function UnaryExpr(op, a, scope) {
-    Expr.call(this);
-    Unary.call(this, op, a, scope);
-}
-UnaryExpr.prototype = Object.create(Expr.prototype);
-UnaryExpr.prototype.constructor = UnaryExpr;
-UnaryExpr.prototype.eval = function () {
-    var value = this.getValue();
-    this.scope.addVar(this.right, value);
-    return value.eval();
-}
-
-export function BinaryExpr(a, op, b) {
-    Expr.call(this);
-    this.left = a;
-    this.operator = op;
-    this.right = b;
-
-}
-BinaryExpr.prototype = Object.create(Expr.prototype);
-BinaryExpr.prototype.constructor = BinaryExpr;
-BinaryExpr.prototype.eval = function () {
-    switch (this.operator) {
-        case '+':
-            return this.left.eval() + this.right.eval();
-        case '-':
-            return this.left.eval() - this.right.eval();
-        case '*':
-            return this.left.eval() * this.right.eval();
-        case '/':
-            return this.left.eval() / this.right.eval();
-        case '%':
-            return this.left.eval() % this.right.eval();
-        case '^':
-            return Math.pow(this.left.eval(), this.right.eval());
-    }
-}
-
-export function Comparison(a, op, b) {
-    BinaryExpr.call(this, a, op, b);
-}
-Comparison.prototype = Object.create(BinaryExpr.prototype);
-Comparison.prototype.constructor = Comparison;
-Comparison.prototype.eval = function () {
-    switch (this.operator) {
-        case '==':
-            return this.left.eval() == this.right.eval();
-        case '!=':
-            return this.left.eval() != this.right.eval();
-        case '>':
-            return this.left.eval() > this.right.eval();
-        case '<':
-            return this.left.eval() < this.right.eval();
-        case '<=':
-            return this.left.eval() <= this.right.eval();
-        case '>=':
-            return this.left.eval() >= this.right.eval();
-    }
-}
-
-export function TrigExpr(op, a) {
-    Expr.call(this);
-    this.operator = op;
-    this.expr = a;
-}
-TrigExpr.prototype = Object.create(Expr.prototype);
-TrigExpr.prototype.constructor = TrigExpr;
-TrigExpr.prototype.eval = function () {
-    switch (this.operator.text) {
-        case 'sin':
-            return Math.sin(this.expr.eval());
-        case 'cos':
-            return Math.cos(this.expr.eval());
-        case 'tan':
-            return Math.tan(this.expr.eval());
-    }
-}
-
-export function Point(x, y) {
-    Expr.call(this);
-    this.x = x;
-    this.y = y;
-}
-Point.prototype = Object.create(Expr.prototype);
-Point.prototype.constructor = Point;
-
-export function Color(r, g, b) {
-    Expr.call(this);
-    this.r = r;
-    this.g = g;
-    this.b = b;
-}
-
-Color.prototype = Object.create(Expr.prototype);
-Color.prototype.constructor = Color;
-Color.prototype.eval = function () {
-    var val = "rgb(";
-    val += this.r.eval() + ",";
-    val += this.g.eval() + ",";
-    val += this.b.eval() + ")";
-    return val;
-}
+*/
