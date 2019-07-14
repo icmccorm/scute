@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import '../css/Console.css';
+import './css/Log.css';
 
-class Console extends Component { 
+class Log extends Component { 
     
     constructor(props){
         super(props);
@@ -11,9 +11,9 @@ class Console extends Component {
     render () {
         return (
             <div className='console-wrapper'>
-                <textarea className='max dark' disabled>{text}</textarea>
+                <textarea className='max dark' disabled value={this.props.text}></textarea>
             </div>
         );
     }
 }
-export default Editor;
+export default Log;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import '../css/Navbar.css';
-import Button from './Button';
+import './css/Navbar.css';
+import Button from '../components/Button';
 import Interpreter from '../lang/Interpreter'
 
 class Navbar extends Component { 
@@ -14,15 +14,10 @@ class Navbar extends Component {
         return (
             <div className='navbar sky-b'>
                 <div className='nav nav-l'>
-                    <Button title='Run' click={this.compile}/>
-
+                    {this.props.children}
                 </div>   
             </div>
         );
-    }
-
-    compile () {
-        Interpreter.run();
     }
 }
 export default Navbar;

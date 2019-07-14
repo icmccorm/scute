@@ -46,3 +46,30 @@
         order: 2;
     }
 }
+
+.code-wrapper{
+    order: 1;
+    flex-grow:7;
+}
+
+/* Media Queries */
+@media (min-width: 576px) { 
+    .inner-flex{
+        flex-flow: row nowrap;
+    }
+}
+
+@media (min-width: 768px) {
+    .inner-flex {
+        flex-flow: column nowrap;
+    }
+}
+
+.frame {
+    position: relative;
+}
+
+.editor-wrapper{
+    order: 1;
+    flex-grow:7;
+}
