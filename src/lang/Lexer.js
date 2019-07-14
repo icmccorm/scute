@@ -1,4 +1,4 @@
-import * as err from './Exceptions';
+//import * as err from './defs/Exceptions';
 //start, current, line, indent, tokens, source
 
 function lex (doc) {
@@ -19,9 +19,6 @@ export default {
         return doc.tokens;
     }
 }
-
-
-
 var types = {
     STRING: 'STRING',
     INTEGER: 'INTEGER',
@@ -318,7 +315,7 @@ function string (char) {
     }
 
     if (!this.hasNext()) {
-        throw new err.LexingError(this.line, "Unterminated String.");
+        throw 1;//new err.LexingError(this.line, "Unterminated String.");
 
     } else {
 

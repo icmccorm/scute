@@ -1,6 +1,6 @@
 /*global Literal Map RuntimeError*/
 
-class Scope {
+export class Scope {
     constructor(superScope) {
         this.superScope = superScope;
         this.vars = new Map();
