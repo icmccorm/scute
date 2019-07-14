@@ -115,7 +115,7 @@ export class Point extends Expression {
     }
 }
 
-export class RGBColor extends Expression {
+export class Color extends Expression {
     constructor(r, g, b){
         this.r = r;
         this.g = g;
@@ -273,8 +273,6 @@ export class For extends Collection {
     }
 }
 
-
-/*
 export function Item() {
     this.global = false;
 }
@@ -446,4 +444,3 @@ Line.prototype.constructor = Line;
 Line.prototype.eval = function () {
     Interpreter.add('line', null, this.getAttributes());
 };
-*/

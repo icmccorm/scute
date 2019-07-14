@@ -1,4 +1,4 @@
-import * as lib from './Hierarchy.js';
+//import * as lib from './defs/HierarchyOld.js/index.js.js';
 import Parser from './Parser';
 
 class FrameCollection {
@@ -48,11 +48,11 @@ function sortAndExecute(){
                     //These are evaluated for each frame.
                     filtered.push(line);
 
-                    if (line instanceof lib.TimeStep) {
+                    /*if (line instanceof lib.TimeStep) {
                         if (line.end > this.end) {
                             this.end = line.end;
                         }
-                    }
+                    }*/
 
                 } else {
                     //Category two encompasses all statements that fall outside the two previous types.
@@ -87,6 +87,7 @@ class Frame {
     constructor(index){
         this.tags = [];
         this.index = index;
+        this.root = document.createElementNS('https://www.http://www.w3.org/2000/svg','g');
     }
     
     addTag(tag){
@@ -98,10 +99,9 @@ class Frame {
     }
 
     eval(){
-        var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         for(var i = 0; i<this.tags.length; ++i){
-            group.appendChild(this.tags[i]);
+            this.root.appendChild(this.tags[i]);
         }
-        return group;
+        return this.root;
     }
 }
