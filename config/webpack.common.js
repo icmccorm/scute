@@ -13,7 +13,8 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            title: 'Title'
+            title: 'Title',
+            template: './public/index.html'
         })
     ],
     stats: {
