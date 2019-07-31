@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import './css/Editor.css';
 
-class Editor extends Component { 
+class Editor extends React.Component<any, any> { 
     
-    constructor(props){
+    constructor(props: object){
         super(props);
         this.state = {}
     }
@@ -14,7 +14,7 @@ class Editor extends Component {
         );
     }
     
-    handleChange = (evt) => {
+    handleChange = (evt: any) => {
         this.setState({text: evt.target.value});
         this.props.handleChange(evt.target.value);
     }
