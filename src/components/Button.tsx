@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import './css/Button.css';
 
-class Button extends Component { 
-    constructor(props){
+class Button extends React.Component<any,any> { 
+
+
+    constructor(props: any){
         super(props);
-        this.state = {};
     }
 
     render (){
@@ -20,7 +21,7 @@ class Button extends Component {
     };
     handleClick = () => {
         console.log("clicked.");
-        this.onClick();
+        this.props.onClick();
     }
 }
 export default Button;

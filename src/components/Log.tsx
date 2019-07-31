@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import './css/Log.css';
 
-class Log extends Component { 
-    
-    constructor(props){
+interface Props {
+    text: string;
+}
+
+class Log extends React.Component<Props, any> { 
+
+    constructor(props: Props){
         super(props);
-        this.state = {};
     }
 
     render () {

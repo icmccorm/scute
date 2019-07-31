@@ -1,36 +1,32 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 
 import Navbar from './Navbar';
-
 import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
 
-import './css/AppContainer.css'
+import './css/AppContainer.css';
 
-export default class App extends Component { 
-    
-    constructor(props){
+type State = {log: string, output: string, code: string};
+
+export default class App extends React.Component<{}, State> { 
+    readonly state: State;
+
+    constructor(props: {}){
         super(props);
-
         this.state = {
-            code: "",
             log: "",
-            output: {
-                svg: "",
-                css: ""
-            }
-        };
-        
+            output: "",
+            code: ""
+        }
     }
 
-    updateCode = (value) => {
+    updateCode (value: string) {
         this.setState({code: value});
     }
-
-    appendToLog = (value) => {
-        this.setState({log: this.state.log += ("> " + value + "\n")});
+    appendToLog (value: string) {
+        this.setState({log: this.state.log + ("> " + value + "\n")});
     }
 
     runCode = () => {
@@ -62,4 +58,4 @@ export default class App extends Component {
             
         );
     }
-} 
+}  
