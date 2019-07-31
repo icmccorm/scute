@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths.js');
 
 module.exports = {
-    entry: "./src/index.js",
+    entry: "./src/index.tsx",
     output: {
         filename: '[name].[contentHash].js',
         path: paths.dist
@@ -29,8 +29,6 @@ module.exports = {
         cached: false,
         depth: false,
         modules: false,
-
-
     },
     optimization: {
         splitChunks: {
@@ -62,20 +60,13 @@ module.exports = {
                 use: ['style-loader', 'css-loader'],
             },
             {
-                test: /\.(jpg|gif|png|svg)$/,
-                include: paths.src,
-                use: ['file-loader']
-            },
-            {
                 test: /\.tsx?$/,
-                include: paths.src,
-                exclude: /node-modules/,
-                use: 'babel-loader',
-
+                exclude: [/node-modules/, /\.(js|jsx)$/],
+                use: 'ts-loader',
             }
         ],
     },
     resolve: {
-        extensions: ['*', '.js', '.ts', '.tsx', '.jsx']
+        extensions: ['.ts', '.tsx', '.js']
     }
 }

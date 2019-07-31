@@ -1,9 +1,13 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import './css/Canvas.css';
 
-class Canvas extends Component { 
-    
-    constructor(props){
+class Canvas extends React.Component<any, any> {
+    display: {
+        svg: string,
+        css: string
+    };
+
+    constructor(props: object){
         super(props);
         this.state = {};
     }

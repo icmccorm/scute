@@ -1,7 +1,7 @@
 /* global Literal BinaryExpr UnaryExpr ParsingError Point BoundStatement Rectangle Circle Ellipse Console For Comparison Assignment Variable TimeStep Color, Text, Polyline, Line, Polygon, PrintStatement, Scope*/
-import Scope from './Scope';
-import * as lib from './Hierarchy';
-import Lexer from './Lexer';
+import Scope from './Scope.js';
+import * as lib from './Hierarchy.js';
+import Lexer from './Lexer.js';
 
 export default function createAST(src) {
     var tokens = new TokenList(Lexer.tokenize(src));

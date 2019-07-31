@@ -1,13 +1,10 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import './css/Navbar.css';
-import Button from '../components/Button';
-import Interpreter from '../lang/Interpreter'
 
-class Navbar extends Component { 
+class Navbar extends React.Component<any, any> { 
     
-    constructor(props){
+    constructor(props: object){
         super(props);
-        this.state = {};
     }
 
     render () {
