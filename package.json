@@ -1,5 +1,5 @@
 {
-  "name": "ianco-react-app",
+  "name": "scalr",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config ./config/webpack.prod.js",
     "build-dev": "webpack --config ./config/webpack.dev.js",
-    "start": "webpack-dev-server --open --config ./config/webpack.dev.js --display minimal"
+    "start": "webpack-dev-server --open --config ./config/webpack.dev.js"
   },
   "author": "",
   "license": "ISC",

@@ -5,6 +5,7 @@ import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
+import {Tokenizer, Token} from '../lang/lexer/Lexer';
 
 import './css/AppContainer.css';
 
@@ -22,15 +23,26 @@ export default class App extends React.Component<{}, State> {
         }
     }
 
-    updateCode (value: string) {
+    updateCode = (value: string) => {
         this.setState({code: value});
     }
-    appendToLog (value: string) {
-        this.setState({log: this.state.log + ("> " + value + "\n")});
+    print = async (value: string) => {
+        await this.setState({log: this.state.log + ("> " + value + "\n")});
     }
 
-    runCode = () => {
-        //Interpreter.run(this.appendToLog);
+    clearLog = async () => {
+        await this.setState({log: ""});
+    }
+
+    runCode = async () => {
+        await this.clearLog();
+        await this.print("Lexing code...");
+        let lexer: Tokenizer = new Tokenizer(this.state.code);
+        const tokens: Token[] = lexer.scanTokens();
+
+        for(let token of tokens){
+            this.print(token.toString());
+        }
     }
     render () {
         return (     
@@ -42,7 +54,8 @@ export default class App extends React.Component<{}, State> {
                             <div id="code" className='editor-wrapper'>
                                 <Editor handleChange={this.updateCode}></Editor>
                             </div>
-                            <Log text={this.state.log}></Log>
+                            <Log value={this.state.log}>
+                            </Log>
                         </div>
                     </div>
                     <div className='view-wrapper darkgray-b'>

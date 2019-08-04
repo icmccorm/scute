@@ -29,6 +29,10 @@ module.exports = {
         cached: false,
         depth: false,
         modules: false,
+        builtAt: false,
+        version: false,
+        assets: false,
+
     },
     optimization: {
         splitChunks: {
