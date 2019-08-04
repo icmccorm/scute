@@ -1,5 +1,5 @@
 /* global GlobalScope Map Engine Console*/
-import * as err from './Exceptions.js';
+import * as err from '../old/Exceptions.js/index.js';
 import Interpreter from './InterpreterUtilities.js';
 
 export class Expression {

@@ -1,5 +1,5 @@
-import Lexer from './Lexer.js';
-import { Scope } from './defs/Scope.js';
+import Lexer from './old/Lexer.js/index.js';
+import { Scope } from './Scope.js/index.js';
 
 export default function createAST(src) {
     var tokens = new TokenList(Lexer.tokenize(src));

@@ -5,7 +5,7 @@ import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
-import {Tokenizer, Token} from '../lang/lexer/Lexer';
+import {Tokenizer, Token} from '../lang/Lexer';
 
 import './css/AppContainer.css';
 

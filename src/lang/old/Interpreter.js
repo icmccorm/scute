@@ -1,5 +1,5 @@
 //import * as lib from './defs/HierarchyOld.js/index.js.js';
-import Parser from './Parser.js';
+import Parser from './Parser.js/index.js';
 
 class FrameCollection {
     constructor(ast){

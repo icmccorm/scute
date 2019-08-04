@@ -1,6 +1,4 @@
-import {TokenType} from './TokenTypes';
-import { types } from 'util';
-import { timingSafeEqual } from 'crypto';
+import {TokenType} from './defs/TokenTypes';
 
 export class Tokenizer {
     source: string;
