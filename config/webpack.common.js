@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths.js');
 
 module.exports = {
-    entry: "./src/index.tsx",
+    entry: ["babel-polyfill", "./src/index.tsx"],
     output: {
         filename: '[name].[contentHash].js',
         path: paths.dist
