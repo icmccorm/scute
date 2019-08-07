@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths.js');
 
 module.exports = {
-    entry: ["babel-polyfill", "./src/index.tsx"],
+    entry: ["./src/index.tsx"],
     output: {
         filename: '[name].[contentHash].js',
         path: paths.dist
@@ -43,28 +43,6 @@ module.exports = {
         },
         runtimeChunk: 'single',
         moduleIds: 'hashed',
-
-    },
-
-    module: {
-        rules: [
-            {
-                test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                include: paths.src,
-                use: 'babel-loader'
-            },
-            {
-                test: /\.css$/,
-                include: paths.src,
-                use: ['style-loader', 'css-loader'],
-            },
-            {
-                test: /\.tsx?$/,
-                exclude: [/node-modules/, /\.(js|jsx)$/],
-                use: 'babel-loader',
-            }
-        ],
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
