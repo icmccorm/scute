@@ -48,6 +48,21 @@ module.exports = {
         runtimeChunk: 'single',
         moduleIds: 'hashed',
     },
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                include: paths.src,
+                use: ['style-loader', 'css-loader'],
+            },
+            {
+                test: /\.tsx?$/,
+                exclude: [/node-modules/, /\.(js|jsx)$/],
+                use: 'babel-loader',
+            }
+        ],
+    },
+
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
     }
