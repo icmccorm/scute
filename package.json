@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config ./config/webpack.prod.js",
-    "build-dev": "webpack --config ./config/webpack.dev.js",
-    "start": "webpack-dev-server --open --config ./config/webpack.dev.js --display minimal"
+    "build": "NODE_ENV=production webpack --config ./config/webpack.prod.js",
+    "build-dev": "NODE_ENV=development webpack --config ./config/webpack.dev.js",
+    "start": "NODE_ENV=development webpack-dev-server --open --config ./config/webpack.dev.js --display minimal"
   },
   "author": "",
   "license": "ISC",
@@ -28,7 +28,6 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "style-loader": "^0.23.1",
-    "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "webpack": "^4.39.1",
     "webpack-dev-server": "^3.7.2",
