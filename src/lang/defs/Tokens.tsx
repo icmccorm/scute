@@ -40,3 +40,15 @@ export class Indent extends Token {
         return superString.substr(0, superString.length - 1) + ', degree: ' + this.degree + '}';
     }
 }
+
+export class Var extends Token{
+    id: string;
+    constructor(line: number, id: string){
+        super(TokenType.ID, line);
+        this.id = id;
+    }
+    toString(): string {
+        const superString = super.toString();
+        return superString.substr(0, superString.length - 1) + ', id: ' + this.id + '}';
+    }
+}

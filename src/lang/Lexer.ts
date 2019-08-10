@@ -2,12 +2,11 @@ import {TokenType} from './defs/TokenTypes';
 import {Token, Literal, Indent} from './defs/Tokens';
 
 export class Tokenizer {
-    source: string;
-    start: number = 0;
-    current: number = 0;
-    line: number = 1;
-    indent: number = 0;
-    tokens: Token[];
+    private source: string;
+    private start: number = 0;
+    private current: number = 0;
+    private line: number = 1;
+    private indent: number = 0;
 
     constructor(src: string){
         this.source = src;
@@ -21,10 +20,9 @@ export class Tokenizer {
     }
 
     private next(amt: number = 1): string {
-        if(amt < 1 || this.hasNext(amt)){
-            this.current += amt;
-            return this.source.substring(this.current - amt, this.current + (amt - 1));
-        } 
+        if(amt < 1 || !this.hasNext(amt)) return null;
+        this.current += amt;
+        return this.source.substring(this.current - amt, this.current + (amt - 1));
     }
 
     private peek(amt: number = 1, singular: boolean = false): string {
