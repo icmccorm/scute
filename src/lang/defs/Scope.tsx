@@ -1,4 +1,4 @@
-import {Expr, BinaryExpr, UnaryExpr, FunctionExpr} from './Expressions';
+import {Expr, Binary, Unary} from './Expr';
 import {Var} from './Tokens';
 
 export class Scope {

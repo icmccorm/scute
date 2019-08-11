@@ -1,44 +1,62 @@
 import {Token, Literal, Indent} from './Tokens';
-
+import {Scope} from './Scope';
 /*the visitor interface allows for a more functional style of representing expressions
  *Inspired by https://craftinginterpreters.com/representing-code.html#implementing-syntax-trees
  */
 
 interface Visitor<T>{
-    visitLiteral(expr: Expr);
+    visitValue(expr: Expr);
     visitBinary(expr: Expr);
     visitUnary(expr: Expr);
-    visitFunction(expr:Expr);
 }
 
 export abstract class Expr {
+
     abstract accept<T>(visitor: Visitor<T>);
 }
 
-export class BinaryExpr extends Expr{
+export class Binary extends Expr{
     lvalue: Expr; 
     rvalue: Expr;
     op: Token;
+
+    constructor(lvalue: Expr, rvalue: Expr, op: Token){
+        super();
+        this.lvalue = lvalue;
+        this.rvalue = rvalue;
+        this.op = op;
+    }
 
     accept<T>(visitor: Visitor<T>){
         visitor.visitBinary(this);
     }
 }
 
-export class UnaryExpr extends Expr{
+export class Unary extends Expr{
     op: Token;
-    rvalue: Expr;
+    cvalue: Token;
+
+    constructor(cvalue: Token, op: Token){
+        super();
+        this.cvalue = cvalue;
+        this.op = op;
+    }
+
 
     accept<T>(visitor: Visitor<T>){
         visitor.visitUnary(this);
     }
 }
 
-export class FunctionExpr extends Expr{
-    func: Token;
-    param: Expr[];
+export class Value extends Expr{
+    value: Token;
+    
+    constructor(value: Token){
+        super();
+        this.value = value;
+    }
 
     accept<T>(visitor: Visitor<T>){
-        visitor.visitFunction(this);
+        visitor.visitValue(this);
     }
 }

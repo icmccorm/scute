@@ -45,8 +45,8 @@ export class Tokenizer {
         return this.source.substring(this.current - (1 + amt), this.current);
     }
 
-    private getSelected(): string{
-        return this.source.substring(this.start, this.current);
+    private getSelected(startOffset: number = 0, endOffset: number = 0): string{
+        return this.source.substring(this.start + startOffset, this.current + endOffset);
     }
 
     scanTokens(): Token[]{
@@ -58,10 +58,11 @@ export class Tokenizer {
                         case TokenType.REAL:
                         case TokenType.INTEGER:
                         case TokenType.BOOLEAN:
-                        case TokenType.STRING:
                         case TokenType.ID:
                             tokens.push(new Literal(result, this.line, this.getSelected()));
                             break;
+                        case TokenType.STRING:
+                            tokens.push(new Literal(result, this.line, this.getSelected(0, -1)));
                         case TokenType.INDENT:
                             tokens.push(new Indent(this.line, this.indent));
                             break;
@@ -74,7 +75,9 @@ export class Tokenizer {
             }catch(e){
                 throw e;
             }
+
         }
+        tokens.push(new Token(TokenType.EOF, this.line));
         return tokens;
     }
 
@@ -88,7 +91,7 @@ export class Tokenizer {
             case ':':
                 return TokenType.COLON;
             case '(':
-                return TokenType.L_BRACK;
+                return TokenType.L_PAREN;
             case ')':
                 return TokenType.R_PAREN;
             case '[':
@@ -236,7 +239,7 @@ export class Tokenizer {
             default:
                 //If the character is a number [0-9], process it as a potential integer or real number using the number() function.
                 if (isDigit(c)) {
-                    this.start = this.current;
+                    this.start = this.current-1;
                     return this.lexNumber();
                     //If the character is alphabetical, process it as a potential keyword or identifier.
                 } else if (isAlpha(c)) {
@@ -281,6 +284,8 @@ export class Tokenizer {
                 return TokenType.TAU;
             case 'e':
                 return TokenType.E;
+            case 'let':
+                return TokenType.LET;
             default:
                 return TokenType.ID;
         }

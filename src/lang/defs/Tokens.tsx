@@ -2,6 +2,7 @@ import {TokenType} from './TokenTypes';
 
 
 export class Token {
+    typeName: string;
     type: TokenType;
     line: number;
     toString () {
@@ -11,6 +12,7 @@ export class Token {
     constructor(type: TokenType, line: number){
         this.type = type;
         this.line = line;
+        this.typeName = TokenType[type];
     }
 }
 
