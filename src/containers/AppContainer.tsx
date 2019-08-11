@@ -5,8 +5,7 @@ import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
-import {Tokenizer, Token} from '../lang/Lexer';
-
+import {Parser} from '../lang/Parser';
 import './css/AppContainer.css';
 
 type State = {log: string, output: string, code: string};
@@ -36,13 +35,9 @@ export default class App extends React.Component<{}, State> {
 
     runCode = async () => {
         await this.clearLog();
-        await this.print("Lexing code...");
-        let lexer: Tokenizer = new Tokenizer(this.state.code);
-        const tokens: Token[] = lexer.scanTokens();
-
-        for(let token of tokens){
-            this.print(token.toString());
-        }
+        await this.print("Parsing code...");
+        let parser: Parser = new Parser(this.state.code);
+        console.log(parser.createAST());
     }
     render () {
         return (     
