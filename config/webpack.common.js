@@ -50,6 +50,7 @@ module.exports = {
     },
     module: {
         rules: [
+            
             {
                 test: /\.css$/,
                 include: paths.src,
@@ -59,6 +60,10 @@ module.exports = {
                 test: /\.tsx?$/,
                 exclude: [/node-modules/, /\.(js|jsx)$/],
                 use: 'babel-loader',
+            },
+            {
+                test: /\.worker\.ts$/,
+                use: ['babel-loader']
             }
         ],
     },
