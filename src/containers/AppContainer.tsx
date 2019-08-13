@@ -5,7 +5,8 @@ import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
-import {Parser} from '../lang/Parser';
+import Interpreter from 'worker-loader!../workers/Interpreter.worker';
+
 import './css/AppContainer.css';
 
 type State = {log: string, output: string, code: string};
@@ -35,12 +36,16 @@ export default class App extends React.Component<{}, State> {
 
     runCode = async () => {
         await this.clearLog();
-        await this.print("Parsing code...");
-        let parser: Parser = new Parser(this.state.code);
-        console.log(parser.createAST());
+        await this.print("Executing...");
+        let interp = new Interpreter();
+        interp.postMessage([this.state.code]);
+        interp.onmessage = async (e) =>{
+            await this.print(e.data[0]);
+        }
     }
+    
     render () {
-        return (     
+        return (    
             
             <div className= 'root'>
                 <div className='flex outer outer-flex'>

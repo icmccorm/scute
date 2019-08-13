@@ -1,5 +1,5 @@
 import {TokenType} from './defs/TokenTypes';
-import {Token, Literal, Indent} from './defs/Tokens';
+import {Token, Literal, Indent, VarToken} from './defs/Tokens';
 
 export class Tokenizer {
     private source: string;
@@ -55,16 +55,23 @@ export class Tokenizer {
             try{
                 const result = this.scanToken();
                     switch(result){
-                        case TokenType.REAL:
-                        case TokenType.INTEGER:
                         case TokenType.BOOLEAN:
-                        case TokenType.ID:
                             tokens.push(new Literal(result, this.line, this.getSelected()));
+                            break;
+                        case TokenType.ID:
+                            tokens.push(new VarToken(this.line, this.getSelected()));
                             break;
                         case TokenType.STRING:
                             tokens.push(new Literal(result, this.line, this.getSelected(0, -1)));
+                            break;
                         case TokenType.INDENT:
                             tokens.push(new Indent(this.line, this.indent));
+                            break;
+                        case TokenType.INTEGER:
+                            tokens.push(new Literal(result, this.line, parseInt(this.getSelected())));
+                            break;
+                        case TokenType.REAL:
+                            tokens.push(new Literal(result, this.line, parseFloat(this.getSelected())));
                             break;
                         default:
                             tokens.push(new Token(result, this.line));

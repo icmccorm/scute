@@ -4,10 +4,10 @@ import {Scope} from './Scope';
  *Inspired by https://craftinginterpreters.com/representing-code.html#implementing-syntax-trees
  */
 
-interface Visitor<T>{
-    visitValue(expr: Expr);
-    visitBinary(expr: Expr);
-    visitUnary(expr: Expr);
+export interface Visitor<T>{
+    visitValue(expr: Value);
+    visitBinary(expr: Binary);
+    visitUnary(expr: Unary);
 }
 
 export abstract class Expr {
@@ -49,11 +49,11 @@ export class Unary extends Expr{
 }
 
 export class Value extends Expr{
-    value: Token;
+    valueToken: Token;
     
     constructor(value: Token){
         super();
-        this.value = value;
+        this.valueToken = value;
     }
 
     accept<T>(visitor: Visitor<T>){

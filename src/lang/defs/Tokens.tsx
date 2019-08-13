@@ -5,6 +5,7 @@ export class Token {
     typeName: string;
     type: TokenType;
     line: number;
+    value: string | number;
     toString () {
         return "{ type: " + TokenType[this.type] + ", line: " + this.line + "}";
     }
@@ -17,7 +18,7 @@ export class Token {
 }
 
 export class Literal extends Token {
-    value: any;
+    value: string | number;
 
     constructor(type: TokenType, line: number, value: any){
         super(type, line);
@@ -43,7 +44,7 @@ export class Indent extends Token {
     }
 }
 
-export class Var extends Token{
+export class VarToken extends Token{
     id: string;
     constructor(line: number, id: string){
         super(TokenType.ID, line);

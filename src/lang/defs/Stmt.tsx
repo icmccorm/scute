@@ -1,9 +1,9 @@
 import * as Expr from './Expr';
-import {Token, Indent} from './Tokens';
+import {Token, Indent, VarToken} from './Tokens';
 
-interface Visitor<T>{
-    visitPrint(stmt: Stmt);
-    visitAssign(stmt: Stmt);
+export interface Visitor<T>{
+    visitPrint(stmt: Print);
+    visitAssign(stmt: Assign);
 }
 
 export abstract class Stmt{

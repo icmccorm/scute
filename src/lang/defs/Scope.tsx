@@ -1,53 +1,27 @@
-import {Expr, Binary, Unary} from './Expr';
-import {Var} from './Tokens';
+import * as Expr from './Expr';
+import {VarToken} from './Tokens';
 
-export class Scope {
-    superScope: Scope;
-    vars: Map<string, Expr>
+export class Environment {
+    enclosing: Environment;
+    vars: Map<string, string | number | Expr.Value>
 
-    constructor(superScope) {
-        this.superScope = superScope;
+    constructor(enclosing) {
+        this.enclosing = enclosing;
         this.vars = new Map();
     }
 
-    addVar (name: string, value: Expr) {
+    set (name: string, value: string | number | Expr.Value) {
         this.vars.set(name, value);
     }
 
-    getVar (varToken: Var): Expr {
-        const name = varToken.id;
-        const test = this.vars.get(name);
-        if (test) {
+    get(varName: string): string | number | Expr.Value{
+        const test = this.vars.get(varName);
+        if(test){
             return test;
-        } else {
-            
-            let holder = this.superScope;
-            
-            while(holder != null){
-                
-                let test = holder.vars.get(name);
-                
-                if(test != undefined){
-                    return test;
-                
-                }else{
-                    holder = holder.superScope;
-                }    
-            }
-            
-            throw varToken.line + ":\'" + name + "\' is undefined or out of scope.";
-        
+        }else if(this.enclosing){
+            return this.enclosing.get(varName);
+        }else{
+            throw 1;
         }
-    }
-
-    checkVar (varToken: Var): boolean {
-        try{
-            this.getVar(varToken);
-        
-        }catch(e){
-            return false;
-        }
-        
-        return true;
     }
 }

@@ -1,5 +1,5 @@
 import {Tokenizer} from './Lexer';
-import {Token, Indent, Literal} from './defs/Tokens';
+import {Token, Indent, VarToken} from './defs/Tokens';
 import {TokenType} from './defs/TokenTypes';
 
 import * as Expr from './defs/Expr';
