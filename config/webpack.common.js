@@ -47,6 +47,11 @@ module.exports = {
     module: {
         rules: [
             {
+                type: "javascript/auto",
+                resolve: {}
+            },
+            
+            {
                 test: /\.css$/,
                 include: paths.src,
                 use: ['style-loader', 'css-loader'],
@@ -55,6 +60,11 @@ module.exports = {
                 test: /\.tsx?$/,
                 exclude: [/node-modules/, /\.(js|jsx)$/],
                 use: 'babel-loader',
+            },
+            {
+                test: /\.wasm?$/,
+                exclude: [/node-modules/],
+                use: 'file-loader'
             }
         ],
     },
