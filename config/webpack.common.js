@@ -50,7 +50,6 @@ module.exports = {
                 type: "javascript/auto",
                 resolve: {}
             },
-            
             {
                 test: /\.css$/,
                 include: paths.src,
@@ -58,14 +57,20 @@ module.exports = {
             },
             {
                 test: /\.tsx?$/,
-                exclude: [/node-modules/, /\.(js|jsx)$/],
+                exclude: [/node_modules/, /\.(js|jsx)$/],
                 use: 'babel-loader',
             },
             {
                 test: /\.wasm?$/,
-                exclude: [/node-modules/],
+                exclude: [/node_modules/],
                 use: 'file-loader'
+            },
+            {
+                test: /\.worker.ts?$/,
+                exclude: [/node_modules/],
+                use: 'babel-loader'
             }
+
         ],
     },
 
