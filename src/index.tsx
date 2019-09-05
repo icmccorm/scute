@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import AppContainer from './containers/AppContainer';
 import './Global.css';
-import ScuteWorker from 'worker-loader!./wasm/scute.worker';
+import ScuteWorker from 'worker-loader!./scute.worker';
 
 const worker = new ScuteWorker();
 

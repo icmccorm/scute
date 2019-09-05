@@ -1,4 +1,4 @@
-import InterpreterModule from '../wasm/scute';
+import InterpreterModule from './lang/scute';
 
 InterpreterModule().then(() => {
 	send('ready');
