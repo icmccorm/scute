@@ -52,19 +52,25 @@ module.exports = {
         rules: [
             
             {
+                type: "javascript/auto",
+                resolve: {}
+            },
+            {
                 test: /\.css$/,
                 include: paths.src,
                 use: ['style-loader', 'css-loader'],
             },
             {
                 test: /\.tsx?$/,
-                exclude: [/node-modules/, /\.(js|jsx)$/],
+                exclude: [/node_modules/, /\.(js|jsx)$/],
                 use: 'babel-loader',
             },
             {
-                test: /\.worker\.ts$/,
-                use: ['babel-loader']
-            }
+                test: /\.wasm?$/,
+                exclude: [/node_modules/],
+                use: 'file-loader'
+            },
+
         ],
     },
 
