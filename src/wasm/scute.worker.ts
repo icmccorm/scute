@@ -1,10 +1,10 @@
-import WebWorker from 'worker-loader!*';
-import InterpreterModule from './scute.js';
+import InterpreterModule from '../wasm/scute';
 
-const ScuteWorker: WebWorker = self as any;
-
-InterpreterModule().then(event => {
-	ScuteWorker.dispatchEvent(new Event("interp"));
+InterpreterModule().then(() => {
+	send('ready');
 })
 
-export default ScuteWorker;
+function send(s: string) {
+	self.postMessage(s, null, null);
+}
+

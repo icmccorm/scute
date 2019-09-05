@@ -26,15 +26,7 @@ function(InterpreterModule) {
 var Module = typeof InterpreterModule !== 'undefined' ? InterpreterModule : {};
 
 // --pre-jses are emitted after the Module integration code, so that they can
-// refer to Module (if they choose; they can also define Module)
-window.InterpreterModule = {
-	onRuntimeInitialized : function() {
-		console.log("Emscripten Ready!");
-		document.dispatchEvent(new Event('emready'));
-	}
-}
-
-
+// refer to Module (if they choose; they can also define Module
 // Sometimes an existing Module object exists with properties
 // meant to overwrite the default module functionality. Here
 // we collect those properties and reapply _after_ we configure
@@ -57,8 +49,8 @@ var quit_ = function(status, toThrow) {
 // Determine the runtime environment we are in. You can customize this by
 // setting the ENVIRONMENT setting at compile time (see settings.js).
 
-var ENVIRONMENT_IS_WEB = true;
-var ENVIRONMENT_IS_WORKER = false;
+var ENVIRONMENT_IS_WEB = false;
+var ENVIRONMENT_IS_WORKER = true;
 var ENVIRONMENT_IS_NODE = false;
 var ENVIRONMENT_HAS_NODE = ENVIRONMENT_IS_NODE;
 var ENVIRONMENT_IS_SHELL = false;

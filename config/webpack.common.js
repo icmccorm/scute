@@ -65,11 +65,6 @@ module.exports = {
                 exclude: [/node_modules/],
                 use: 'file-loader'
             },
-            {
-                test: /\.worker.ts?$/,
-                exclude: [/node_modules/],
-                use: 'babel-loader'
-            }
 
         ],
     },
