@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV=production webpack --config ./config/webpack.prod.js",
-    "build-dev": "NODE_ENV=development webpack --config ./config/webpack.dev.js",
+    "build": "npm run scute ; NODE_ENV=production webpack --config ./config/webpack.prod.js",
+    "build-dev": "npm run scute ; NODE_ENV=development webpack --config ./config/webpack.dev.js",
     "dev": "NODE_ENV=development webpack-dev-server --open --config ./config/webpack.dev.js --display minimal",
     "start": "npm run scute --quiet ; npm run dev --quiet",
-    "scute": "make -C ./src/lang emcc"
+    "scute": "make -C ./src/lang emcc",
+    "deploy": "npm run build ; gh-pages -d dist"
   },
+
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -27,6 +29,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.2.0",
     "file-loader": "^4.2.0",
+    "gh-pages": "^2.1.1",
     "html-webpack-plugin": "^3.2.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
