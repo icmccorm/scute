@@ -1,2 +1,2 @@
-# scalr
-An SVG scripting language created with React and ES6+ JavaScript
+# Scute
+The ReactJS web editor for Scute, an SVG scripting language coded in C and compiled to WebAssembly.
