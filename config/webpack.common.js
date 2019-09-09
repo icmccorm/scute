@@ -29,6 +29,10 @@ module.exports = {
         cached: false,
         depth: false,
         modules: false,
+        builtAt: false,
+        version: false,
+        assets: false,
+
     },
     optimization: {
         splitChunks: {
@@ -46,6 +50,11 @@ module.exports = {
     },
     module: {
         rules: [
+            
+            {
+                type: "javascript/auto",
+                resolve: {}
+            },
             {
                 test: /\.css$/,
                 include: paths.src,
@@ -53,9 +62,15 @@ module.exports = {
             },
             {
                 test: /\.tsx?$/,
-                exclude: [/node-modules/, /\.(js|jsx)$/],
+                exclude: [/node_modules/, /\.(js|jsx)$/],
                 use: 'babel-loader',
-            }
+            },
+            {
+                test: /\.wasm?$/,
+                exclude: [/node_modules/],
+                use: 'file-loader'
+            },
+
         ],
     },
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import './css/Log.css';
 
 interface Props {
-    text: string;
+    value: string;
 }
 
 class Log extends React.Component<Props, any> { 
@@ -14,7 +14,8 @@ class Log extends React.Component<Props, any> {
     render () {
         return (
             <div className='console-wrapper'>
-                <textarea className='max dark' disabled value={this.props.text}></textarea>
+                <textarea className='max dark' disabled value={this.props.value}>
+                </textarea>
             </div>
         );
     }

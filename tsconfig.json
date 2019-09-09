@@ -3,15 +3,15 @@
       "outDir": "./dist/",
       "sourceMap": true,
       "noImplicitAny": false,
-      "module": "es6",
+      "module": "esnext",
       "moduleResolution": "node",
       "target": "esnext",
       "jsx": "react",
       "allowJs": true,
       "baseUrl": ".",
-      "types": [
-        "react",
-      ],
-      
+      "typeRoots": [
+        "node_modules/@types",
+        "typings"
+      ]
     }
   }

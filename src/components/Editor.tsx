@@ -10,14 +10,22 @@ class Editor extends React.Component<any, any> {
 
     render = () => {
         return (
-            <textarea className='max dark' value={this.state.value} onChange={this.handleChange}/>
+            <textarea className='max dark' value={this.state.value} onChange={this.handleChange} onKeyDown={this.handleSpecialCharacters}/>
         );
     }
     
     handleChange = (evt: any) => {
-        this.setState({text: evt.target.value});
+        this.setState({value: evt.target.value});
         this.props.handleChange(evt.target.value);
     }
     
+    handleSpecialCharacters = (evt: any) => {
+        switch(evt.keyCode){
+            case 9: //tab
+                evt.preventDefault();
+                this.setState({value: this.state.value ? (this.state.value + '\t') : '\t'})
+                break;
+        }
+    }
 }
 export default Editor;
