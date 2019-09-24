@@ -6,8 +6,16 @@ import Button from '../components/Button';
 import Canvas from '../components/Canvas';
 import './css/AppContainer.css';
 
+enum Commands {
+    OUT = 1,
+    DEBUG = 2,
+    ERROR = 3
+}
+
 type State = {log: string, output: string, code: string};
 type Props = {worker: Worker};
+type CommandData = {code: number, payload: string}
+
 export default class App extends React.Component<{}, State> { 
     readonly state: State;
     readonly props: Props;
@@ -20,9 +28,18 @@ export default class App extends React.Component<{}, State> {
         }
     }
 
+
     componentDidMount(){
         this.props.worker.onmessage = async (event) => {
-            await this.print(event.data);
+            let command: CommandData = event.data;
+            switch(command.code){
+                case Commands.OUT:
+                    await this.print(command.payload);
+                    break;
+                case Commands.ERROR:
+                    await this.print(command.payload);
+                    break;
+            }
         }
     }
 

@@ -1,3 +1,3 @@
-[submodule "src/lang"]
-	path = src/lang
+[submodule "src/lang-c"]
+	path = src/lang-c
 	url = https://github.com/ian-colcanon/scute.c.git
