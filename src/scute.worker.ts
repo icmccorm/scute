@@ -1,4 +1,4 @@
-import InterpreterModule from './lang-c/scute';
+import InterpreterModule from './lang-c/scute.js';
 
 InterpreterModule().then((em_module) => {
 	send('ready');

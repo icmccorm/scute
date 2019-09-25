@@ -50,7 +50,6 @@ module.exports = {
     },
     module: {
         rules: [
-            
             {
                 type: "javascript/auto",
                 resolve: {}
@@ -70,7 +69,6 @@ module.exports = {
                 exclude: [/node_modules/],
                 use: 'file-loader'
             },
-
         ],
     },
 

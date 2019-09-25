@@ -6,7 +6,7 @@ import Button from '../components/Button';
 import Canvas from '../components/Canvas';
 import './css/AppContainer.css';
 
-enum Commands {
+enum Commands { 
     OUT = 1,
     DEBUG = 2,
     ERROR = 3
@@ -21,7 +21,7 @@ export default class App extends React.Component<{}, State> {
     readonly props: Props;
     constructor(props: {}){
         super(props);
-        this.state = {
+        this.state = { 
             log: "",
             output: "",
             code: "",
@@ -31,6 +31,7 @@ export default class App extends React.Component<{}, State> {
 
     componentDidMount(){
         this.props.worker.onmessage = async (event) => {
+
             let command: CommandData = event.data;
             switch(command.code){
                 case Commands.OUT:
@@ -38,6 +39,8 @@ export default class App extends React.Component<{}, State> {
                     break;
                 case Commands.ERROR:
                     await this.print(command.payload);
+                    break;
+                default:
                     break;
             }
         }
