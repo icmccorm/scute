@@ -4,17 +4,19 @@ import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
+import {Tag} from '../components/shapes/Shape';
 import './css/AppContainer.css';
 
 enum Commands { 
     OUT = 1,
-    DEBUG = 2,
-    ERROR = 3
+    DEBUG,
+    ERROR,
+    RESULT
 }
 
-type State = {log: string, output: string, code: string};
+type State = {log: string, output: string, code: string, shapes: Tag[]};
 type Props = {worker: Worker};
-type CommandData = {code: number, payload: string}
+type CommandData = {code: number, payload: any}
 
 export default class App extends React.Component<{}, State> { 
     readonly state: State;
@@ -25,6 +27,7 @@ export default class App extends React.Component<{}, State> {
             log: "",
             output: "",
             code: "",
+            shapes: []
         }
     }
 
@@ -40,6 +43,9 @@ export default class App extends React.Component<{}, State> {
                 case Commands.ERROR:
                     await this.print(command.payload);
                     break;
+                case Commands.RESULT:
+                    this.setState({shapes: this.state.shapes.concat([command.payload])})
+                    break;
                 default:
                     break;
             }
@@ -51,7 +57,7 @@ export default class App extends React.Component<{}, State> {
     }
     
     print (value: string) {
-        this.setState({log: this.state.log + ("> " + value + "\n")});
+        this.setState({log: this.state.log + (value)});
     }
 
     runCode = async () => {
@@ -77,7 +83,7 @@ export default class App extends React.Component<{}, State> {
                             <Navbar>
                                 <Button onClick={this.runCode}>Run</Button>
                             </Navbar>
-                            <Canvas display={this.state.output}/>
+                            <Canvas tags={this.state.shapes}/>
                         </div>
                     </div>
                 </div>

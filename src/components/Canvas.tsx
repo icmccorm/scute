@@ -1,58 +1,41 @@
 import * as React from 'react';
 import './css/Canvas.css';
-import Shape from './Shape';
+import {Shape, Tag} from './shapes/Shape';
 
-
-type State = {tags: Tag[]}
-class Canvas extends React.Component<any, any> {
-    readonly state: State;
+type Props = {tags: Tag[]}
+class Canvas extends React.Component<Props, any> {
     updates: Map<number, Function>;
-    constructor(props: object){
+    static defaultProps = {
+        tags: []
+    }
+    constructor(props: Props){
         super(props);
         this.updates = new Map<number, Function>();
-        this.state = {tags: []}
-
     }
+
     update(id:number, tagName:string){
         let updateFunction = this.updates.get(id);
         if(updateFunction){
             updateFunction(null);
         }else{
-            this.setState({tags: this.state.tags.concat(new Tag(tagName, id))});
         }
     }
 
     componentDidMount(){
-        this.update(1, "rect");
 
     }
     render () {
         return (
                 <div className= 'canvas shadow'>
                     <svg id='canvas'>
-                        {this.state.tags.map((item) => {
-                            return <Shape 
-                                        key={item.id}
-                                        tagName={item.tagName}
-                                        id={item.id}
-                                        funcMap={this.updates}
-                                        attrs={[]}
-                                    />
+                        {this.props.tags.map((item) => {
+                            return <Shape key={item.id} funcMap={this.updates} tag={item}/>
                         })}
                     </svg>
                 </div>
         );
     }
 }
-
-class Tag{
-    tagName: string;
-    id: number;
-    constructor(tagName, id){
-        this.tagName = tagName;
-        this.id = id;
-    }
-}
-
+ 
 export default Canvas;
 
