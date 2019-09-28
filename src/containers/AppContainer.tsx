@@ -61,7 +61,8 @@ export default class App extends React.Component<{}, State> {
     }
 
     runCode = async () => {
-        await this.setState({log: ""})
+        this.setState({shapes: []});
+        await this.setState({log: ""});
         this.props.worker.postMessage(this.state.code);
     }
     

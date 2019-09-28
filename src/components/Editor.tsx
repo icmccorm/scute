@@ -10,7 +10,7 @@ class Editor extends React.Component<any, any> {
 
     render = () => {
         return (
-            <textarea className='max dark' value={this.state.value} onChange={this.handleChange} onKeyDown={this.handleSpecialCharacters}/>
+            <textarea spellCheck={false} className='max dark' value={this.state.value} onChange={this.handleChange} onKeyDown={this.handleSpecialCharacters}/>
         );
     }
     
