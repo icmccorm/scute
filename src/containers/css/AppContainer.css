@@ -68,8 +68,3 @@
 .frame {
     position: relative;
 }
-
-.editor-wrapper{
-    order: 1;
-    flex-grow:7;
-}

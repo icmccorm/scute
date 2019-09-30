@@ -43,6 +43,11 @@ textarea {
     padding: .5rem;
     resize: none;
 }
+
+*{
+    font: 11pt "Ubuntu Mono", monospace;
+}
+
 textarea.dark {
     color: white;
     background-color: hsl(210, 3%, 12%);

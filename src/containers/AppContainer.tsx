@@ -72,11 +72,8 @@ export default class App extends React.Component<{}, State> {
                 <div className='flex outer outer-flex'>
                     <div className='text-wrapper'>
                         <div className='flex inner-flex max'>
-                            <div id="code" className='editor-wrapper'>
-                                <Editor handleChange={this.updateCode}></Editor>
-                            </div>
-                            <Log value={this.state.log}>
-                            </Log>
+                            <Editor handleChange={this.updateCode}></Editor>
+                            <Log value={this.state.log}/>
                         </div>
                     </div>
                     <div className='view-wrapper darkgray-b'>

@@ -1,5 +1,5 @@
 
 .console-wrapper{
     order: 2;
-    flex-grow: 3;
+    flex-basis: 20%;
 }
