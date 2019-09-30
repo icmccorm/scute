@@ -1,11 +1,12 @@
 .editor-wrapper{
     order: 1;
 	flex-basis: 80%;
-	background-color: aqua;
 	display: flex;
 	flex-flow: ltr nowrap;
 	overflow-x: hidden;
 	overflow-y: auto;
+
+	background-color: hsl(210, 3%, 12%);
 }
 
 .lineNums{
@@ -21,7 +22,7 @@
 }
 
 .textPadding{
-	padding: 0.25rem;
+	padding: 0.5rem;
 	border: none;
 }
 

@@ -1,11 +1,11 @@
 .text-wrapper{
     order: 1;
-    flex-grow: 3;
+    flex-basis: 35%;
 }
 
 .view-wrapper {
     order: 2;
-    flex-grow: 6;
+    flex-basis: 65%;
 }
 
 .flex {
@@ -16,12 +16,6 @@
 .outer-flex {
     flex-flow: row nowrap;
 }
-.text-wrapper{
-    order: 1;
-}
-.view-wrapper{
-    order: 2;
-}
 
 @media (min-width: 0px) {
     .outer-flex{
@@ -29,6 +23,7 @@
     }
     .text-wrapper{
         order: 2;
+        overflow-y: auto;
     }
     .view-wrapper{
         order: 1;

@@ -16,6 +16,8 @@ html, body, #root, .root{
     margin: 0;
     padding: 0;
     overflow: hidden;
+    border: none;
+    outline: none;
 }
 
 
@@ -38,8 +40,7 @@ html, body, #root, .root{
 
 textarea {
     outline: none;
-    border-width: 2px;
-    border-color: #303132;
+    border: none;
     padding: .5rem;
     resize: none;
 }
