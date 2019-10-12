@@ -4,14 +4,10 @@ import AppContainer from './containers/AppContainer';
 import './Global.css';
 import ScuteWorker from 'worker-loader!./scute.worker';
 
-const worker = new ScuteWorker();
-
-worker.onmessage = event => {
-    ReactDOM.render(
-        <AppContainer worker={worker}/>,
-        document.getElementById('root')
-    );
-}
+ReactDOM.render(
+    <AppContainer/>,
+    document.getElementById('root')
+);
 
 //import * as serviceWorker from '../scalr/src/serviceWorker';
 // If you want your app to work offline and load faster, you can change

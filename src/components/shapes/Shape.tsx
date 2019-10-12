@@ -17,20 +17,13 @@ class sTag {
 
 export type Tag = sTag & object;
 
-export type Props = {funcMap: Map<number, Function>, tag: Tag}
+export type Props = {tag: Tag}
 
 export class Shape extends React.Component<any, any>{
 	readonly props: Props;
 
 	constructor(props){
 		super(props);
-	}
-
-	update (attrs: Tag){
-		this.setState({attrs: attrs});
-	}
-	componentDidMount(){
-		this.props.funcMap.set(this.props.tag.id, this.update);
 	}
 	render(){
 		return React.createElement(typeToTag(this.props.tag.tag), this.props.tag.attrs, null);

@@ -1,36 +1,43 @@
 import * as React from 'react';
 import './css/Canvas.css';
 import {Shape, Tag} from './shapes/Shape';
+import {EventClient, Events} from '../containers/EventClient';
 
-type Props = {tags: Tag[]}
-class Canvas extends React.Component<Props, any> {
-    updates: Map<number, Function>;
-    static defaultProps = {
-        tags: []
-    }
+type Props = {client: EventClient}
+type State = {frame: Tag}
+
+class Canvas extends React.Component<Props, State> {
+    timer: any;
+    state: State;
+    client: EventClient;
+
     constructor(props: Props){
         super(props);
-        this.updates = new Map<number, Function>();
+        this.state = {
+            frame: undefined
+        }
+
     }
 
-    update(id:number, tagName:string){
-        let updateFunction = this.updates.get(id);
-        if(updateFunction){
-            updateFunction(null);
-        }else{
-        }
+    play(){
+        this.timer = setTimeout(()=>{
+        }, 10);
+    }
+
+    pause(){
+        clearTimeout(this.timer);
     }
 
     componentDidMount(){
-
+        this.props.client.on(Events.REQ_COMPILE, this.pause);
+        this.props.client.on(Events.FIN_COMPILE, this.play);
     }
+
     render () {
         return (
                 <div className= 'canvas shadow'>
                     <svg id='canvas'>
-                        {this.props.tags.map((item) => {
-                            return <Shape key={item.id} funcMap={this.updates} tag={item}/>
-                        })}
+                        {this.state.frame ? <Shape key={this.state.frame.id} tag={this.state.frame}/> : ''}
                     </svg>
                 </div>
         );
