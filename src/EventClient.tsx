@@ -1,26 +1,21 @@
 import { EventEmitter } from "events";
-import ScuteWorker from 'worker-loader!../scute.worker';
+import ScuteWorker from 'worker-loader!./scute.worker';
+import {InputCommands, OutputCommands, CommandData} from './workers/WorkerCommands';
 
 export enum Events{
 	REQ_COMPILE = 1,
 	FIN_COMPILE,
 	PRINT_OUT,
 	PRINT_DEBUG,
-	PRINT_ERROR
+	PRINT_ERROR,
+	FRAME,
 }
-
-enum Commands { 
-    OUT = 1,
-    DEBUG,
-    ERROR,
-    RESULT
-}
-
-type CommandData = {code: number, payload: any}
 
 export class EventClient{
 	emitter: EventEmitter;
 	worker: ScuteWorker;
+	maxIndex: number;
+
 	constructor(){
 		this.emitter = new EventEmitter();
 		this.worker = new ScuteWorker();
@@ -30,26 +25,30 @@ export class EventClient{
 	handleWorkerCommands = async (event) => {
 		let command: CommandData = event.data;
 		switch(command.code){
-			case Commands.OUT:
+			case OutputCommands.OUT:
 				this.emit(Events.PRINT_OUT, command.payload);
 				break;
-			case Commands.ERROR:
+			case OutputCommands.ERROR:
 				this.emit(Events.PRINT_OUT, command.payload);
 				break;
-			case Commands.RESULT:
+			case OutputCommands.COMPILED:
+				this.maxIndex = command.payload;
 				this.emit(Events.FIN_COMPILE, command.payload);
 				break;
+			case OutputCommands.FRAME:
+				this.emit(Events.FRAME, command.payload);
 			default:
 				break;
 		}
 	}
 
 	async requestFrame(){
-		
+		this.worker.postMessage([InputCommands.RUN]);
 	}
 
 	async requestCompile(code: string){
-		this.worker.postMessage(code);
+		this.emit(Events.REQ_COMPILE, null, false);
+		this.worker.postMessage([InputCommands.COMPILE, code]);
 	}
 
 	on(eventName, listener){

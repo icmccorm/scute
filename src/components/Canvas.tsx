@@ -1,47 +1,62 @@
 import * as React from 'react';
 import './css/Canvas.css';
 import {Shape, Tag} from './shapes/Shape';
-import {EventClient, Events} from '../containers/EventClient';
+import {EventClient, Events} from '../EventClient';
 
 type Props = {client: EventClient}
-type State = {frame: Tag}
+type State = {frame: any}
 
-class Canvas extends React.Component<Props, State> {
-    timer: any;
-    state: State;
-    client: EventClient;
+class Canvas extends React.PureComponent<Props, State> {
+	timer: any;
+	state: State;
+	client: EventClient;
 
-    constructor(props: Props){
-        super(props);
-        this.state = {
-            frame: undefined
-        }
+	constructor(props: Props){
+		super(props);
+		this.state = {
+			frame: []
+		}
+	}
 
-    }
+	play(){
+		this.timer = setInterval(()=>{
+			this.props.client.requestFrame();
+		}, 500);
+	}
 
-    play(){
-        this.timer = setTimeout(()=>{
-        }, 10);
-    }
+	pause(){
+		clearInterval(this.timer);
+	}
 
-    pause(){
-        clearTimeout(this.timer);
-    }
+	componentDidMount(){
+		this.props.client.on(Events.REQ_COMPILE, () => {
+			this.pause();
+		});
 
-    componentDidMount(){
-        this.props.client.on(Events.REQ_COMPILE, this.pause);
-        this.props.client.on(Events.FIN_COMPILE, this.play);
-    }
+		this.props.client.on(Events.FIN_COMPILE, (data) => {
+			if(data > 1){
+				this.play();
+			}else{
+				this.props.client.requestFrame();
+			}
+		});
 
-    render () {
-        return (
-                <div className= 'canvas shadow'>
-                    <svg id='canvas'>
-                        {this.state.frame ? <Shape key={this.state.frame.id} tag={this.state.frame}/> : ''}
-                    </svg>
-                </div>
-        );
-    }
+		this.props.client.on(Events.FRAME, (data) => {
+			const tags = data ? data.map((item) => {
+				return <Shape key={item.id} defs={item}/>
+			}): null;
+			this.setState({frame: tags});
+		});
+	}
+	render () {
+		return (
+			<div className= 'canvas shadow'>
+				<svg id='canvas'>
+					{this.state.frame}
+				</svg>
+			</div>
+		);
+	}
 }
  
 export default Canvas;

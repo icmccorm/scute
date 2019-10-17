@@ -17,7 +17,7 @@ class sTag {
 
 export type Tag = sTag & object;
 
-export type Props = {tag: Tag}
+export type Props = {defs: any, key: number}
 
 export class Shape extends React.Component<any, any>{
 	readonly props: Props;
@@ -26,7 +26,7 @@ export class Shape extends React.Component<any, any>{
 		super(props);
 	}
 	render(){
-		return React.createElement(typeToTag(this.props.tag.tag), this.props.tag.attrs, null);
+		return React.createElement(typeToTag(this.props.defs.tag), this.props.defs.attrs, null);
 	}
 }
 
