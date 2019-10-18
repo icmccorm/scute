@@ -59,11 +59,12 @@ export default class App extends React.Component<{}, State> {
                             <Log value={this.state.log}/>
                         </div>
                     </div>
-                    <div className='view-wrapper darkgray-b'>
-                        <div className='frame max inset-shadow'>
-                            <Navbar>
-                                <Button onClick={this.runCode}>Run</Button>
-                            </Navbar>
+
+                    <div className='view-wrapper darkgray-b'> 
+                        <Navbar>
+                            <Button onClick={this.runCode}>Run</Button>
+                        </Navbar>
+                        <div className='view-flex min-max'>
                             <Canvas client={this.eventClient}/>
                         </div>
                     </div>

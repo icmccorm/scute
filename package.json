@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run scute ; NODE_ENV=production webpack --config ./config/webpack.prod.js",
-    "build-dev": "npm run scute ; NODE_ENV=development webpack --config ./config/webpack.dev.js",
     "dev": "NODE_ENV=development webpack-dev-server --open --config ./config/webpack.dev.js --display minimal",
     "start": "npm run scute --quiet ; npm run dev --quiet",
     "scute": "make -C ./src/lang-c emcc",

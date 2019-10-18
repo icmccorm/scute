@@ -4,8 +4,7 @@ import {Shape, Tag} from './shapes/Shape';
 import {EventClient, Events} from '../EventClient';
 
 type Props = {client: EventClient}
-type State = {frame: any}
-
+type State = {frame: any, width:number, height:number}
 class Canvas extends React.PureComponent<Props, State> {
 	timer: any;
 	state: State;
@@ -14,7 +13,9 @@ class Canvas extends React.PureComponent<Props, State> {
 	constructor(props: Props){
 		super(props);
 		this.state = {
-			frame: []
+			frame: [],
+			width: 500,
+			height: 500
 		}
 	}
 
@@ -50,11 +51,12 @@ class Canvas extends React.PureComponent<Props, State> {
 	}
 	render () {
 		return (
-			<div className= 'canvas shadow'>
-				<svg id='canvas'>
+				<svg className='canvas shadow' 
+					width={this.state.width} 
+					height={this.state.height}
+				>
 					{this.state.frame}
 				</svg>
-			</div>
 		);
 	}
 }

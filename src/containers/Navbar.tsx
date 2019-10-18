@@ -9,7 +9,7 @@ class Navbar extends React.Component<any, any> {
 
     render () {
         return (
-            <div className='navbar sky-b'>
+            <div className='navbar'>
                 <div className='nav nav-l'>
                     {this.props.children}
                 </div>   

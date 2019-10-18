@@ -6,11 +6,23 @@
 .view-wrapper {
     order: 2;
     flex-basis: 65%;
+    overflow: auto;
+}
+
+.view-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem;
 }
 
 .flex {
     display: flex;
     align-items: stretch;
+}
+
+.min-max {
+    min-height: 100%;
 }
 
 .outer-flex {
