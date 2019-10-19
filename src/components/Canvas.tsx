@@ -72,4 +72,3 @@ class Canvas extends React.PureComponent<Props, State> {
 }
  
 export default Canvas;
-
