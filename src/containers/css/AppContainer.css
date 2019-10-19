@@ -55,8 +55,8 @@
     .text-wrapper{
         order: 2;
         overflow-y: auto;
-        width: 100% !important;
         height: 35%;
+        min-width: 100% !important; 
     }
     .view-wrapper{
         order: 1;
@@ -72,8 +72,8 @@
     }
     .text-wrapper{
         order: 1;
-        width: 35% !important;
         height: 100%;
+        min-width: 25% !important;
     }
     .view-wrapper{
         order: 2;
