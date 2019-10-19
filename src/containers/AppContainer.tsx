@@ -1,20 +1,24 @@
 import * as React from 'react';
+
 import Navbar from './Navbar';
 import Log from '../components/Log';
 import Editor from '../components/Editor';
 import Button from '../components/Button';
 import Canvas from '../components/Canvas';
+import Dragger from '../components/Dragger';
 import {EventClient, Events} from '../EventClient';
+
 import './css/AppContainer.css';
 
 type State = {log: string, output: string, code: string};
 type Props = {};
-type CommandData = {code: number, payload: any}
 
-export default class App extends React.Component<{}, State> { 
+export default class App extends React.Component<Props, State> { 
     readonly state: State;
     readonly props: Props;
     eventClient: EventClient;
+    leftWrapper: any;
+    rightWrapper: any;
     
     constructor(props: {}){
         super(props);
@@ -24,6 +28,8 @@ export default class App extends React.Component<{}, State> {
             code: "",
         }
         this.eventClient = new EventClient();
+        this.leftWrapper = React.createRef();
+        this.rightWrapper = React.createRef();
     }
 
     updateCode = (value: string) => {
@@ -49,18 +55,27 @@ export default class App extends React.Component<{}, State> {
         })
     }
 
+    adjustLeft = (dx: number) => {
+        let lNode = this.leftWrapper.current;
+        let rNode = this.rightWrapper.current;
+        if(lNode && rNode){
+            lNode.style.width = dx + "px";
+            lNode.style.flexGrow = 0;
+        }
+    }
+
     render () {
         return (     
-            <div className= 'root'>
-                <div className='flex outer outer-flex'>
-                    <div className='text-wrapper'>
-                        <div className='flex inner-flex max'>
+            <div className='root flex outer-flex'>
+                    <div className='text-wrapper' ref={this.leftWrapper}>
+                        <div className='inner-text-wrapper flex inner-flex max'>
                             <Editor handleChange={this.updateCode}></Editor>
                             <Log value={this.state.log}/>
                         </div>
+                        <Dragger adjust={this.adjustLeft}/> 
                     </div>
 
-                    <div className='view-wrapper darkgray-b'> 
+                    <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
                         <Navbar>
                             <Button onClick={this.runCode}>Run</Button>
                         </Navbar>
@@ -68,7 +83,6 @@ export default class App extends React.Component<{}, State> {
                             <Canvas client={this.eventClient}/>
                         </div>
                     </div>
-                </div>
             </div>
         );
     }

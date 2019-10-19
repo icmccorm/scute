@@ -2,7 +2,6 @@
     box-sizing: border-box;
 }
 
-
 /* layouts */
 .flex {
     display: flex;
@@ -20,8 +19,6 @@ html, body, #root, .root{
     outline: none;
 }
 
-
-
 .max {
     width: 100%;
     height: 100%;
@@ -37,16 +34,16 @@ html, body, #root, .root{
 .shadow{
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .56);
 }
+.inset-shadow{
+    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .56) inset;
+}
+
 
 textarea {
     outline: none;
     border: none;
     padding: .5rem;
     resize: none;
-}
-
-*{
-    font: 11pt "Ubuntu Mono", monospace;
 }
 
 textarea.dark {
@@ -62,6 +59,7 @@ textarea.light {
 .black-b {
     background-color: #1e1e24;
 }
+
 .black-f {
     color: #1e1e24;
 }

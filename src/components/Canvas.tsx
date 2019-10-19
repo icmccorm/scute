@@ -4,7 +4,7 @@ import {Shape, Tag} from './shapes/Shape';
 import {EventClient, Events} from '../EventClient';
 
 type Props = {client: EventClient}
-type State = {frame: any, width:number, height:number}
+type State = {frame: any, width:number, height:number, originX: number, originY: number}
 class Canvas extends React.PureComponent<Props, State> {
 	timer: any;
 	state: State;
@@ -15,7 +15,9 @@ class Canvas extends React.PureComponent<Props, State> {
 		this.state = {
 			frame: [],
 			width: 500,
-			height: 500
+			height: 500,
+			originX: 0,
+			originY: 0
 		}
 	}
 
@@ -49,11 +51,19 @@ class Canvas extends React.PureComponent<Props, State> {
 			this.setState({frame: tags});
 		});
 	}
+
+	getViewBox(){
+		return [
+			this.state.originX,
+			this.state.originY, 
+			this.state.width, 
+			this.state.height
+		].join(" ");
+	}
+
 	render () {
 		return (
-				<svg className='canvas shadow' 
-					width={this.state.width} 
-					height={this.state.height}
+				<svg className='canvas shadow' viewBox={this.getViewBox()}
 				>
 					{this.state.frame}
 				</svg>
