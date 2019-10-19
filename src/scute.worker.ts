@@ -30,7 +30,7 @@ class ScuteWrapper {
 		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
 		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
 		
-		this.sendCommand(OutputCommands.FRAME, this.module._frames.shift());
+		this.sendCommand(OutputCommands.FRAME, this.module._currentFrame);
 		this.module._currentFrame = [];
 	}
 
@@ -42,7 +42,7 @@ class ScuteWrapper {
 	}
 	
 	sendCommand(cmd: OutputCommands, obj: any) {
-		let message: CommandData = {code: cmd, payload: obj};
+		let message = {code: cmd, payload: obj};
 		this.worker.postMessage(message, null, null);
 	}
 }

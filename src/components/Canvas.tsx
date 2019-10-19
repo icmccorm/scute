@@ -24,7 +24,7 @@ class Canvas extends React.PureComponent<Props, State> {
 	play(){
 		this.timer = setInterval(()=>{
 			this.props.client.requestFrame();
-		}, 500);
+		}, 10);
 	}
 
 	pause(){
@@ -63,7 +63,11 @@ class Canvas extends React.PureComponent<Props, State> {
 
 	render () {
 		return (
-				<svg className='canvas shadow' viewBox={this.getViewBox()}
+				<svg 
+					width={this.state.width} 
+					height={this.state.height} 
+					className='canvas shadow' 
+					viewBox={this.getViewBox()}
 				>
 					{this.state.frame}
 				</svg>
