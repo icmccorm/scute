@@ -1,0 +1,17 @@
+.handle {
+	fill: red;
+	cursor: grab;
+}
+
+.handle .down{
+	cursor: grabbing;
+}
+
+.hover{
+	border: "3px dashed red";
+}
+
+
+.hoverGroup{
+	pointer-events: "bounding-box";
+}

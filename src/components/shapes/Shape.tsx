@@ -1,7 +1,9 @@
 import * as React from 'react';
+import Rect from "./Rect";
+import { EventClient } from 'src/EventClient';
 
 enum ShapeType{
-	SP_RECT = 1,
+	SP_RECT = 53,
 	SP_CIRC,
 	SP_LINE,
 	SP_POLYL,
@@ -16,9 +18,7 @@ class sTag {
 }
 
 export type Tag = sTag & object;
-
-export type Props = {defs: any, key: number}
-
+export type Props = {defs: any, key: number, client: EventClient}
 export class Shape extends React.Component<any, any>{
 	readonly props: Props;
 
@@ -26,23 +26,13 @@ export class Shape extends React.Component<any, any>{
 		super(props);
 	}
 	render(){
-		return React.createElement(typeToTag(this.props.defs.tag), this.props.defs.attrs, null);
-	}
-}
 
-function typeToTag(sp:ShapeType):string{
-	switch(sp){
-		case ShapeType.SP_RECT:
-			return 'rect';
-		case ShapeType.SP_CIRC:
-			return 'circle';
-		case ShapeType.SP_LINE:
-			return 'line';
-		case ShapeType.SP_POLYG:
-			return 'polygon';
-		case ShapeType.SP_POLYL:
-			return 'polyline';
-		default:
-			return;
+		switch(this.props.defs.tag){
+			case ShapeType.SP_RECT:
+				return (<Rect client={this.props.client} attrs={this.props.defs.attrs}></Rect>);
+			default:
+				break;
+		}
+
 	}
 }

@@ -46,7 +46,7 @@ class Canvas extends React.PureComponent<Props, State> {
 
 		this.props.client.on(Events.FRAME, (data) => {
 			const tags = data ? data.map((item) => {
-				return <Shape key={item.id} defs={item}/>
+				return <Shape client={this.props.client} key={item.id} defs={item}/>
 			}): null;
 			this.setState({frame: tags});
 		});

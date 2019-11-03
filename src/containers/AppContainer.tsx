@@ -69,7 +69,7 @@ export default class App extends React.Component<Props, State> {
             <div className='root flex outer-flex'>
                     <div className='text-wrapper' ref={this.leftWrapper}>
                         <div className='inner-text-wrapper flex inner-flex max'>
-                            <Editor handleChange={this.updateCode}></Editor>
+                            <Editor client={this.eventClient} handleChange={this.updateCode}></Editor>
                             <Log value={this.state.log}/>
                         </div>
                         <Dragger adjust={this.adjustLeft}/> 

@@ -1,19 +1,29 @@
 import * as React from 'react';
 import './css/Editor.css';
+import { EventClient } from 'src/EventClient';
+import { LinkedValue } from './shapes/LinkedValue';
+import { RefObject } from 'react';
 
-class Editor extends React.Component<any, any> { 
+type Props = {client: EventClient, handleChange: Function}
+type State = {value: string, lineNums: any, scrollTop: number}
+
+class Editor extends React.Component<Props, State> { 
+    readonly props: Props;
     wrapper: any;
     nums: any;
+    text: RefObject<HTMLTextAreaElement>;;
 
-    constructor(props: object){
+    constructor(props){
         super(props);
         this.state = {
             lineNums: [<span key={1}>1</span>],
             scrollTop: 0,
+            value: ""
         }
 
         this.wrapper = React.createRef();
         this.nums = React.createRef();
+        this.text = React.createRef<HTMLTextAreaElement>();
     }
 
     render = () => {
@@ -26,7 +36,7 @@ class Editor extends React.Component<any, any> {
                         {this.state.lineNums}
                 </div>
                 <textarea
-                
+                    ref={this.text}
                     spellCheck={false}
                     className='dark textArea textPadding'
                     value={this.state.value}
@@ -55,6 +65,24 @@ class Editor extends React.Component<any, any> {
 
     syncScroll = (evt) =>{
         this.setState({scrollTop: evt.target.scrollTop});
+    }
+
+    componentDidMount(){
+        this.props.client.on('manipulation', this.changeText);
+    }
+
+    changeText = (data) => {
+        let currentText = this.state.value;
+        let payload: LinkedValue = data;
+        let oldValueLength = payload.previous.toString().length;
+
+        let newValue = currentText.substring(0, payload.index) 
+            + ("" + payload.current) 
+            + currentText.substring(payload.index + oldValueLength, currentText.length+1);
+        
+        this.setState({value: newValue});
+        this.props.handleChange(newValue);
+        this.text.current.setSelectionRange(payload.index, payload.index + payload.current.toString().length+1);
     }
 
     componentDidUpdate(){
