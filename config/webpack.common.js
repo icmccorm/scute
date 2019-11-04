@@ -52,7 +52,8 @@ module.exports = {
         rules: [
             {
                 type: "javascript/auto",
-                resolve: {}
+                include: paths.src,
+                use: 'babel-loader'
             },
             {
                 test: /\.css$/,
