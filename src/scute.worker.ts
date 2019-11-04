@@ -1,5 +1,5 @@
-import InterpreterModule from './lang-c/scute.js';
-import {InputCommands, OutputCommands, CommandData} from './workers/WorkerCommands';
+import Scute from './lang-c/scute.js';
+import {OutputCommands} from './workers/WorkerCommands';
 
 class ScuteWrapper {
 	currentIndex: number;
@@ -47,7 +47,7 @@ class ScuteWrapper {
 	}
 }
 
-InterpreterModule().then((em_module) => {
+Scute().then((em_module) => {
 	var scute = new ScuteWrapper(em_module, self);
 	self.onmessage = event => {
 		let message: any[] = event.data;

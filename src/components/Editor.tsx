@@ -71,18 +71,18 @@ class Editor extends React.Component<Props, State> {
         this.props.client.on('manipulation', this.changeText);
     }
 
-    changeText = (data) => {
+    changeText = async (data) => {
         let currentText = this.state.value;
         let payload: LinkedValue = data;
         let oldValueLength = payload.previous.toString().length;
+        let oldValueText = currentText.substring(payload.index, payload.index + oldValueLength);
 
-        let newValue = currentText.substring(0, payload.index) 
-            + ("" + payload.current) 
-            + currentText.substring(payload.index + oldValueLength, currentText.length+1);
+        let prev = currentText.substring(0, payload.index);
+        let end = currentText.substring(payload.index+oldValueLength);
+        let newValue = prev + payload.current + end;
         
-        this.setState({value: newValue});
+        await this.setState({value: newValue});
         this.props.handleChange(newValue);
-        this.text.current.setSelectionRange(payload.index, payload.index + payload.current.toString().length+1);
     }
 
     componentDidUpdate(){
