@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './css/Editor.css';
-import { EventClient } from 'src/EventClient';
+import { EventClient, Events } from '../EventClient';
 import { LinkedValue } from './shapes/LinkedValue';
 import { RefObject } from 'react';
 
@@ -68,7 +68,7 @@ class Editor extends React.Component<Props, State> {
     }
 
     componentDidMount(){
-        this.props.client.on('manipulation', this.changeText);
+        this.props.client.on(Events.MANIPULATION, this.changeText);
     }
 
     changeText = async (data) => {
@@ -90,11 +90,16 @@ class Editor extends React.Component<Props, State> {
         this.nums.current.scrollTop = this.state.scrollTop;
     }
 
-    handleSpecialCharacters = (evt: any) => {
+    handleSpecialCharacters = async (evt: any) => {
         switch(evt.keyCode){
             case 9: //tab
                 evt.preventDefault();
-                this.setState({value: this.state.value ? (this.state.value + '\t') : '\t'})
+                let start = evt.currentTarget.selectionStart;
+                let newVal = this.state.value ?
+                this.state.value.substring(0, start) + '\t' + this.state.value.substring(start) 
+                : '\t';
+                await this.setState({value: newVal})
+                this.text.current.setSelectionRange(start + 1, start + 1);
                 break;
         }
     }

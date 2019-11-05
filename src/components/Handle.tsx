@@ -30,6 +30,7 @@ class Handle extends React.Component<Props,any> {
 	};
 
 	recordMousePosition = (event) =>{
+		document.body.style.cursor = "grabbing"
 		event.preventDefault();
 
 		this.mouseX = event.pageX;

@@ -44,6 +44,7 @@ textarea {
     border: none;
     padding: .5rem;
     resize: none;
+    tab-size: 3;
 }
 
 textarea.dark {

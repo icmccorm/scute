@@ -9,6 +9,8 @@ export enum Events{
 	PRINT_DEBUG,
 	PRINT_ERROR,
 	FRAME,
+	MANIPULATION,
+	SHIFT,
 }
 
 export class EventClient{

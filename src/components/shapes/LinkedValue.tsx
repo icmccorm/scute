@@ -1,4 +1,4 @@
-import { EventClient } from '../../EventClient';
+import { EventClient, Events } from '../../EventClient';
 
 type ShiftCommand = {line:number, diff: number, index: number};
 
@@ -15,8 +15,8 @@ export class LinkedValue{
 		this.index = obj.index;
 		this.previous = null;
 		this.client = client;
-		this.client.on("shift", (data: ShiftCommand) => {
-			if(data.line == this.line && this.index > data.index){
+		this.client.on(Events.SHIFT, (data: ShiftCommand) => {
+			if(this.index > data.index){
 				this.index += (data.diff);
 			}
 		})
@@ -29,9 +29,9 @@ export class LinkedValue{
 		let prevLength = this.previous.toString().length;
 		let currLength = this.current.toString().length;
 
-		if(currLength != prevLength) this.client.emit("shift", {line: this.line, index: this.index, diff: currLength - prevLength});
+		if(currLength != prevLength) this.client.emit(Events.SHIFT, {line: this.line, index: this.index, diff: currLength - prevLength});
 			
-		if(this.index > -1)	this.client.emit("manipulation", this);
+		if(this.index > -1)	this.client.emit(Events.MANIPULATION, this);
 		return this;
 	}
 }
