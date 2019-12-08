@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Rect from "./Rect";
+import Circ from "./Circ";
 import { EventClient } from 'src/EventClient';
 
 enum ShapeType{
@@ -30,6 +31,8 @@ export class Shape extends React.Component<any, any>{
 		switch(this.props.defs.tag){
 			case ShapeType.SP_RECT:
 				return (<Rect client={this.props.client} attrs={this.props.defs.attrs}></Rect>);
+			case ShapeType.SP_CIRC:
+				return (<Circ client={this.props.client} attrs={this.props.defs.attrs}></Circ>);
 			default:
 				break;
 		}
