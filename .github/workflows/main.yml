@@ -1,7 +1,5 @@
 name: CI
-
-on: [push]
-
+on: [deployment]
 jobs:
   deploy:
     runs-on: ubuntu-latest
