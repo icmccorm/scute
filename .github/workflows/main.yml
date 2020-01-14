@@ -1,0 +1,14 @@
+name: CI
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-nodev1.1.0
+    - name: Deploy to gh-pages branch
+      run: npm run deploy
+        
+
