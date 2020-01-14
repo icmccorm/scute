@@ -7,7 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Node.js for use with actions
-      uses: actions/setup-node@v1.1.0
+    - uses: actions/setup-node@v1.1.0
+    - uses: lovasoa/setup-emscripten@master
+      with:
+        emscripten-version: '1.38.47'
     - name: Deploy to gh-pages branch
       run: npm run deploy
