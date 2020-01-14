@@ -6,9 +6,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Setup Node.js for use with actions
-      uses: actions/setup-nodev1.1.0
+      uses: actions/setup-node@v1.1.0
     - name: Deploy to gh-pages branch
       run: npm run deploy
-        
-
