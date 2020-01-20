@@ -1,20 +1,24 @@
-const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 var paths = require('./paths.js');
 
 module.exports = {
-    entry: ["./src/index.tsx"],
+    entry: [paths.indexTSX],
     output: {
         filename: '[name].[contentHash].js',
         path: paths.dist
+    },
+    resolve:{
+        extensions: ['.ts', '.tsx', '.js'],
+        alias:{
+            src: paths.src
+        }
     },
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'Title',
-            template: './public/index.html'
+            template: paths.indexHTML
         })
     ],
     stats: {
@@ -52,8 +56,7 @@ module.exports = {
         rules: [
             {
                 type: "javascript/auto",
-                include: paths.src,
-                use: 'babel-loader'
+                exclude: [/node_modules/],
             },
             {
                 test: /\.css$/,
@@ -72,8 +75,4 @@ module.exports = {
             },
         ],
     },
-
-    resolve: {
-        extensions: ['.ts', '.tsx', '.js']
-    }
 }
