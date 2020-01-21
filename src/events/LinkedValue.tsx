@@ -1,4 +1,4 @@
-import { EventClient, Events } from '../../EventClient';
+import { EventClient, Events } from './EventClient';
 
 type ShiftCommand = {line:number, diff: number, index: number};
 

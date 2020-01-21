@@ -1,21 +1,18 @@
 import * as React from 'react';
 import {RefObject} from 'react';
-import {LinkedValue} from './LinkedValue';
-import Handle from '../Handle';
+import {LinkedValue} from 'src/events/LinkedValue';
+import Handle from 'src/components/Handle';
+import {ShapeProps, ShapeState} from './Shape';
 
-import "./handles.css";
-import { EventClient } from 'src/EventClient';
-
-export type Props = {attrs: any, client: EventClient};
-export type State = {
+type Props = ShapeProps;
+type State = {
 	x: LinkedValue, 
 	y: LinkedValue, 
 	width: LinkedValue, 
 	height: LinkedValue,
-	hovering: boolean,
-};
+} & ShapeState;
 
-export default class Rect extends React.Component<Props, any>{
+export default class Rect extends React.Component<Props, State>{
 	readonly props: Props;
 	readonly state: State;
 	group: RefObject<SVGGElement>;
@@ -26,12 +23,15 @@ export default class Rect extends React.Component<Props, any>{
 
 	constructor(props){
 		super(props);
+		this.props = props
+		let attrs:any = this.props.defs.attrs
 		this.state = {
-			x: new LinkedValue(props.attrs.x, props.client),
-			y: new LinkedValue(props.attrs.y, props.client),
-			width: new LinkedValue(props.attrs.width, props.client),
-			height: new LinkedValue(props.attrs.height, props.client),
+			x: new LinkedValue(attrs.x, props.client),
+			y: new LinkedValue(attrs.y, props.client),
+			width: new LinkedValue(attrs.width, props.client),
+			height: new LinkedValue(attrs.height, props.client),
 			hovering: false,
+			style: this.props.defs.style.values,
 		}
 
 		this.group = React.createRef<SVGGElement>();
@@ -63,7 +63,6 @@ export default class Rect extends React.Component<Props, any>{
 			width: this.state.width.diffValue(dx)
 		})
 		console.log(dx + " " + dy);
-
 	}
 
 	setHeight = (dx: number, dy: number) =>{
@@ -71,7 +70,6 @@ export default class Rect extends React.Component<Props, any>{
 			height: this.state.height.diffValue(dy)
 		})
 		console.log(dx + " " + dy);
-
 	}
 
 	render(){
@@ -82,6 +80,7 @@ export default class Rect extends React.Component<Props, any>{
 					y={this.state.y.current} 
 					width={this.state.width.current} 
 					height={this.state.height.current}
+					style={this.state.style}
 				></rect>
 
 				{this.state.hovering ?

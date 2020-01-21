@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './css/Editor.css';
-import { EventClient, Events } from '../EventClient';
-import { LinkedValue } from './shapes/LinkedValue';
+import { EventClient, Events } from 'src/events/EventClient';
+import { LinkedValue } from 'src/events/LinkedValue';
 import { RefObject } from 'react';
 
 type Props = {client: EventClient, handleChange: Function}

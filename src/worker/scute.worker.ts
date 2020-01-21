@@ -1,5 +1,5 @@
-import Scute from './lang-c/scute.js';
-import {OutputCommands} from './workers/WorkerCommands';
+import Scute from 'src/lang-c/scute.js';
+import {OutputCommands} from './WorkerCommands';
 
 class ScuteWrapper {
 	currentIndex: number;

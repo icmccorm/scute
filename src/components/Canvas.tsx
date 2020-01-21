@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './css/Canvas.css';
-import {Shape, Tag} from './shapes/Shape';
-import {EventClient, Events} from '../EventClient';
+import {Shape, Tag} from 'src/shapes/Shape';
+import {EventClient, Events} from 'src/events/EventClient';
 
 type Props = {client: EventClient}
 type State = {frame: any, width:number, height:number, originX: number, originY: number}

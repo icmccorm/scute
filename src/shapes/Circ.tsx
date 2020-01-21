@@ -1,18 +1,18 @@
 import * as React from 'react';
 import {RefObject} from 'react';
-import {LinkedValue} from './LinkedValue';
-import Handle from '../Handle';
+import {LinkedValue} from 'src/events/LinkedValue';
+import Handle from 'src/components/Handle';
+import {ShapeProps, ShapeState} from './Shape'
 
-import "./handles.css";
-import { EventClient } from '../../EventClient';
+import "src/components/css/Handle.css";
+import { EventClient } from '../events/EventClient';
 
-export type Props = {attrs: any, client: EventClient};
-export type State = {
+type Props = ShapeProps;
+type State = {
 	cx: LinkedValue, 
 	cy: LinkedValue, 
 	r: LinkedValue, 
-	hovering: boolean,
-};
+} & ShapeState;
 
 export default class Circ extends React.Component<Props, any>{
 	readonly props: Props;
@@ -24,11 +24,14 @@ export default class Circ extends React.Component<Props, any>{
 
 	constructor(props){
 		super(props);
+		this.props = props;
+		let attrs:any = props.defs.attrs;
 		this.state = {
-			cx: new LinkedValue(props.attrs.cx, props.client),
-			cy: new LinkedValue(props.attrs.cy, props.client),
-			r: new LinkedValue(props.attrs.r, props.client),
+			cx: new LinkedValue(attrs.cx, props.client),
+			cy: new LinkedValue(attrs.cy, props.client),
+			r: new LinkedValue(attrs.r, props.client),
 			hovering: false,
+			style: this.props.defs.style.values
 		}
 		this.group = React.createRef<SVGGElement>();
 		this.pos = React.createRef<SVGCircleElement>();
@@ -65,6 +68,7 @@ export default class Circ extends React.Component<Props, any>{
 					cx={this.state.cx.current} 
 					cy={this.state.cy.current} 
 					r={this.state.r.current} 
+					style={this.state.style}
 				></circle>
 
 				{this.state.hovering ?

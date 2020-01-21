@@ -1,0 +1,28 @@
+button {
+    border-radius: .25rem;
+    border:none;
+    border-bottom: 3px solid;
+    outline: none;
+    vertical-align: center;
+
+    padding: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    margin-left: .25rem;
+    margin-right: .25rem;
+    
+    color: white;
+    transition-property: box-shadow;
+    transition-duration: 100ms;
+    transition-timing-function: ease-in;
+}
+
+button:hover{
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, .75);
+}
+
+button:active{
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, .75) inset;
+    border:none
+}

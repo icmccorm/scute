@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
-import ScuteWorker from 'worker-loader!./scute.worker';
-import {InputCommands, OutputCommands, CommandData} from './workers/WorkerCommands';
+import ScuteWorker from 'worker-loader!src/worker/scute.worker';
+import {InputCommands, OutputCommands, CommandData} from '../worker/WorkerCommands';
 
 export enum Events{
 	REQ_COMPILE = 1,

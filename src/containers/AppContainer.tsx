@@ -1,12 +1,12 @@
 import * as React from 'react';
 
 import Navbar from './Navbar';
-import Log from '../components/Log';
-import Editor from '../components/Editor';
-import Button from '../components/Button';
-import Canvas from '../components/Canvas';
-import Dragger from '../components/Dragger';
-import {EventClient, Events} from '../EventClient';
+import Log from 'src/components/Log';
+import Editor from 'src/components/Editor';
+import Button from 'src/components/Button';
+import Canvas from 'src/components/Canvas';
+import Dragger from 'src/components/Dragger';
+import {EventClient, Events} from 'src/events/EventClient';
 
 import './css/AppContainer.css';
 
@@ -17,7 +17,7 @@ export default class App extends React.Component<Props, State> {
     readonly state: State;
     readonly props: Props;
     eventClient: EventClient;
-    leftWrapper: any;
+    leftWrapper: any; 
     rightWrapper: any;
     
     constructor(props: {}){
