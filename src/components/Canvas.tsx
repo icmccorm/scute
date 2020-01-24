@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './css/Canvas.css';
+import './style/Canvas.scss';
 import {Shape, Tag} from 'src/shapes/Shape';
 import {EventClient, Events} from 'src/events/EventClient';
 

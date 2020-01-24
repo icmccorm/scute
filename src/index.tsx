@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import AppContainer from './containers/AppContainer';
-import './Global.css';
+import './Global.scss';
 import ScuteWorker from 'worker-loader!./worker/scute.worker';
 
 ReactDOM.render(

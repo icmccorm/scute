@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './css/Log.css';
+import './style/Log.scss';
 
 interface Props {
     value: string;

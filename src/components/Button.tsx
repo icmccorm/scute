@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './css/Button.css';
+import './style/Button.scss';
 
 class Button extends React.Component<any,any> { 
 
@@ -11,7 +11,7 @@ class Button extends React.Component<any,any> {
     render (){
         return (
             <button 
-                className='btn turq-b sky-f' 
+                className='btn turq-b' 
                 onClick={this.props.onClick}>
 
                     {this.props.children}

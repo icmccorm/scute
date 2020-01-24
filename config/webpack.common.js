@@ -1,6 +1,7 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths.js');
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 module.exports = {
     entry: [paths.indexTSX],
@@ -59,11 +60,6 @@ module.exports = {
                 exclude: [/node_modules/],
             },
             {
-                test: /\.css$/,
-                include: paths.src,
-                use: ['style-loader', 'css-loader'],
-            },
-            {
                 test: /\.tsx?$/,
                 exclude: [/node_modules/, /\.(js|jsx)$/],
                 use: 'babel-loader',
@@ -72,6 +68,18 @@ module.exports = {
                 test: /\.wasm?$/,
                 exclude: [/node_modules/],
                 use: 'file-loader'
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                include: paths.src,
+                use: [
+                  // Creates `style` nodes from JS strings
+                  'style-loader',
+                  // Translates CSS into CommonJS
+                  'css-loader',
+                  // Compiles Sass to CSS
+                  'sass-loader',
+                ],
             },
         ],
     },

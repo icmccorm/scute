@@ -4,7 +4,7 @@ import {LinkedValue} from 'src/events/LinkedValue';
 import Handle from 'src/components/Handle';
 import {ShapeProps, ShapeState} from './Shape'
 
-import "src/components/css/Handle.css";
+import "src/components/style/Handle.scss";
 import { EventClient } from '../events/EventClient';
 
 type Props = ShapeProps;

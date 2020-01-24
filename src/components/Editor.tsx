@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './css/Editor.css';
+import './style/Editor.scss';
 import { EventClient, Events } from 'src/events/EventClient';
 import { LinkedValue } from 'src/events/LinkedValue';
 import { RefObject } from 'react';

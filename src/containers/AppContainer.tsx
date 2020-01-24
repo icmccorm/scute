@@ -8,7 +8,7 @@ import Canvas from 'src/components/Canvas';
 import Dragger from 'src/components/Dragger';
 import {EventClient, Events} from 'src/events/EventClient';
 
-import './css/AppContainer.css';
+import './style/AppContainer.scss';
 
 type State = {log: string, output: string, code: string};
 type Props = {};
