@@ -45,6 +45,20 @@
     overflow-x: auto;
 }
 
+.view-flex {
+    display: flex;
+    flex-grow: 0;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    position: absolute;
+}
+
+.min-max {
+    min-width: 100%;
+    min-height: 100%;
+}
+
 @media (min-width: 0px) {
     .outer-flex{
         flex-flow: column nowrap;
