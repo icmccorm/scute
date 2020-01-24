@@ -10,7 +10,7 @@ import {EventClient, Events} from 'src/events/EventClient';
 
 import './style/AppContainer.scss';
 
-type State = {log: string, output: string, code: string};
+type State = {log: string, output: string, code: string, canvasHeight: number, canvasWidth: number};
 type Props = {};
 
 export default class App extends React.Component<Props, State> { 
@@ -26,6 +26,8 @@ export default class App extends React.Component<Props, State> {
             log: "",
             output: "",
             code: "",
+            canvasWidth: 500,
+            canvasHeight: 500,
         }
         this.eventClient = new EventClient();
         this.leftWrapper = React.createRef();
@@ -64,25 +66,46 @@ export default class App extends React.Component<Props, State> {
         }
     }
 
+    zoomCanvas = (event: React.WheelEvent<HTMLDivElement>) => {
+        let change = event.deltaY;
+        this.setState({
+            canvasWidth: this.state.canvasWidth + change,
+            canvasHeight: this.state.canvasHeight + change,
+        });
+    }
+
     render () {
         return (     
             <div className='root flex outer-flex'>
-                    <div className='text-wrapper' ref={this.leftWrapper}>
-                        <div className='inner-text-wrapper flex inner-flex max'>
-                            <Editor client={this.eventClient} handleChange={this.updateCode}></Editor>
-                            <Log value={this.state.log}/>
-                        </div>
-                        <Dragger adjust={this.adjustLeft}/> 
+                <div className='text-wrapper' ref={this.leftWrapper}>
+                    <div className='inner-text-wrapper flex inner-flex max'>
+                        <Editor client={this.eventClient} handleChange={this.updateCode}></Editor>
+                        <Log value={this.state.log}/>
                     </div>
+                    <Dragger adjust={this.adjustLeft}/> 
+                </div>
 
+<<<<<<< Updated upstream
+                <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
+                    <Navbar>
+                        <Button onClick={this.runCode}>Run</Button>
+                    </Navbar>
+                    <div className='view-flex min-max' onWheel={this.zoomCanvas}>
+=======
                     <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
                         <Navbar>
                             <Button onClick={this.runCode}>Run</Button>
+                            <Button>Export</Button>
+                            <Button>Fit</Button>
                         </Navbar>
-                        <div className='view-flex min-max'>
-                            <Canvas client={this.eventClient}/>
-                        </div>
+>>>>>>> Stashed changes
+                        <Canvas 
+                            client={this.eventClient} 
+                            width={this.state.canvasWidth} 
+                            height={this.state.canvasHeight}>
+                        </Canvas>
                     </div>
+                </div>
             </div>
         );
     }
