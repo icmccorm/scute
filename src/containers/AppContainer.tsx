@@ -85,20 +85,13 @@ export default class App extends React.Component<Props, State> {
                     <Dragger adjust={this.adjustLeft}/> 
                 </div>
 
-<<<<<<< Updated upstream
                 <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
                     <Navbar>
                         <Button onClick={this.runCode}>Run</Button>
+                        <Button>Export</Button>
+                        <Button>Fit</Button>
                     </Navbar>
-                    <div className='view-flex min-max' onWheel={this.zoomCanvas}>
-=======
-                    <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
-                        <Navbar>
-                            <Button onClick={this.runCode}>Run</Button>
-                            <Button>Export</Button>
-                            <Button>Fit</Button>
-                        </Navbar>
->>>>>>> Stashed changes
+                    <div className="view-flex min-max" onWheel={this.zoomCanvas}>
                         <Canvas 
                             client={this.eventClient} 
                             width={this.state.canvasWidth} 

@@ -1,6 +1,6 @@
 .text-wrapper{
     order: 1;
-    width: 45%;
+    width: 36%;
     flex: 1 1 45% auto;
 
     overflow: hidden;
@@ -8,7 +8,9 @@
     display: flex;
     align-items: stretch;
     flex-flow: ltr nowrap;
+    flex-shrink: 0;
     min-width: 25%;
+    max-width: 60%
 }
 
 .text-wrapper * {
@@ -22,16 +24,10 @@
 }
 
 .view-wrapper {
-    flex: 1 1 auto;
+    flex: 1 0 auto;
     order: 2;
-    overflow: auto;
-}
-
-.view-flex {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5rem;
+    overflow: hidden;
+    position: relative;
 }
 
 .flex {
@@ -46,6 +42,7 @@
 
 .outer-flex {
     flex-flow: row nowrap;
+    overflow-x: auto;
 }
 
 @media (min-width: 0px) {
