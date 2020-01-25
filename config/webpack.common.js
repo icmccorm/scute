@@ -36,8 +36,7 @@ module.exports = {
         modules: false,
         builtAt: false,
         version: false,
-        assets: false,
-
+        assets: true,
     },
     optimization: {
         splitChunks: {
@@ -52,6 +51,7 @@ module.exports = {
         },
         runtimeChunk: 'single',
         moduleIds: 'hashed',
+        mangleWasmImports: true
     },
     module: {
         rules: [
@@ -60,8 +60,8 @@ module.exports = {
                 exclude: [/node_modules/],
             },
             {
-                test: /\.tsx?$/,
-                exclude: [/node_modules/, /\.(js|jsx)$/],
+                test: /.tsx?$/,
+                exclude: [/node_modules/],
                 use: 'babel-loader',
             },
             {

@@ -8,26 +8,26 @@ import Canvas from 'src/components/Canvas';
 import Dragger from 'src/components/Dragger';
 import {EventClient, Events} from 'src/events/EventClient';
 
+import {connect} from 'react-redux';
+
 import './style/AppContainer.scss';
 
-type State = {log: string, output: string, code: string, canvasHeight: number, canvasWidth: number};
-type Props = {};
+type State = {log: string, output: string, code: string};
+type Props = {defaultHeight: number, defaultWidth: number};
 
-export default class App extends React.Component<Props, State> { 
+export class App extends React.Component<Props, State> { 
     readonly state: State;
     readonly props: Props;
     eventClient: EventClient;
     leftWrapper: any; 
     rightWrapper: any;
     
-    constructor(props: {}){
+    constructor(props){
         super(props);
         this.state = { 
             log: "",
             output: "",
             code: "",
-            canvasWidth: 500,
-            canvasHeight: 500,
         }
         this.eventClient = new EventClient();
         this.leftWrapper = React.createRef();
@@ -66,12 +66,8 @@ export default class App extends React.Component<Props, State> {
         }
     }
 
-    zoomCanvas = (event: React.WheelEvent<HTMLDivElement>) => {
-        let change = event.deltaY;
-        this.setState({
-            canvasWidth: this.state.canvasWidth + change,
-            canvasHeight: this.state.canvasHeight + change,
-        });
+    resetCanvas = (event) => {
+        this.setState();
     }
 
     render () {
@@ -89,17 +85,30 @@ export default class App extends React.Component<Props, State> {
                     <Navbar>
                         <Button onClick={this.runCode}>Run</Button>
                         <Button>Export</Button>
-                        <Button>Fit</Button>
+                        <Button onClick={this.resetCanvas}>Fit</Button>
                     </Navbar>
-                    <div className="view-flex min-max" onWheel={this.zoomCanvas}>
-                        <Canvas 
-                            client={this.eventClient} 
-                            width={this.state.canvasWidth} 
-                            height={this.state.canvasHeight}>
-                        </Canvas>
-                    </div>
+                    <Canvas 
+                        client={this.eventClient} 
+                        width={this.props.defaultWidth} 
+                        height={this.props.defaultHeight}>
+                    </Canvas>
                 </div>
             </div>
         );
     }
 }
+
+
+function mapStateToProps(state){
+    return {
+        defaultWidth: state.defaultWidth,
+        defaultHeight: state.defaultHeight,
+    };
+}
+
+function mapDispatchToProps(){
+    
+}
+
+const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
+export default AppContainer;

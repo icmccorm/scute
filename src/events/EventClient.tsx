@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
-import ScuteWorker from 'worker-loader!src/worker/scute.worker';
 import {InputCommands, OutputCommands, CommandData} from '../worker/WorkerCommands';
+import {ScuteWorkerObject} from 'src/redux/ScuteWorker';
 
 export enum Events{
 	REQ_COMPILE = 1,
@@ -15,12 +15,12 @@ export enum Events{
 
 export class EventClient{
 	emitter: EventEmitter;
-	worker: ScuteWorker;
+	worker: any;
 	maxIndex: number;
 
 	constructor(){
 		this.emitter = new EventEmitter();
-		this.worker = new ScuteWorker();
+		this.worker = ScuteWorkerObject;
 		this.worker.onmessage = this.handleWorkerCommands;
 	}
 

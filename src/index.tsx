@@ -2,10 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import AppContainer from './containers/AppContainer';
 import './Global.scss';
-import ScuteWorker from 'worker-loader!./worker/scute.worker';
+
+import {Provider} from 'react-redux';
+import {scuteStore} from './redux/ScuteStore';
 
 ReactDOM.render(
-    <AppContainer/>,
+	<Provider store={scuteStore}>
+    	<AppContainer/>
+	</Provider>,
     document.getElementById('root')
 );
 

@@ -1,3 +1,18 @@
 .canvas {    
     position: relative;
+
+    min-width: 30px;
+    min-height: 30px;
+}
+.view-flex {
+    display: flex;
+    flex-grow: 0;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    position: absolute;
+}
+.min-max {
+    min-width: 100%;
+    min-height: 100%;
 }
