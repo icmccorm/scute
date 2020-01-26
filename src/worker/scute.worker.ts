@@ -1,5 +1,6 @@
 import Scute from 'src/lang-c/scute.js';
 import {OutputCommands} from './WorkerCommands';
+var scuteModule = require('src/lang-c/scute.wasm');
 
 class ScuteWrapper {
 	currentIndex: number;
@@ -47,6 +48,29 @@ class ScuteWrapper {
 	}
 }
 
+
+Scute({
+	locateFile(path) {
+	  if(path.endsWith('.wasm')) {
+		return scuteModule;
+	  }
+	  return path;
+	}
+}).then((em_module) => {
+	var scute = new ScuteWrapper(em_module, self);
+	self.onmessage = event => {
+		let message: any[] = event.data;
+		switch(message[0]){
+			case 0:
+				scute.compileCode(message[1])
+				break;
+			case 1:
+				scute.runCode();
+				break;
+		}
+	}
+});
+/*
 Scute().then((em_module) => {
 	var scute = new ScuteWrapper(em_module, self);
 	self.onmessage = event => {
@@ -62,4 +86,4 @@ Scute().then((em_module) => {
 	}
 })
 
-
+*/

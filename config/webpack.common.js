@@ -51,7 +51,6 @@ module.exports = {
         },
         runtimeChunk: 'single',
         moduleIds: 'hashed',
-        mangleWasmImports: true
     },
     module: {
         rules: [
