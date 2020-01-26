@@ -7,12 +7,13 @@ import Button from 'src/components/Button';
 import Canvas from 'src/components/Canvas';
 import Dragger from 'src/components/Dragger';
 import {EventClient, Events} from 'src/events/EventClient';
+import {Shape, Tag} from 'src/shapes/Shape';
 
 import {connect} from 'react-redux';
 
 import './style/AppContainer.scss';
 
-type State = {log: string, output: string, code: string};
+type State = {log: string, output: string, code: string, canvasWidth: number, canvasHeight: number, originX: number, originY: number, frame: any};
 type Props = {defaultHeight: number, defaultWidth: number};
 
 export class App extends React.Component<Props, State> { 
@@ -28,6 +29,11 @@ export class App extends React.Component<Props, State> {
             log: "",
             output: "",
             code: "",
+            canvasWidth: props.defaultWidth,
+            canvasHeight: props.defaultHeight,
+            originX: 0,
+            originY: 0,
+            frame: [],
         }
         this.eventClient = new EventClient();
         this.leftWrapper = React.createRef();
@@ -67,8 +73,36 @@ export class App extends React.Component<Props, State> {
     }
 
     resetCanvas = (event) => {
-        this.setState();
+        this.setState({
+            canvasHeight: this.props.defaultHeight,
+            canvasWidth: this.props.defaultWidth
+        });
     }
+
+	getViewBox(){
+		return [
+			this.state.originX,
+			this.state.originY, 
+			this.props.defaultWidth, 
+			this.props.defaultHeight
+		].join(" ");
+	}
+
+	zoomCanvas = (event: React.WheelEvent<HTMLDivElement>) => {
+        let change = event.deltaY;
+        this.setState({
+            canvasWidth: this.state.canvasWidth + change,
+            canvasHeight: this.state.canvasHeight + change,
+        });
+    }
+
+	generateFrame(data){
+        //Triggered on ActionType.FRAME, receives the output from webworker.
+		/*const tags = data ? data.map((item) => {
+			return <Shape client={null} key={item.id} defs={item}/>
+		}): null;
+		this.setState({frame: tags});*/
+	}
 
     render () {
         return (     
@@ -87,17 +121,21 @@ export class App extends React.Component<Props, State> {
                         <Button>Export</Button>
                         <Button onClick={this.resetCanvas}>Fit</Button>
                     </Navbar>
-                    <Canvas 
-                        client={this.eventClient} 
-                        width={this.props.defaultWidth} 
-                        height={this.props.defaultHeight}>
-                    </Canvas>
+                    <div className="view-flex min-max" onWheel={this.zoomCanvas}>
+                        <svg 
+                            width={this.state.canvasWidth} 
+                            height={this.state.canvasHeight} 
+                            className='canvas shadow' 
+                            viewBox={this.getViewBox()}
+                        >
+                            {this.state.frame}
+                        </svg>
+			        </div>
                 </div>
             </div>
         );
     }
 }
-
 
 function mapStateToProps(state){
     return {
