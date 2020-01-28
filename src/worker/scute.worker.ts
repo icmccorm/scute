@@ -22,7 +22,12 @@ class ScuteWrapper {
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
-		this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
+
+		try{
+			this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
+		}catch(e){
+			this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + e.message + "\n");
+		}
 		this.module._free(codePtr);
 		
 		this.sendCommand(ActionType.FIN_COMPILE, this.module._maxFrameIndex);
@@ -56,7 +61,7 @@ Scute({
 		return scuteModule;
 	  }
 	  return path;
-	}
+	},
 }).then((em_module) => {
 	var scute = new ScuteWrapper(em_module, self);
 	self.onmessage = event => {
@@ -70,5 +75,8 @@ Scute({
 				scute.runCode();
 				break;
 		}
+	}
+	em_module.onAbort = () =>{
+		scute.sendCommand(ActionType.PRINT_OUT, "Runtime aborted.\n");
 	}
 });
