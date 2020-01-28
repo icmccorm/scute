@@ -26,10 +26,10 @@ export default class Rect extends React.Component<Props, State>{
 		this.props = props
 		let attrs:any = this.props.defs.attrs
 		this.state = {
-			x: attrs.x,//new LinkedValue(attrs.x, props.client),
-			y: attrs.y,//new LinkedValue(attrs.y, props.client),
-			width: attrs.width,//new LinkedValue(attrs.width, props.client),
-			height: attrs.height,//new LinkedValue(attrs.height, props.client),
+			x: attrs.x.value,//new LinkedValue(attrs.x, props.client),
+			y: attrs.y.value,//new LinkedValue(attrs.y, props.client),
+			width: attrs.width.value,//new LinkedValue(attrs.width, props.client),
+			height: attrs.height.value,//new LinkedValue(attrs.height, props.client),
 			hovering: false,
 			style: this.props.defs.style.values,
 		}

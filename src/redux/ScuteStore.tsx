@@ -48,12 +48,12 @@ export function reduceUI(store = initialStore, action: Action){
 			break;
 		case ActionType.FIN_FRAME:
 			if(action.payload){
-				let frame: Array<JSX.Element> = [];
+				let newFrame: Array<JSX.Element> = [];
 				for(let item of action.payload){
-					frame.push(<Shape key={item.id} defs={item}/>);
+					newFrame.push(<Shape key={item.id} defs={item}/>);
 				}
 				store = Object.assign({}, store, {
-					currentFrame: frame,
+					frame: newFrame,
 				})
 			}
 			break;

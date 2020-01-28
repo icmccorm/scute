@@ -26,9 +26,9 @@ export default class Circ extends React.Component<Props, any>{
 		this.props = props;
 		let attrs:any = props.defs.attrs;
 		this.state = {
-			cx: attrs.cx, //new LinkedValue(attrs.cx, props.client),
-			cy: attrs.cy, //new LinkedValue(attrs.cy, props.client),
-			r: attrs.r, //new LinkedValue(attrs.r, props.client),
+			cx: attrs.cx.value, //new LinkedValue(attrs.cx, props.client),
+			cy: attrs.cy.value, //new LinkedValue(attrs.cy, props.client),
+			r: attrs.r.value, //new LinkedValue(attrs.r, props.client),
 			hovering: false,
 			style: this.props.defs.style.values
 		}
