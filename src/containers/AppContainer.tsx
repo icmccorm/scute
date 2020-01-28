@@ -96,6 +96,24 @@ class App extends React.Component<Props, State> {
         
     }
 
+    downloadCanvas = () => {
+        var svg = this.canvasWrapper.current;
+        var data = new XMLSerializer().serializeToString(svg);
+        var svgBlob = new Blob([data], {
+            type: 'image/svg+xml;charset=utf-8'
+        });
+        var link = document.createElement('a');
+        link.download = name;
+        link.href = URL.createObjectURL(svgBlob);
+        // Firefox needs the element to be live for some reason.
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () {
+            URL.revokeObjectURL(link.href);
+            document.body.removeChild(link);
+        });
+    }
+
 	zoomCanvas = (event: React.WheelEvent<HTMLDivElement>) => {
         const {
             pageX,
@@ -163,7 +181,7 @@ class App extends React.Component<Props, State> {
                 <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
                     <Navbar>
                         <Button onClick={this.props.runCode}>Run</Button>
-                        <Button>Export</Button>
+                        <Button onClick={this.downloadCanvas}>Export</Button>
                         <Button onClick={this.resetCanvas}>Fit</Button>
 
                         <span className="coords">{(this.state.mouseX).toFixed(1) + " " + this.state.mouseY.toFixed(1)}</span>
@@ -173,13 +191,14 @@ class App extends React.Component<Props, State> {
                             onWheel={this.zoomCanvas} 
                             className="view-flex min-max zoomRelative"
                             style={{transform: this.getTransform()}}
+
                             >
                             <svg 
+                                ref={this.canvasWrapper}
                                 width={this.props.defaultWidth} 
                                 height={this.props.defaultHeight} 
                                 className='canvas shadow' 
                                 viewBox={this.getViewBox()}
-                                ref={this.canvasWrapper}
                                 onMouseMove={this.recordMousePosition}
                             >
                                 {this.props.frame}

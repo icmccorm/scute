@@ -51,13 +51,17 @@
     overflow-x: auto;
 }
 
+
 .view-flex {
     display: flex;
+
+    margin-top: -3.5rem;
     flex-grow: 0;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     position: absolute;
+
 }
 
 
