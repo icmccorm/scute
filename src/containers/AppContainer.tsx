@@ -6,9 +6,6 @@ import Editor from 'src/components/Editor';
 import Button from 'src/components/Button';
 import Dragger from 'src/components/Dragger';
 import {Shape} from 'src/shapes/Shape';
-
-import {scuteStore} from 'src/redux/ScuteStore';
-
 import {connect} from 'react-redux';
 
 import './style/AppContainer.scss';
@@ -17,9 +14,15 @@ import {ActionType, createAction } from 'src/redux/Actions';
 type State = {
     originX: number, 
     originY: number,
+   
     translateX: number,
+    initialTranslateX: number,
+
     translateY: number,
+    initialTranslateY: number,
+    
     scale: number
+    
     mouseX: number,
     mouseY: number,
 };
@@ -30,7 +33,6 @@ type Props = {
     log: string, 
     frame: Array<Shape>,
     
-
     updateCode: Function, 
     runCode: Function,
 
@@ -49,7 +51,9 @@ class App extends React.Component<Props, State> {
             originX: 0,
             originY: 0,
             translateX: 0,
+            initialTranslateX: 0,
             translateY: 0,
+            initialTranslateY: 0,
             scale: 1,
             mouseX: 0,
             mouseY: 0,
@@ -59,11 +63,11 @@ class App extends React.Component<Props, State> {
         this.canvasWrapper = React.createRef();
     }
 
-    adjustLeft = (dx: number) => {
+    adjustLeft = (pageX: number, pageY: number, dx: number, dy: number) => {
         let lNode = this.leftWrapper.current;
         let rNode = this.rightWrapper.current;
         if(lNode && rNode){
-            lNode.style.width = dx + "px";
+            lNode.style.width = pageX + "px";
             lNode.style.flexGrow = 0;
         }
     }
@@ -71,6 +75,8 @@ class App extends React.Component<Props, State> {
     resetCanvas = (event) => {
         this.setState({
             translateX: 0,
+            initialTranslateX: 0,
+            initialTranslateY: 0,
             translateY: 0,
             scale: 1,
         });
@@ -116,11 +122,25 @@ class App extends React.Component<Props, State> {
      
     }
 
+    dragCanvas = (pageX: number, pageY: number, dx: number, dy: number) => {
+        this.setState({
+            translateX: dx + this.state.initialTranslateX,
+            translateY: dy + this.state.initialTranslateY,
+        })
+    }
+
+    dropCanvas = () => {
+        this.setState({
+            initialTranslateX: this.state.translateX,
+            initialTranslateY: this.state.translateY,
+        })
+    }
+
     recordMousePosition = (event) => {
         let eventBounds = this.canvasWrapper.current.getBoundingClientRect();
         this.setState({
-            mouseX: event.pageX - Math.floor(eventBounds.left),
-            mouseY: event.pageY - Math.floor(eventBounds.top),
+            mouseX: (event.pageX - Math.floor(eventBounds.left)) / this.state.scale,
+            mouseY: (event.pageY - Math.floor(eventBounds.top)) / this.state.scale,
         })
     }
 
@@ -132,7 +152,7 @@ class App extends React.Component<Props, State> {
                         <Editor handleChange={this.props.updateCode}></Editor>
                         <Log value={this.props.log}/>
                     </div>
-                    <Dragger adjust={this.adjustLeft}/> 
+                    <Dragger drag={this.adjustLeft} className="scrubber"/> 
                 </div>
 
                 <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
@@ -140,24 +160,28 @@ class App extends React.Component<Props, State> {
                         <Button onClick={this.props.runCode}>Run</Button>
                         <Button>Export</Button>
                         <Button onClick={this.resetCanvas}>Fit</Button>
-                        <span>{this.state.mouseX + " " + this.state.mouseY}</span>
+
+                        <span className="coords">{(this.state.mouseX).toFixed(1) + " " + this.state.mouseY.toFixed(1)}</span>
                     </Navbar>
-                    <div 
-                        onWheel={this.zoomCanvas} 
-                        className="view-flex min-max zoomRelative"
-                        style={{transform: this.getTransform()}}
-                        >
-                        <svg 
-                            width={this.props.defaultWidth} 
-                            height={this.props.defaultHeight} 
-                            className='canvas shadow' 
-                            viewBox={this.getViewBox()}
-                            ref={this.canvasWrapper}
-                            onMouseMove={this.recordMousePosition}
-                        >
-                            {this.props.frame}
-                        </svg>
-			        </div>
+                    <Dragger drag={this.dragCanvas} drop={this.dropCanvas}>
+                        <div  
+                            onWheel={this.zoomCanvas} 
+                            className="view-flex min-max zoomRelative"
+                            style={{transform: this.getTransform()}}
+                            >
+                            <svg 
+                                width={this.props.defaultWidth} 
+                                height={this.props.defaultHeight} 
+                                className='canvas shadow' 
+                                viewBox={this.getViewBox()}
+                                ref={this.canvasWrapper}
+                                onMouseMove={this.recordMousePosition}
+                            >
+                                {this.props.frame}
+                            </svg>
+                        </div>
+                    </Dragger>
+                    
                 </div>
             </div>
         );

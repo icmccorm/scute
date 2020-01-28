@@ -1,5 +1,5 @@
 .navbar {
-    position: fixed;
+    position: sticky;
     z-index: 1;
     top: 0px;
     display: flex;
@@ -7,10 +7,12 @@
     height: 3.5rem!important;
     width: 100%;
     align-items: center;
-    justify-content: left;
+
 }
 
 .nav{
-    padding-left: .75rem;
-    padding-right: .75rem;
+    width: 100%;
+    margin-left: .75rem;
+    margin-right: .75rem; 
+    box-sizing: border-box;
 }

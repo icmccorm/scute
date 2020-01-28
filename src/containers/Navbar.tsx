@@ -10,9 +10,9 @@ class Navbar extends React.Component<any, any> {
     render () {
         return (
             <div className='navbar'>
-                <div className='nav nav-l'>
+                <div className='nav'>
                     {this.props.children}
-                </div>   
+                </div>
             </div>
         );
     }

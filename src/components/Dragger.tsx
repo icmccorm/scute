@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-type Props = {adjust: Function};
-type State = {};
+type Props = {drag: Function, drop?: Function, children?: any, className?:string};
+type State = {dragging: boolean};
 
 class Dragger extends React.Component<Props,State> { 
 	readonly props: Props;
@@ -12,35 +12,41 @@ class Dragger extends React.Component<Props,State> {
     constructor(props: any){
 		super(props);
 		this.draggerDiv = React.createRef();
+		this.state = {
+			dragging: false,
+		}
     }
 
     render (){
         return (
 			<div 
 				ref={this.draggerDiv}
-				className="scrubber" 
-				onMouseDown={this.recordMousePosition}
-			>
+				className={this.props.className}
+				onMouseDown={this.recordMousePosition}>
+				{this.props.children}
 			</div>
         );
 	};
 
 	recordMousePosition = (event) =>{
 		event.preventDefault();
-
+		this.setState({dragging: true});
 		this.mouseX = event.pageX;
 		this.mouseY = event.pageY;
 		let node:HTMLDivElement = this.draggerDiv.current;
 		window.addEventListener('mousemove', this.resizeComponents, false);	
 		window.addEventListener('mouseup', ()=>{
 			window.removeEventListener('mousemove', this.resizeComponents, false);
+			this.setState({dragging: false});
+			if(this.props.drop) this.props.drop();
 		}, false);
 	}
 	
 	resizeComponents = (event) => {
 		event.preventDefault();
 		let dx = event.pageX - this.mouseX;
-		this.props.adjust(event.pageX);
+		let dy = event.pageY - this.mouseY;
+		this.props.drag(event.pageX, event.pageY, dx, dy);
 	}
 }
 

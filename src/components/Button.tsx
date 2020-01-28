@@ -11,7 +11,7 @@ class Button extends React.Component<any,any> {
     render (){
         return (
             <button 
-                className='btn turq-b' 
+                className='button turq-b' 
                 onClick={this.props.onClick}>
 
                     {this.props.children}
