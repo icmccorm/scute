@@ -114,10 +114,15 @@ class App extends React.Component<Props, State> {
 
         let ratio = 1 - newScale/this.state.scale;
 
+        let newTransX = this.state.translateX + (eventX - this.state.translateX) * ratio;
+        let newTransY = this.state.translateY + (eventY - this.state.translateY) * ratio;
+
         this.setState({
             scale: newScale,
-            translateX: this.state.translateX + (eventX - this.state.translateX) * ratio,
-            translateY: this.state.translateY + (eventY - this.state.translateY) * ratio,
+            translateX: newTransX,
+            translateY: newTransY,
+            initialTranslateX: newTransX,
+            initialTranslateY: newTransY,
         });
      
     }
