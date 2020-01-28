@@ -96,12 +96,14 @@ class App extends React.Component<Props, State> {
             pageY,
         } = event;
 
-        let bounds = this.rightWrapper.current.getBoundingClientRect();
+        let rightBounds = this.rightWrapper.current.getBoundingClientRect();
+        let leftBounds = this.leftWrapper.current.getBoundingClientRect();
+        let boundsWidth = (rightBounds.x > 0 ? leftBounds.width + rightBounds.width : rightBounds.width);
 
-        let eventX = pageX - bounds.width;
-        let eventY = pageY - bounds.height;
+        let eventX = pageX - boundsWidth;
+        let eventY = pageY - rightBounds.height;
 
-        let change = event.deltaY/bounds.height;
+        let change = event.deltaY/rightBounds.height;
         let newScale = this.state.scale + change * .5;
 
         let ratio = 1 - newScale/this.state.scale;
@@ -116,7 +118,6 @@ class App extends React.Component<Props, State> {
 
     recordMousePosition = (event) => {
         let eventBounds = this.canvasWrapper.current.getBoundingClientRect();
-        console.log(eventBounds);
         this.setState({
             mouseX: event.pageX - Math.floor(eventBounds.left),
             mouseY: event.pageY - Math.floor(eventBounds.top),
