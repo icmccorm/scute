@@ -5,13 +5,12 @@ import Handle from 'src/components/Handle';
 import {ShapeProps, ShapeState} from './Shape'
 
 import "src/components/style/Handle.scss";
-import { EventClient } from '../events/EventClient';
 
 type Props = ShapeProps;
 type State = {
-	cx: LinkedValue, 
-	cy: LinkedValue, 
-	r: LinkedValue, 
+	cx: any,//LinkedValue, 
+	cy: any,//LinkedValue, 
+	r: any,//LinkedValue, 
 } & ShapeState;
 
 export default class Circ extends React.Component<Props, any>{
@@ -27,9 +26,9 @@ export default class Circ extends React.Component<Props, any>{
 		this.props = props;
 		let attrs:any = props.defs.attrs;
 		this.state = {
-			cx: new LinkedValue(attrs.cx, props.client),
-			cy: new LinkedValue(attrs.cy, props.client),
-			r: new LinkedValue(attrs.r, props.client),
+			cx: attrs.cx, //new LinkedValue(attrs.cx, props.client),
+			cy: attrs.cy, //new LinkedValue(attrs.cy, props.client),
+			r: attrs.r, //new LinkedValue(attrs.r, props.client),
 			hovering: false,
 			style: this.props.defs.style.values
 		}
@@ -50,14 +49,14 @@ export default class Circ extends React.Component<Props, any>{
 
 	setPosition = (dx:number, dy: number) =>{
 		this.setState({
-			cx: this.state.cx.diffValue(dx),
-			cy: this.state.cy.diffValue(dy),
+			cx: this.state.cx,//this.state.cx.diffValue(dx),
+			cy: this.state.cy,//this.state.cy.diffValue(dy),
 		})
 	}
 
 	setRadius = (dx: number, dy: number) =>{
 		this.setState({
-			r: this.state.r.diffValue(dx)
+			r: this.state.r, //this.state.r.diffValue(dx)
 		})
 	}
 
@@ -65,22 +64,22 @@ export default class Circ extends React.Component<Props, any>{
 		return (
 			<g ref={this.group} className="hoverGroup">
 				<circle ref={this.circ} className={(this.state.hovering ? 'hover' : '')}
-					cx={this.state.cx.current} 
-					cy={this.state.cy.current} 
-					r={this.state.r.current} 
+					cx={this.state.cx } 
+					cy={this.state.cy } 
+					r={this.state.r } 
 					style={this.state.style}
 				></circle>
 
 				{this.state.hovering ?
 					<g>
 						<Handle
-							cx={this.state.cx.current + this.state.r.current}
-							cy={this.state.cy.current}
+							cx={this.state.cx  + this.state.r }
+							cy={this.state.cy }
 							adjust={this.setRadius}
 						></Handle>
 						<Handle
-							cx={this.state.cx.current}
-							cy={this.state.cy.current}
+							cx={this.state.cx}// }
+							cy={this.state.cy }
 							adjust={this.setPosition}
 						></Handle>
 					</g>

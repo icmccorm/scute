@@ -21,10 +21,10 @@ export type Tag = {
 	}
 }
 
-export type ShapeProps = {defs: Tag, client: EventClient, children: any}
+export type ShapeProps = {defs: Tag, children: any}
 export type ShapeState = {hovering: boolean, style: object}
 
-export type Props = {defs: Tag, key: number, client: EventClient}
+export type Props = {defs: Tag, key: number}
 
 export class Shape extends React.Component<Props, any>{
 	readonly props: Props;
@@ -37,12 +37,10 @@ export class Shape extends React.Component<Props, any>{
 		switch(this.props.defs.tag){
 			case ShapeType.SP_RECT:
 				return (<Rect 
-							client={this.props.client} 
 							defs={this.props.defs}>
 						</Rect>);
 			case ShapeType.SP_CIRC:
 				return (<Circ 
-							client={this.props.client}
 							defs={this.props.defs}>
 						</Circ>);
 			default:

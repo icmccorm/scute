@@ -4,16 +4,16 @@ export enum ActionType{
 	PRINT_OUT,
 	PRINT_DEBUG,
 	PRINT_ERROR,
-	FRAME,
+	REQ_FRAME,
+	FIN_FRAME,
 	MANIPULATION,
 	SHIFT,
+	UPDATE_CODE,
+
 }
 
-export class Action {
-	type: ActionType;
-	payload: any;
-	constructor(type: ActionType, payload:any){
-		this.type = type;
-		this.payload = payload;
-	}
+export type Action = {type: ActionType, payload: any};
+
+export function createAction(type: ActionType, payload: any){
+	return {type: type, payload: payload};
 }

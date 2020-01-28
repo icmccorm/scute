@@ -1,11 +1,10 @@
 import * as React from 'react';
 import './style/Editor.scss';
-import { EventClient, Events } from 'src/events/EventClient';
 import { LinkedValue } from 'src/events/LinkedValue';
 import { RefObject } from 'react';
 
-type Props = {client: EventClient, handleChange: Function}
-type State = {value: string, lineNums: any, scrollTop: number}
+type Props = {handleChange: Function}
+type State = {lineNums: any, scrollTop: number, value: string}
 
 class Editor extends React.Component<Props, State> { 
     readonly props: Props;
@@ -18,7 +17,7 @@ class Editor extends React.Component<Props, State> {
         this.state = {
             lineNums: [<span key={1}>1</span>],
             scrollTop: 0,
-            value: ""
+            value: "",
         }
 
         this.wrapper = React.createRef();
@@ -66,11 +65,7 @@ class Editor extends React.Component<Props, State> {
     syncScroll = (evt) =>{
         this.setState({scrollTop: evt.target.scrollTop});
     }
-
-    componentDidMount(){
-        this.props.client.on(Events.MANIPULATION, this.changeText);
-    }
-
+/*
     changeText = async (data) => {
         let currentText = this.state.value;
         let payload: LinkedValue = data;
@@ -83,7 +78,7 @@ class Editor extends React.Component<Props, State> {
         
         await this.setState({value: newValue});
         this.props.handleChange(newValue);
-    }
+    }*/
 
     componentDidUpdate(){
         this.wrapper.current.scrollTop = this.state.scrollTop;
@@ -99,6 +94,7 @@ class Editor extends React.Component<Props, State> {
                 this.state.value.substring(0, start) + '\t' + this.state.value.substring(start) 
                 : '\t';
                 await this.setState({value: newVal})
+                this.props.handleChange(newVal);
                 this.text.current.setSelectionRange(start + 1, start + 1);
                 break;
         }

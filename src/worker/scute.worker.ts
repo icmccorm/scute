@@ -1,5 +1,7 @@
 import Scute from 'src/lang-c/scute.js';
 import {OutputCommands} from './WorkerCommands';
+import {Action, ActionType, createAction} from 'src/redux/Actions';
+
 var scuteModule = require('src/lang-c/scute.wasm');
 
 class ScuteWrapper {
@@ -23,7 +25,7 @@ class ScuteWrapper {
 		this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
 		this.module._free(codePtr);
 		
-		this.sendCommand(OutputCommands.COMPILED, this.module._maxFrameIndex);
+		this.sendCommand(ActionType.FIN_COMPILE, this.module._maxFrameIndex);
 		this.currentIndex = 0;
 	}
 
@@ -31,7 +33,7 @@ class ScuteWrapper {
 		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
 		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
 		
-		this.sendCommand(OutputCommands.FRAME, this.module._currentFrame);
+		this.sendCommand(ActionType.FIN_FRAME, this.module._currentFrame);
 		this.module._currentFrame = [];
 	}
 
@@ -42,9 +44,8 @@ class ScuteWrapper {
 		return charArrayPtr;
 	}
 	
-	sendCommand(cmd: OutputCommands, obj: any) {
-		let message = {code: cmd, payload: obj};
-		this.worker.postMessage(message, null, null);
+	sendCommand(type: ActionType, payload: any) {
+		this.worker.postMessage(createAction(type, payload), null, null);
 	}
 }
 
@@ -61,29 +62,13 @@ Scute({
 	self.onmessage = event => {
 		let message: any[] = event.data;
 		switch(message[0]){
-			case 0:
+			case ActionType.REQ_COMPILE:
+				console.log(message[1]);
 				scute.compileCode(message[1])
 				break;
-			case 1:
+			case ActionType.REQ_FRAME:
 				scute.runCode();
 				break;
 		}
 	}
 });
-/*
-Scute().then((em_module) => {
-	var scute = new ScuteWrapper(em_module, self);
-	self.onmessage = event => {
-		let message: any[] = event.data;
-		switch(message[0]){
-			case 0:
-				scute.compileCode(message[1])
-				break;
-			case 1:
-				scute.runCode();
-				break;
-		}
-	}
-})
-
-*/
