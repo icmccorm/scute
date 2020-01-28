@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run scute ; NODE_ENV=production webpack --config ./config/webpack.prod.js",
-    "dev": "NODE_ENV=development webpack-dev-server --open --config ./config/webpack.dev.js --verbose",
+    "dev": "NODE_ENV=development webpack-dev-server --config ./config/webpack.dev.js --verbose",
     "start": "npm run scute --quiet ; npm run dev --quiet",
     "scute": "make -C ./src/lang-c emcc",
     "deploy": "npm run build ; gh-pages -d dist"
