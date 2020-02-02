@@ -20,7 +20,6 @@ class Button extends React.Component<any,any> {
         );
     };
     handleClick = () => {
-        console.log("clicked.");
         this.props.onClick();
     }
 }

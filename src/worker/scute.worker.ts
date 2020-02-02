@@ -69,7 +69,6 @@ Scute({
 		let message: any[] = event.data;
 		switch(message[0]){
 			case ActionType.REQ_COMPILE:
-				console.log(message[1]);
 				scute.compileCode(message[1])
 				break;
 			case ActionType.REQ_FRAME:
