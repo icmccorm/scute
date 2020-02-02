@@ -22,7 +22,7 @@ class Handle extends React.Component<Props,any> {
         return (
 			<circle ref={this.handle}
 				className={'handle'} 
-				r="10px" 
+				r="5px" 
 				cx={this.props.cx}
 				cy={this.props.cy}
 				onMouseDown={this.recordMousePosition}
