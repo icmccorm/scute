@@ -12,30 +12,25 @@ import './style/AppContainer.scss';
 import {ActionType, createAction } from 'src/redux/Actions';
 
 type State = {
-    originX: number, 
-    originY: number,
-   
-    translateX: number,
-    initialTranslateX: number,
-
-    translateY: number,
-    initialTranslateY: number,
-    
+    currentTranslate: Array<number>,
+    initialTranslate: Array<number>,
+    mousePosition: Array<number>,
     scale: number
-    
+        
     mouseX: number,
     mouseY: number,
 };
 
 type Props = {
-    defaultHeight: number,
-    defaultWidth: number, 
+    dimensions: Array<number>,
+    origin: Array<number>,
     log: string, 
-    frame: Array<Shape>,
+    frame: Array<any>,
+    code: string,
     
     updateCode: Function, 
     runCode: Function,
-
+    manipulate: Function,
 };
 
 class App extends React.Component<Props, State> { 
@@ -48,12 +43,9 @@ class App extends React.Component<Props, State> {
     constructor(props){
         super(props);
         this.state = { 
-            originX: 0,
-            originY: 0,
-            translateX: 0,
-            initialTranslateX: 0,
-            translateY: 0,
-            initialTranslateY: 0,
+            currentTranslate: [0,0],
+            initialTranslate: [0,0],
+            mousePosition: [0,0],
             scale: 1,
             mouseX: 0,
             mouseY: 0,
@@ -61,6 +53,7 @@ class App extends React.Component<Props, State> {
         this.leftWrapper = React.createRef();
         this.rightWrapper = React.createRef();
         this.canvasWrapper = React.createRef();
+
     }
 
     adjustLeft = (pageX: number, pageY: number, dx: number, dy: number) => {
@@ -74,25 +67,23 @@ class App extends React.Component<Props, State> {
 
     resetCanvas = (event) => {
         this.setState({
-            translateX: 0,
-            initialTranslateX: 0,
-            initialTranslateY: 0,
-            translateY: 0,
+            currentTranslate: [0,0],
+            initialTranslate: [0,0],
             scale: 1,
         });
     }
 
 	getViewBox(){
 		return [
-			this.state.originX,
-			this.state.originY, 
-			this.props.defaultWidth, 
-			this.props.defaultHeight
+			this.props.origin[0],
+			this.props.origin[1], 
+			this.props.dimensions[0],
+			this.props.dimensions[1],
 		].join(" ");
     }
     
     getTransform(){
-        return " translate(" + this.state.translateX + "px, " + this.state.translateY + "px) " + "scale(" + this.state.scale + ")";
+        return " translate(" + this.state.currentTranslate[0] + "px, " + this.state.currentTranslate[1] + "px) " + "scale(" + this.state.scale + ")";
         
     }
 
@@ -132,38 +123,37 @@ class App extends React.Component<Props, State> {
 
         let ratio = 1 - newScale/this.state.scale;
 
-        let newTransX = this.state.translateX + (eventX - this.state.translateX) * ratio;
-        let newTransY = this.state.translateY + (eventY - this.state.translateY) * ratio;
+        let newTransX = this.state.currentTranslate[0] + (eventX - this.state.currentTranslate[0]) * ratio;
+        let newTransY = this.state.currentTranslate[1] + (eventY - this.state.currentTranslate[1]) * ratio;
 
         this.setState({
             scale: newScale,
-            translateX: newTransX,
-            translateY: newTransY,
-            initialTranslateX: newTransX,
-            initialTranslateY: newTransY,
+            currentTranslate: [newTransX, newTransY],
+            initialTranslate: [newTransX, newTransY],
         });
      
     }
 
     dragCanvas = (pageX: number, pageY: number, dx: number, dy: number) => {
         this.setState({
-            translateX: dx + this.state.initialTranslateX,
-            translateY: dy + this.state.initialTranslateY,
+            currentTranslate: [dx + this.state.initialTranslate[0], dy + this.state.initialTranslate[1]],
         })
     }
 
     dropCanvas = () => {
         this.setState({
-            initialTranslateX: this.state.translateX,
-            initialTranslateY: this.state.translateY,
+            initialTranslate: this.state.currentTranslate,
         })
     }
 
     recordMousePosition = (event) => {
         let eventBounds = this.canvasWrapper.current.getBoundingClientRect();
+        let newMousePosition = [];
+
+        newMousePosition[0] = (event.pageX - Math.floor(eventBounds.left)) / this.state.scale;
+        newMousePosition[1] = (event.pageY - Math.floor(eventBounds.top)) / this.state.scale;
         this.setState({
-            mouseX: (event.pageX - Math.floor(eventBounds.left)) / this.state.scale,
-            mouseY: (event.pageY - Math.floor(eventBounds.top)) / this.state.scale,
+            mousePosition: newMousePosition,
         })
     }
 
@@ -172,7 +162,7 @@ class App extends React.Component<Props, State> {
             <div className='root flex outer-flex'>
                 <div className='text-wrapper' ref={this.leftWrapper}>
                     <div className='inner-text-wrapper flex inner-flex max'>
-                        <Editor handleChange={this.props.updateCode}></Editor>
+                        <Editor value={this.props.code} handleChange={this.props.updateCode}></Editor>
                         <Log value={this.props.log}/>
                     </div>
                     <Dragger drag={this.adjustLeft} className="scrubber"/> 
@@ -182,10 +172,17 @@ class App extends React.Component<Props, State> {
                     <Navbar>
                         <Button onClick={this.props.runCode}>Run</Button>
                         <Button onClick={this.downloadCanvas}>Export</Button>
-                        <Button onClick={this.resetCanvas}>Fit</Button>
-
-                        <span className="coords">{(this.state.mouseX).toFixed(1) + " " + this.state.mouseY.toFixed(1)}</span>
+                        <Button onClick={this.resetCanvas}>Fit</Button>   
+                        <Button> Settings</Button>
+                
                     </Navbar>
+              
+                    <div className='infoBox'>
+                        <span className="infoText">{"Dimensions: " + this.props.dimensions[0] + "x" + this.props.dimensions[1]}</span>
+                        <span className="infoText">{"Cursor: (" + (this.state.mousePosition[0]).toFixed(1) + ", " + this.state.mousePosition[1].toFixed(1) + ")"}</span>
+                        <span className="infoText">{"Origin: (" + this.props.origin[0] + ", " + this.props.origin[1] + ")"}</span>
+                    </div>     
+
                     <Dragger drag={this.dragCanvas} drop={this.dropCanvas}>
                         <div  
                             onWheel={this.zoomCanvas} 
@@ -195,17 +192,19 @@ class App extends React.Component<Props, State> {
                             >
                             <svg 
                                 ref={this.canvasWrapper}
-                                width={this.props.defaultWidth} 
-                                height={this.props.defaultHeight} 
+                                width={this.props.dimensions[0]} 
+                                height={this.props.dimensions[1]} 
                                 className='canvas shadow' 
                                 viewBox={this.getViewBox()}
                                 onMouseMove={this.recordMousePosition}
                             >
-                                {this.props.frame}
+                                {this.props.frame.map(item => {
+                                    return <Shape manipulate={this.props.manipulate} key={item.id} defs={item}></Shape>
+                                })}
                             </svg>
+
                         </div>
                     </Dragger>
-                    
                 </div>
             </div>
         );
@@ -214,10 +213,12 @@ class App extends React.Component<Props, State> {
 
 function mapStateToProps(store, ownProps: Props){
     return {
-        defaultWidth: store.root.defaultWidth,
-        defaultHeight: store.root.defaultHeight,
+        dimensions: store.root.dimensions,
+        origin: store.root.origin,
         log: store.root.log,
         frame: store.root.frame,
+        shiftClient: store.root.shiftClient,
+        code: store.root.code,
     };
 }
 
@@ -225,6 +226,7 @@ function mapDispatchToProps(dispatch){
     return {
         runCode: () => dispatch(createAction(ActionType.REQ_COMPILE, null)),
         updateCode: (code) => dispatch(createAction(ActionType.UPDATE_CODE, code)),
+        manipulate: (manipObject) => dispatch(createAction(ActionType.MANIPULATION, manipObject)),
     }
 }
 

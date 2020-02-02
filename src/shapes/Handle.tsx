@@ -21,22 +21,27 @@ class Handle extends React.Component<Props,any> {
     render (){
         return (
 			<circle ref={this.handle}
-				className={this.state.dragging ? 'handle down' : 'handle'} 
-				r="5px" 
+				className={'handle'} 
+				r="10px" 
 				cx={this.props.cx}
 				cy={this.props.cy}
+				onMouseDown={this.recordMousePosition}
 			></circle>
         );
 	};
 
 	recordMousePosition = (event) =>{
-		document.body.style.cursor = "grabbing"
 		event.preventDefault();
+		event.stopPropagation();
+
+		document.body.style.cursor = "grabbing";
 
 		this.mouseX = event.pageX;
 		this.mouseY = event.pageY;
 		window.addEventListener('mousemove', this.resizeComponents, false);	
+
 		window.addEventListener('mouseup', ()=>{
+			document.body.style.cursor = "grab";
 			window.removeEventListener('mousemove', this.resizeComponents, false);
 		}, false);
 	}
@@ -48,9 +53,6 @@ class Handle extends React.Component<Props,any> {
 		this.mouseY = event.pageY;
 	}
 
-	componentDidMount(){
-		this.handle.current.addEventListener('mousedown', this.recordMousePosition);
-	}
 }
 
 export default Handle;

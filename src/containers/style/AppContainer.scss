@@ -34,6 +34,7 @@
     order: 2;
     overflow: hidden;
     position: relative;
+    margin: .75rem;
 }
 
 .flex {
@@ -144,4 +145,18 @@
 
 .zoomRelative{
     transform-origin: bottom right;
+}
+
+.infoBox{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: auto;
+    padding-top: .75rem;
+    padding-right: 1.25rem;
+}
+
+.infoText{
+    display: block;
+    margin-bottom: 5px;
 }

@@ -19,6 +19,7 @@ class ScuteWrapper {
 	compileCode(code: string){
 		this.module._frames = [];
 		this.module._maxFrameIndex = 0;
+		this.module._values = [];
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
@@ -30,7 +31,7 @@ class ScuteWrapper {
 		}
 		this.module._free(codePtr);
 		
-		this.sendCommand(ActionType.FIN_COMPILE, this.module._maxFrameIndex);
+		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, values: this.module._values});
 		this.currentIndex = 0;
 	}
 

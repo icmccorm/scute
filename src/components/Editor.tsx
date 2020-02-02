@@ -1,10 +1,10 @@
 import * as React from 'react';
 import './style/Editor.scss';
-import { LinkedValue } from 'src/events/LinkedValue';
+import { LinkedValue } from 'src/redux/LinkedValue';
 import { RefObject } from 'react';
 
-type Props = {handleChange: Function}
-type State = {lineNums: any, scrollTop: number, value: string}
+type Props = {handleChange: Function, value: string}
+type State = {lineNums: any, scrollTop: number}
 
 class Editor extends React.Component<Props, State> { 
     readonly props: Props;
@@ -17,7 +17,6 @@ class Editor extends React.Component<Props, State> {
         this.state = {
             lineNums: [<span key={1}>1</span>],
             scrollTop: 0,
-            value: "",
         }
 
         this.wrapper = React.createRef();
@@ -38,7 +37,7 @@ class Editor extends React.Component<Props, State> {
                     ref={this.text}
                     spellCheck={false}
                     className='dark textArea textPadding'
-                    value={this.state.value}
+                    value={this.props.value}
                     onChange={this.handleChange}
                     onKeyDown={this.handleSpecialCharacters}
                 />
@@ -47,7 +46,6 @@ class Editor extends React.Component<Props, State> {
     }
     
     handleChange = (evt: any) => {
-        this.setState({value: evt.target.value});
         this.props.handleChange(evt.target.value);
         this.syncLineNumbers(evt.target.value);
     }
@@ -65,20 +63,6 @@ class Editor extends React.Component<Props, State> {
     syncScroll = (evt) =>{
         this.setState({scrollTop: evt.target.scrollTop});
     }
-/*
-    changeText = async (data) => {
-        let currentText = this.state.value;
-        let payload: LinkedValue = data;
-        let oldValueLength = payload.previous.toString().length;
-        let oldValueText = currentText.substring(payload.index, payload.index + oldValueLength);
-
-        let prev = currentText.substring(0, payload.index);
-        let end = currentText.substring(payload.index+oldValueLength);
-        let newValue = prev + payload.current + end;
-        
-        await this.setState({value: newValue});
-        this.props.handleChange(newValue);
-    }*/
 
     componentDidUpdate(){
         this.wrapper.current.scrollTop = this.state.scrollTop;
@@ -90,10 +74,9 @@ class Editor extends React.Component<Props, State> {
             case 9: //tab
                 evt.preventDefault();
                 let start = evt.currentTarget.selectionStart;
-                let newVal = this.state.value ?
-                this.state.value.substring(0, start) + '\t' + this.state.value.substring(start) 
+                let newVal = this.props.value ?
+                this.props.value.substring(0, start) + '\t' + this.props.value.substring(start) 
                 : '\t';
-                await this.setState({value: newVal})
                 this.props.handleChange(newVal);
                 this.text.current.setSelectionRange(start + 1, start + 1);
                 break;

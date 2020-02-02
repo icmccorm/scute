@@ -4,6 +4,7 @@ import {scuteStore} from './ScuteStore';
 
 var ScuteWorkerObject = new ScuteWorker();
 
+
 ScuteWorkerObject.onmessage = async (event) => {
 	let action: Action = event.data;
 	scuteStore.dispatch(action);

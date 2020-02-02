@@ -1,26 +1,37 @@
 import * as React from 'react';
-import {createStore, combineReducers} from 'redux';
+import {createStore, combineReducers, applyMiddleware} from 'redux';
 import {ActionType, Action} from './Actions';
 import {requestCompile, requestFrame} from './ScuteWorker';
 import {Shape} from 'src/shapes/Shape';
+import {Manipulation} from './LinkedValue';
+
+export type CompilationResponse = {maxFrameIndex: number, values: []};
+export type ValueMeta = {line: number, startIndex: number, length: number};
 
 export type scuteStore = {
-	defaultWidth: number,
-	defaultHeight: number,
+	origin: Array<number>,
+	dimensions: Array<number>,
 	code: string,
 	log: string,
-	frame: Array<Shape>
+	frame: Array<Shape>,
+	frameIndex: number,
+	maxFrameIndex: number,
+	values: Array<ValueMeta>
 }
 
 var initialStore: scuteStore = {
 	frame: [],
-	defaultWidth: 500,
-	defaultHeight: 500,
+	dimensions: [500, 500],
+	origin: [0,0],
 	code: "",
 	log: "",
+	maxFrameIndex: 0,
+	frameIndex: 0,
+	values: [],
 }
 
 export function reduceUI(store = initialStore, action: Action){
+
 	switch(action.type){
 
 		case ActionType.REQ_COMPILE:
@@ -30,6 +41,12 @@ export function reduceUI(store = initialStore, action: Action){
 			requestCompile(store.code);
 			break;
 		case ActionType.FIN_COMPILE:
+			let response: CompilationResponse = action.payload;
+			store = Object.assign({}, store, {
+				values: response.values,
+				maxFrameIndex: response.maxFrameIndex,
+			});
+
 			requestFrame();
 			break;
 
@@ -48,20 +65,30 @@ export function reduceUI(store = initialStore, action: Action){
 			break;
 		case ActionType.FIN_FRAME:
 			if(action.payload){
-				let newFrame: Array<JSX.Element> = [];
-				for(let item of action.payload){
-					newFrame.push(<Shape key={item.id} defs={item}/>);
-				}
 				store = Object.assign({}, store, {
-					frame: newFrame,
+					frame: action.payload,
 				})
 			}
 			break;
 		case ActionType.MANIPULATION:
-			break;
-		case ActionType.SHIFT:
-			break;
+			let change: Manipulation = action.payload;
+			let meta = store.values[change.valueIndex];
 
+			let start = store.code.substring(0, meta.startIndex);
+			let end = store.code.substring(meta.startIndex + meta.length);
+
+			store = Object.assign({}, store, {
+				code: start + change.value + end,
+			});
+
+			if(change.lengthDifference != 0){
+				meta.length += change.lengthDifference;
+				for(let i = change.valueIndex + 1; i< store.values.length; ++i){
+					store.values[i].startIndex += change.lengthDifference;
+				}
+			}
+		
+			break;
 		case ActionType.UPDATE_CODE:
 			store = Object.assign({}, store, {
 				code: action.payload,
@@ -70,7 +97,6 @@ export function reduceUI(store = initialStore, action: Action){
 	}
 	return store;
 }
-
 
 var rootReducer = combineReducers({
 	root: reduceUI,

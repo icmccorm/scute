@@ -30,22 +30,30 @@ class Dragger extends React.Component<Props,State> {
 
 	recordMousePosition = (event) =>{
 		event.preventDefault();
+
 		this.setState({dragging: true});
+
 		this.mouseX = event.pageX;
 		this.mouseY = event.pageY;
 		let node:HTMLDivElement = this.draggerDiv.current;
-		window.addEventListener('mousemove', this.resizeComponents, false);	
-		window.addEventListener('mouseup', ()=>{
-			window.removeEventListener('mousemove', this.resizeComponents, false);
+
+		this.draggerDiv.current.addEventListener('mousemove', this.resizeComponents, false);	
+
+		this.draggerDiv.current.addEventListener('mouseup', ()=>{
+
+			this.draggerDiv.current.removeEventListener('mousemove', this.resizeComponents, false);
 			this.setState({dragging: false});
 			if(this.props.drop) this.props.drop();
+
 		}, false);
 	}
 	
 	resizeComponents = (event) => {
 		event.preventDefault();
+
 		let dx = event.pageX - this.mouseX;
 		let dy = event.pageY - this.mouseY;
+		
 		this.props.drag(event.pageX, event.pageY, dx, dy);
 	}
 }
