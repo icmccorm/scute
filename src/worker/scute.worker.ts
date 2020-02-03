@@ -1,6 +1,5 @@
 import Scute from 'src/lang-c/scute.js';
-import {OutputCommands} from './WorkerCommands';
-import {Action, ActionType, createAction} from 'src/redux/Actions';
+import {ActionType, createAction} from 'src/redux/Actions';
 
 var scuteModule = require('src/lang-c/scute.wasm');
 
@@ -19,7 +18,7 @@ class ScuteWrapper {
 	compileCode(code: string){
 		this.module._frames = [];
 		this.module._maxFrameIndex = 0;
-		this.module._values = [];
+		this.module._lines = [];
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
@@ -31,7 +30,7 @@ class ScuteWrapper {
 		}
 		this.module._free(codePtr);
 		
-		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, values: this.module._values});
+		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, lines: this.module._lines});
 		this.currentIndex = 0;
 	}
 

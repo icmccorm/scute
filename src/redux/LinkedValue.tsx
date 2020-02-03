@@ -1,34 +1,33 @@
-import { ShapeProps } from "src/shapes/Shape";
-
-export type Manipulation = {value: number | string, valueIndex: number, lengthDifference: number}
-export type ValueLink = {value: number, valueIndex: number};
+export type Manipulation = {value: number | string, lineIndex: number, inlineIndex, lengthDifference: number}
+export type ValueLink = {value: number, lineIndex: number, inlineIndex};
 
 export class LinkedValue{
 	previous: number;
 	current: number;
-	valueIndex: number;
+	link: ValueLink;
 	manipulate: Function;
 
 	constructor(obj: ValueLink, manipulate: Function){
 		this.current = obj.value;
-		this.valueIndex = obj.valueIndex;
 		this.previous = null;
+		this.link = obj;
 		this.manipulate = manipulate;
 	}
 
 	diffValue = (newDiff: any) => {
-		this.previous = this.current; 
-		this.current = this.current + newDiff;
+		if(newDiff != 0){
+			this.previous = this.current; 
+			this.current = this.current + newDiff;
 	
-		let prevLength = this.previous.toString().length;
-		let currLength = this.current.toString().length;
-
-		this.manipulate({
-			value: this.current,
-			valueIndex: this.valueIndex,
-			lengthDifference: currLength - prevLength,
-		});
-		
+			let lengthDifference = this.current.toString().length - this.previous.toString().length;
+	
+			this.manipulate({
+				value: this.current,
+				lineIndex: this.link.lineIndex,
+				inlineIndex: this.link.inlineIndex,
+				lengthDifference: lengthDifference
+			});
+		}
 		return this;
 	}
 }

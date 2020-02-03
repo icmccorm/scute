@@ -1,12 +1,12 @@
-import * as React from 'react';
-import {createStore, combineReducers, applyMiddleware} from 'redux';
+import {createStore, combineReducers} from 'redux';
 import {ActionType, Action} from './Actions';
 import {requestCompile, requestFrame} from './ScuteWorker';
 import {Shape} from 'src/shapes/Shape';
 import {Manipulation} from './LinkedValue';
 
-export type CompilationResponse = {maxFrameIndex: number, values: []};
-export type ValueMeta = {line: number, startIndex: number, length: number};
+export type CompilationResponse = {maxFrameIndex: number, lines: []};
+export type ValueMeta = {inlineOffset: number, length: number};
+export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
 
 export type scuteStore = {
 	origin: Array<number>,
@@ -16,7 +16,7 @@ export type scuteStore = {
 	frame: Array<Shape>,
 	frameIndex: number,
 	maxFrameIndex: number,
-	values: Array<ValueMeta>
+	lines: Array<LineMeta>
 }
 
 var initialStore: scuteStore = {
@@ -27,7 +27,7 @@ var initialStore: scuteStore = {
 	log: "",
 	maxFrameIndex: 0,
 	frameIndex: 0,
-	values: [],
+	lines: [],
 }
 
 export function reduceUI(store = initialStore, action: Action){
@@ -43,7 +43,7 @@ export function reduceUI(store = initialStore, action: Action){
 		case ActionType.FIN_COMPILE:
 			let response: CompilationResponse = action.payload;
 			store = Object.assign({}, store, {
-				values: response.values,
+				lines: response.lines,
 				maxFrameIndex: response.maxFrameIndex,
 			});
 
@@ -72,22 +72,27 @@ export function reduceUI(store = initialStore, action: Action){
 			break;
 		case ActionType.MANIPULATION:
 			let change: Manipulation = action.payload;
-			let meta = store.values[change.valueIndex];
+			let line: LineMeta = store.lines[change.lineIndex];
+			let meta: ValueMeta = line.values[change.inlineIndex];
 
-			let start = store.code.substring(0, meta.startIndex);
-			let end = store.code.substring(meta.startIndex + meta.length);
+			let startIndex = line.charIndex + meta.inlineOffset;
+
+			let start = store.code.substring(0, startIndex);
+			let end = store.code.substring(startIndex + meta.length);
+			meta.length += change.lengthDifference;
 
 			store = Object.assign({}, store, {
 				code: start + change.value + end,
 			});
 
 			if(change.lengthDifference != 0){
-				meta.length += change.lengthDifference;
-				for(let i = change.valueIndex + 1; i< store.values.length; ++i){
-					store.values[i].startIndex += change.lengthDifference;
+				for(let i = change.inlineIndex + 1; i< line.values.length; ++i){
+					line.values[i].inlineOffset += change.lengthDifference;
+				}
+				for(let i = change.lineIndex + 1; i < store.lines.length; ++i){
+					store.lines[i].charIndex += change.lengthDifference;
 				}
 			}
-		
 			break;
 		case ActionType.UPDATE_CODE:
 			store = Object.assign({}, store, {
