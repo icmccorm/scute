@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { ValueLink } from 'src/redux/ScuteStore';
 import {Rect} from "./RectHook";
 import {Circ} from "./CircHook";
