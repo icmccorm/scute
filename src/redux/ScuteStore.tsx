@@ -7,6 +7,7 @@ import {Manipulation} from './LinkedValue';
 export type CompilationResponse = {maxFrameIndex: number, lines: []};
 export type ValueMeta = {inlineOffset: number, length: number};
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
+export type ValueLink = {type: number, lineIndex: number, inlineIndex};
 
 export type scuteStore = {
 	origin: Array<number>,
@@ -101,6 +102,10 @@ export function reduceUI(store = initialStore, action: Action){
 			break;
 	}
 	return store;
+}
+
+export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
+	return lines[link.lineIndex][link.inlineIndex].value;
 }
 
 var rootReducer = combineReducers({

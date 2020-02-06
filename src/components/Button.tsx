@@ -3,7 +3,6 @@ import './style/Button.scss';
 
 class Button extends React.Component<any,any> { 
 
-
     constructor(props: any){
         super(props);
     }

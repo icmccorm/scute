@@ -1,5 +1,5 @@
 export type Manipulation = {value: number | string, lineIndex: number, inlineIndex, lengthDifference: number}
-export type ValueLink = {value: number, lineIndex: number, inlineIndex};
+export type ValueLink = {type: number, lineIndex: number, inlineIndex};
 
 export class LinkedValue{
 	previous: number;
@@ -8,7 +8,7 @@ export class LinkedValue{
 	manipulate: Function;
 
 	constructor(obj: ValueLink, manipulate: Function){
-		this.current = obj.value;
+		this.current = 0;
 		this.previous = null;
 		this.link = obj;
 		this.manipulate = manipulate;
