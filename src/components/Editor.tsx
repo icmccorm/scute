@@ -6,10 +6,7 @@ type Props = {handleChange: Function, value: string}
 type State = {lineNums: any, scrollTop: number}
 
 
-export const Editor = () => {
-
-
-    
+export const Editor = ({value, handleChange}:Props) => {
     return (
         <div ref={this.wrapper} id="code" className='editor-wrapper' onScroll={this.syncScroll}>
             <div

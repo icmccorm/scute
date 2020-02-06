@@ -3,7 +3,7 @@ import * as React from 'react';
 type Props = {drag: Function, drop?: Function, children?: any, className?:string};
 type State = {dragging: boolean};
 
-export const Dragger = () => {
+export const Dragger = ({drag, drop, children, className}:Props) => {
     return (
         <div 
             ref={this.draggerDiv}

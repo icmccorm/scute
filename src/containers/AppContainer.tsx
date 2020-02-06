@@ -1,12 +1,11 @@
 import * as React from 'react';
 
-import Navbar from './Navbar';
-import Log from 'src/components/Log';
-import Editor from 'src/components/Editor';
-import Button from 'src/components/Button';
-import Dragger from 'src/components/Dragger';
+import {Navbar} from './Navbar';
+import {Log} from 'src/components/Log';
+import {Editor} from 'src/components/Editor';
+import {Button} from 'src/components/Button';
+import {Dragger} from 'src/components/Dragger';
 import {Shape} from 'src/shapes/Shape';
-import {connect} from 'react-redux';
 
 import './style/AppContainer.scss';
 import {ActionType, createAction } from 'src/redux/Actions';
@@ -33,6 +32,58 @@ type Props = {
     manipulate: Function,
 };
 
+export const App = () => {
+
+    return (
+        <div className='root flex outer-flex'>
+            <div className='text-wrapper' ref={this.leftWrapper}>
+                <div className='inner-text-wrapper flex inner-flex max'>
+                    <Editor value={this.props.code} handleChange={this.props.updateCode}></Editor>
+                    <Log value={this.props.log}></Log>
+                </div>
+                <Dragger drag={this.adjustLeft} className="scrubber"/> 
+            </div>
+
+            <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
+                <Navbar>
+                    <Button onClick={this.props.runCode}>Run</Button>
+                    <Button onClick={this.downloadCanvas}>Export</Button>
+                    <Button onClick={this.resetCanvas}>Fit</Button>   
+                    <Button>Settings</Button>
+                </Navbar>
+        
+                <div className='infoBox'>
+                    <span className="infoText">{"Dimensions: " + this.props.dimensions[0] + "x" + this.props.dimensions[1]}</span>
+                    <span className="infoText">{"Cursor: (" + (this.state.mousePosition[0]).toFixed(1) + ", " + this.state.mousePosition[1].toFixed(1) + ")"}</span>
+                    <span className="infoText">{"Origin: (" + this.props.origin[0] + ", " + this.props.origin[1] + ")"}</span>
+                </div>     
+
+                <Dragger drag={this.dragCanvas} drop={this.dropCanvas}>
+                    <div  
+                        onWheel={this.zoomCanvas} 
+                        className="view-flex min-max zoomRelative"
+                        style={{transform: this.getTransform()}}
+
+                        >
+                        <svg 
+                            ref={this.canvasWrapper}
+                            width={this.props.dimensions[0]} 
+                            height={this.props.dimensions[1]} 
+                            className='canvas shadow' 
+                            viewBox={this.getViewBox()}
+                            onMouseMove={this.recordMousePosition}
+                        >
+                            {this.props.frame.map(item => {
+                                return <Shape key={item.id} defs={item}></Shape>
+                            })}
+                        </svg>
+                    </div>
+                </Dragger>
+            </div>
+        </div>
+    );
+}
+/*
 class App extends React.Component<Props, State> { 
     readonly state: State;
     readonly props: Props;
@@ -159,54 +210,7 @@ class App extends React.Component<Props, State> {
 
     render () {
         return (     
-            <div className='root flex outer-flex'>
-                <div className='text-wrapper' ref={this.leftWrapper}>
-                    <div className='inner-text-wrapper flex inner-flex max'>
-                        <Editor value={this.props.code} handleChange={this.props.updateCode}></Editor>
-                        <Log value={this.props.log}/>
-                    </div>
-                    <Dragger drag={this.adjustLeft} className="scrubber"/> 
-                </div>
-
-                <div className='view-wrapper darkgray-b' ref={this.rightWrapper}> 
-                    <Navbar>
-                        <Button onClick={this.props.runCode}>Run</Button>
-                        <Button onClick={this.downloadCanvas}>Export</Button>
-                        <Button onClick={this.resetCanvas}>Fit</Button>   
-                        <Button> Settings</Button>
-                
-                    </Navbar>
-              
-                    <div className='infoBox'>
-                        <span className="infoText">{"Dimensions: " + this.props.dimensions[0] + "x" + this.props.dimensions[1]}</span>
-                        <span className="infoText">{"Cursor: (" + (this.state.mousePosition[0]).toFixed(1) + ", " + this.state.mousePosition[1].toFixed(1) + ")"}</span>
-                        <span className="infoText">{"Origin: (" + this.props.origin[0] + ", " + this.props.origin[1] + ")"}</span>
-                    </div>     
-
-                    <Dragger drag={this.dragCanvas} drop={this.dropCanvas}>
-                        <div  
-                            onWheel={this.zoomCanvas} 
-                            className="view-flex min-max zoomRelative"
-                            style={{transform: this.getTransform()}}
-
-                            >
-                            <svg 
-                                ref={this.canvasWrapper}
-                                width={this.props.dimensions[0]} 
-                                height={this.props.dimensions[1]} 
-                                className='canvas shadow' 
-                                viewBox={this.getViewBox()}
-                                onMouseMove={this.recordMousePosition}
-                            >
-                                {this.props.frame.map(item => {
-                                    return <Shape manipulate={this.props.manipulate} key={item.id} defs={item}></Shape>
-                                })}
-                            </svg>
-
-                        </div>
-                    </Dragger>
-                </div>
-            </div>
+ 
         );
     }
 }
@@ -231,4 +235,4 @@ function mapDispatchToProps(dispatch){
 }
 
 const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
-export default AppContainer;
+export default AppContainer;*/
