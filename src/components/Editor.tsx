@@ -5,30 +5,7 @@ import { RefObject } from 'react';
 type Props = {handleChange: Function, value: string}
 type State = {lineNums: any, scrollTop: number}
 
-
-export const Editor = ({value, handleChange}:Props) => {
-    return (
-        <div ref={this.wrapper} id="code" className='editor-wrapper' onScroll={this.syncScroll}>
-            <div
-                ref={this.nums} 
-                className='lineNums textPadding'
-            >
-                    {this.state.lineNums}
-            </div>
-            <textarea
-                ref={this.text}
-                spellCheck={false}
-                className='dark textArea textPadding'
-                value={this.props.value}
-                onChange={this.handleChange}
-                onKeyDown={this.handleSpecialCharacters}
-            />
-        </div>
-    );
-}
-
-/*
-class Editor extends React.Component<Props, State> { 
+export class Editor extends React.Component<Props, State> { 
     readonly props: Props;
     wrapper: any;
     nums: any;
@@ -47,7 +24,24 @@ class Editor extends React.Component<Props, State> {
     }
 
     render = () => {
-        
+        return (
+            <div ref={this.wrapper} id="code" className='editor-wrapper' onScroll={this.syncScroll}>
+                <div
+                    ref={this.nums} 
+                    className='lineNums textPadding'
+                >
+                {this.state.lineNums}
+                </div>
+                <textarea
+                    ref={this.text}
+                    spellCheck={false}
+                    className='dark textArea textPadding'
+                    value={this.props.value}
+                    onChange={this.handleChange}
+                    onKeyDown={this.handleSpecialCharacters}
+                />
+            </div>
+        );
     }
     
     handleChange = (evt: any) => {
@@ -88,4 +82,4 @@ class Editor extends React.Component<Props, State> {
         }
     }
 }
-export default Editor;*/
+export default Editor;

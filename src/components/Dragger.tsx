@@ -3,19 +3,7 @@ import * as React from 'react';
 type Props = {drag: Function, drop?: Function, children?: any, className?:string};
 type State = {dragging: boolean};
 
-export const Dragger = ({drag, drop, children, className}:Props) => {
-    return (
-        <div 
-            ref={this.draggerDiv}
-            className={this.props.className}
-            onMouseDown={this.recordMousePosition}>
-            {this.props.children}
-        </div>
-    );
-}
-
-/*
-class Dragger extends React.Component<Props,State> { 
+export class Dragger extends React.Component<Props,State> { 
 	readonly props: Props;
 	mouseX: number;
 	mouseY: number;
@@ -30,7 +18,14 @@ class Dragger extends React.Component<Props,State> {
     }
 
     render (){
-        
+        return (
+			<div 
+				ref={this.draggerDiv}
+				className={this.props.className}
+				onMouseDown={this.recordMousePosition}>
+				{this.props.children}
+			</div>
+		);
 	};
 
 	recordMousePosition = (event) =>{
@@ -62,5 +57,3 @@ class Dragger extends React.Component<Props,State> {
 		this.props.drag(event.pageX, event.pageY, dx, dy);
 	}
 }
-
-export default Dragger;*/
