@@ -4,27 +4,23 @@ import {useSelector} from 'react-redux';
 import { ValueLink, getLinkedValue } from '../redux/ScuteStore';
 import Handle from './Handle';
 
-export const Rect = (defs: any) => {
+export const Rect = ({defs}) => {
     let attrs: Array<ValueLink> = defs.attrs;
     console.log(attrs);
-    const linkedAttributes = useSelector(state => {
-        let lines = state.root.lines;
-        return ({
-            x: getLinkedValue(state.root.lines, attrs['x']),
-            y: getLinkedValue(state.root.lines, attrs['y']),
-            width: getLinkedValue(state.root.lines, attrs['width']),
-            height: getLinkedValue(state.root.lines, attrs['height']), 
-        });
+    const lines = useSelector(store => store.root.lines);
+
+    const[state, setState] = React.useState({
+        hovering: false,
+        style: {},
+        x: getLinkedValue(lines, attrs['x']),
+        y: getLinkedValue(lines, attrs['y']),
+        width: getLinkedValue(lines, attrs['width']),
+        height: getLinkedValue(lines, attrs['height']), 
     });
 
-    const[state, setState] = React.useState(Object.assign({}, linkedAttributes, {
-        hovering: false,
-        style: {}
-    }));
-
     return (
-        <g ref={this.group} className="hoverGroup">
-            <rect ref={this.rect} className={(state.hovering ? 'hover' : '')}
+        <g className="hoverGroup">
+            <rect className={(state.hovering ? 'hover' : '')}
                 x={state.x} 
                 y={state.y} 
                 width={state.width} 

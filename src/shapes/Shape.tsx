@@ -1,6 +1,8 @@
 import { ValueLink } from 'src/redux/ScuteStore';
 import {Rect} from "./Rect";
 import {Circ} from "./Circ";
+import { render } from 'node-sass';
+import * as React from 'react';
 
 enum ShapeType{
 	SP_RECT = 62,
@@ -25,11 +27,15 @@ export type ShapeState = {hovering: boolean, style: object}
 export type Props = {defs: Tag}
 
 export const Shape = ({defs}:Props) => {
-	switch(this.props.defs.tags){
+	switch(defs.tag){
 		case ShapeType.SP_RECT:
-			return Rect(defs);
+			return(
+				<Rect defs={defs}></Rect>
+			);
 		case ShapeType.SP_CIRC:
-			return Circ(defs);
+			return(
+				<Rect defs={defs}></Rect>
+			);
 		default:
 			return null;
 	}

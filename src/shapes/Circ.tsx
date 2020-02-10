@@ -4,30 +4,26 @@ import {useSelector} from 'react-redux';
 import { ValueLink, getLinkedValue } from '../redux/ScuteStore';
 import Handle from './Handle';
 
-export const Circ = (defs: any) => {
+export const Circ = ({defs}) => {
     let attrs: Array<ValueLink> = defs.attrs;
     console.log(attrs);
-    const linkedAttributes = useSelector(state => {
-        let lines = state.root.lines;
-        return ({
-            r: getLinkedValue(lines, attrs['r']),
-            cx: getLinkedValue(lines, attrs['cx']),
-            cy: getLinkedValue(lines, attrs['cy']),
-        });
+    const lines = useSelector(store => store.root.lines);
+
+    const[state, setState] = React.useState({
+        hovering: false,
+        style: {},
+        r: getLinkedValue(lines, attrs['r']),
+        cx: getLinkedValue(lines, attrs['cx']),
+        cy: getLinkedValue(lines, attrs['cy']),
     });
 
-    const[state, setState] = React.useState(Object.assign({}, linkedAttributes, {
-        hovering: false,
-        style: {}
-    }));
-
     return (
-		<g ref={this.group} className="hoverGroup">
-			<circle ref={this.circ} className={(this.state.hovering ? 'hover' : '')}
-				cx={this.state.cx.current} 
-				cy={this.state.cy.current} 
-				r={this.state.r.current} 
-				style={this.state.style}
+		<g className="hoverGroup">
+			<circle className={(state.hovering ? 'hover' : '')}
+				cx={state.cx} 
+				cy={state.cy} 
+				r={state.r} 
+				style={state.style}
 			></circle>
 		</g>
     );
@@ -37,8 +33,8 @@ export const Circ = (defs: any) => {
         {state.hovering ?
             <g>
                 <Handle
-                    cx={state.x.current + 0.5*state.width}
-                    cy={state.y.current + state.height}
+                    cx={state.x + 0.5*state.width}
+                    cy={state.y + state.height}
                     adjust={this.setHeight}
                 ></Handle>
                 <Handle
