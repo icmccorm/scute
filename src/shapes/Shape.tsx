@@ -1,8 +1,9 @@
-import { ValueLink } from 'src/redux/ScuteStore';
 import {Rect} from "./Rect";
 import {Circ} from "./Circ";
-import { render } from 'node-sass';
 import * as React from 'react';
+import { Polyline } from './Polyline';
+import { Segment } from './PathUtilities';
+import { ValueLink } from "src/redux/Manipulation";
 
 enum ShapeType{
 	SP_RECT = 62,
@@ -20,13 +21,12 @@ export type Tag = {
 		values: object,
 		loc: object
 	}
+	segments: Array<Segment>
 }
 
-export type ShapeProps = {defs: Tag, children: any}
-export type ShapeState = {hovering: boolean, style: object}
-export type Props = {defs: Tag}
+export type ShapeProps = {defs: Tag, children?: any}
 
-export const Shape = ({defs}:Props) => {
+export const Shape = ({defs}:ShapeProps) => {
 	switch(defs.tag){
 		case ShapeType.SP_RECT:
 			return(
@@ -34,7 +34,15 @@ export const Shape = ({defs}:Props) => {
 			);
 		case ShapeType.SP_CIRC:
 			return(
-				<Rect defs={defs}></Rect>
+				<Circ defs={defs}></Circ>
+			);
+		case ShapeType.SP_POLYL:
+			return(
+				<Polyline defs={defs}></Polyline>
+			);
+		case ShapeType.SP_POLYG:
+			return(
+				null
 			);
 		default:
 			return null;

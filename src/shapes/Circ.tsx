@@ -1,52 +1,50 @@
 import * as React from 'react';
-import {ShapeProps, ShapeState, Tag} from './Shape';
-import {useSelector} from 'react-redux';
-import { ValueLink, getLinkedValue } from '../redux/ScuteStore';
+import {ShapeProps} from './Shape';
+import {useSelector, useDispatch} from 'react-redux';
 import Handle from './Handle';
+import { ValueLink, getLinkedValue, ValueMeta, manipulation } from 'src/redux/Manipulation';
+import { scuteStore } from 'src/redux/ScuteStore';
 
-export const Circ = ({defs}) => {
+export const Circ = ({defs}:ShapeProps) => {
     let attrs: Array<ValueLink> = defs.attrs;
-    console.log(attrs);
-    const lines = useSelector(store => store.root.lines);
+    let dispatch = useDispatch();
 
-    const[state, setState] = React.useState({
-        hovering: false,
-        style: {},
-        r: getLinkedValue(lines, attrs['r']),
-        cx: getLinkedValue(lines, attrs['cx']),
-        cy: getLinkedValue(lines, attrs['cy']),
-    });
+    const cxValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['cx']));
+    const cyValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['cy']));
+    const rValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['r']));
+    const[hovering, setHover] = React.useState(false);
+
+    const setRadius = (dx: number, dy: number) => {
+        dispatch(manipulation(dx, attrs['r']));
+    }
+
+    const setPosition = (dx: number, dy: number) => {
+        dispatch(manipulation(dx, attrs['cx']));
+        dispatch(manipulation(dy, attrs['cy']));
+    }
 
     return (
-		<g className="hoverGroup">
-			<circle className={(state.hovering ? 'hover' : '')}
-				cx={state.cx} 
-				cy={state.cy} 
-				r={state.r} 
-				style={state.style}
+		<g className="hoverGroup" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+			<circle className={(hovering ? 'hover' : '')}
+				cx={cxValue.value} 
+				cy={cyValue.value} 
+				r={rValue.value} 
 			></circle>
+
+            {hovering ?
+                <g>
+                    <Handle
+                        cx={cxValue.value + rValue.value}
+                        cy={cyValue.value}
+                        adjust={setRadius}
+                    ></Handle>
+                    <Handle
+                        cx={cxValue.value}
+                        cy={cyValue.value}
+                        adjust={setPosition}
+                    ></Handle>
+                </g>
+            : null}
 		</g>
     );
  }
-
- /*
-        {state.hovering ?
-            <g>
-                <Handle
-                    cx={state.x + 0.5*state.width}
-                    cy={state.y + state.height}
-                    adjust={this.setHeight}
-                ></Handle>
-                <Handle
-                    cx={state.x + 0.5*state.width}
-                    cy={state.y + 0.5*state.height}
-                    adjust={this.setPosition}
-                ></Handle>
-                <Handle
-                    cx={state.x + state.width}
-                    cy={state.y + 0.5*state.height}
-                    adjust={this.setWidth}
-                ></Handle>
-            </g>
-        : null}
- */

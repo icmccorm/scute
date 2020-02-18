@@ -24,13 +24,14 @@
 }
 
 .scrubber {
-    flex-basis: 5px;
+    flex-basis: 8px;
     flex-shrink: 0;
-    cursor: ew-resize;
+    background-color: hsl(210, 3%, 30%)
 }
 
 .view-wrapper {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    width: auto;
     order: 2;
     overflow: hidden;
     position: relative;

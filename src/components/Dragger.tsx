@@ -28,6 +28,13 @@ export class Dragger extends React.Component<Props,State> {
 		);
 	};
 
+	exitRecording = () => {
+		window.removeEventListener('mousemove', this.resizeComponents, false);
+		this.setState({dragging: false});
+		if(this.props.drop) this.props.drop();
+		window.removeEventListener('mouseup', this.exitRecording);
+	}
+
 	recordMousePosition = (event) =>{
 		event.preventDefault();
 
@@ -37,15 +44,9 @@ export class Dragger extends React.Component<Props,State> {
 		this.mouseY = event.pageY;
 		let node:HTMLDivElement = this.draggerDiv.current;
 
-		this.draggerDiv.current.addEventListener('mousemove', this.resizeComponents, false);	
+		window.addEventListener('mousemove', this.resizeComponents, false);	
 
-		this.draggerDiv.current.addEventListener('mouseup', ()=>{
-
-			this.draggerDiv.current.removeEventListener('mousemove', this.resizeComponents, false);
-			this.setState({dragging: false});
-			if(this.props.drop) this.props.drop();
-
-		}, false);
+		window.addEventListener('mouseup', this.exitRecording, false);
 	}
 	
 	resizeComponents = (event) => {

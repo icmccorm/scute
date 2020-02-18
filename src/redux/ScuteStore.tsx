@@ -1,26 +1,24 @@
 import {createStore, combineReducers} from 'redux';
 import {ActionType, Action} from './Actions';
 import {requestCompile, requestFrame} from './ScuteWorker';
-import {Shape} from 'src/shapes/Shape';
-import {Manipulation} from './LinkedValue';
+import { LineMeta, numberCharLength, ValueMeta, Manipulation } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number, lines: []};
-export type ValueMeta = {value: any, inlineOffset: number, length: number};
-export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
-export type ValueLink = {type: number, lineIndex: number, inlineIndex};
 
 export type scuteStore = {
-	origin: Array<number>,
-	dimensions: Array<number>,
-	code: string,
-	log: string,
-	frame: Array<Shape>,
-	frameIndex: number,
-	maxFrameIndex: number,
-	lines: Array<LineMeta>
+	root: {
+		origin: Array<number>,
+		dimensions: Array<number>,
+		code: string,
+		log: string,
+		frame: Array<React.ReactElement>,
+		frameIndex: number,
+		maxFrameIndex: number,
+		lines: Array<LineMeta>
+	}
 }
 
-var initialStore: scuteStore = {
+var initialStore = {
 	frame: [],
 	dimensions: [500, 500],
 	origin: [0,0],
@@ -77,23 +75,35 @@ export function reduceUI(store = initialStore, action: Action){
 			let meta: ValueMeta = line.values[change.inlineIndex];
 
 			let startIndex = line.charIndex + meta.inlineOffset;
+			
+			let newValue = meta.value + change.delta;
+			let newValueLength = numberCharLength(newValue);
+			let oldValueLength = numberCharLength(meta.value);
+
+			let lengthDifference = newValueLength - oldValueLength;
+			
 
 			let start = store.code.substring(0, startIndex);
 			let end = store.code.substring(startIndex + meta.length);
-			meta.length += change.lengthDifference;
+			meta.length += lengthDifference;
+
 
 			store = Object.assign({}, store, {
-				code: start + change.value + end,
+				code: start + (meta.value + change.delta) + end,
 			});
 
-			if(change.lengthDifference != 0){
+			meta.value = newValue;
+
+			if(lengthDifference != 0){
 				for(let i = change.inlineIndex + 1; i< line.values.length; ++i){
-					line.values[i].inlineOffset += change.lengthDifference;
+					line.values[i].inlineOffset += lengthDifference;
 				}
 				for(let i = change.lineIndex + 1; i < store.lines.length; ++i){
-					store.lines[i].charIndex += change.lengthDifference;
+					store.lines[i].charIndex += lengthDifference;
 				}
 			}
+			break;
+		case ActionType.END_MANIPULATION:
 			break;
 		case ActionType.UPDATE_CODE:
 			store = Object.assign({}, store, {
@@ -102,12 +112,6 @@ export function reduceUI(store = initialStore, action: Action){
 			break;
 	}
 	return store;
-}
-
-export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
-	let lineValues = lines[link.lineIndex].values;
-	let inline = lineValues[link.inlineIndex];
-	return inline.value;
 }
 
 var rootReducer = combineReducers({

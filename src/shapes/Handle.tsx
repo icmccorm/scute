@@ -1,58 +1,40 @@
 import * as React from 'react';
-import {RefObject} from 'react';
+import "./style/Handle.scss";
 
 type Props = {adjust: Function, cx: number, cy: number};
-type State = {dragging: boolean}
-class Handle extends React.Component<Props,any> { 
-	readonly props: Props;
-	readonly state: State;
-	mouseX: number;
-	mouseY: number;
-	handle: RefObject<SVGCircleElement>;
 
-    constructor(props: any){
-		super(props);
-		this.handle = React.createRef<SVGCircleElement>();
-		this.state = {
-			dragging: false
-		}
-    }
+const Handle = ({adjust, cx, cy}:Props) => {
+	const [mousePosition, setMouse] = React.useState([0, 0]);
 
-    render (){
-        return (
-			<circle ref={this.handle}
-				className={'handle'} 
-				r="5px" 
-				cx={this.props.cx}
-				cy={this.props.cy}
-				onMouseDown={this.recordMousePosition}
-			></circle>
-        );
-	};
+	const resizeComponents = (event) => {
+		event.preventDefault();
+		adjust(event.pageX - mousePosition[0], event.pageY - mousePosition[1]);
+		setMouse([event.pageX, event.pageY]);
+	}
 
-	recordMousePosition = (event) =>{
+	const recordMousePosition = (event) =>{
 		event.preventDefault();
 		event.stopPropagation();
 
 		document.body.style.cursor = "grabbing";
-
-		this.mouseX = event.pageX;
-		this.mouseY = event.pageY;
-		window.addEventListener('mousemove', this.resizeComponents, false);	
+		setMouse([event.pageX, event.pageY]);
+		window.addEventListener('mousemove', resizeComponents, false);	
 
 		window.addEventListener('mouseup', ()=>{
 			document.body.style.cursor = "grab";
-			window.removeEventListener('mousemove', this.resizeComponents, false);
+			window.removeEventListener('mousemove', resizeComponents, false);
 		}, false);
 	}
-	
-	resizeComponents = (event) => {
-		event.preventDefault();
-		this.props.adjust(event.pageX - this.mouseX, event.pageY - this.mouseY);
-		this.mouseX = event.pageX;
-		this.mouseY = event.pageY;
-	}
 
+	return (
+		<circle
+			className={'handle'} 
+			r="5px" 
+			cx={cx}
+			cy={cy}
+			onMouseDown={recordMousePosition}
+		></circle>
+	);
 }
 
 export default Handle;

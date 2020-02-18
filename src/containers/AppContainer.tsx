@@ -12,6 +12,7 @@ import './style/AppContainer.scss';
 import {ActionType, createAction } from 'src/redux/Actions';
 
 type State = {
+    currentLeftWidth: number,
     currentTranslate: Array<number>,
     initialTranslate: Array<number>,
     mousePosition: Array<number>,
@@ -36,13 +37,17 @@ type Props = {
 class App extends React.Component<Props, State> { 
     readonly state: State;
     readonly props: Props;
-    leftWrapper: any; 
-    rightWrapper: any;
-    canvasWrapper: any;
+    leftWrapper: React.RefObject<HTMLDivElement>; 
+    rightWrapper: React.RefObject<HTMLDivElement>;
+    canvasWrapper: React.RefObject<SVGSVGElement>;
     
     constructor(props){
         super(props);
+        this.leftWrapper = React.createRef();
+        this.rightWrapper = React.createRef();
+        this.canvasWrapper = React.createRef();
         this.state = { 
+            currentLeftWidth: 0,
             currentTranslate: [0,0],
             initialTranslate: [0,0],
             mousePosition: [0,0],
@@ -50,18 +55,11 @@ class App extends React.Component<Props, State> {
             mouseX: 0,
             mouseY: 0,
         }
-        this.leftWrapper = React.createRef();
-        this.rightWrapper = React.createRef();
-        this.canvasWrapper = React.createRef();
+
     }
 
     adjustLeft = (pageX: number, pageY: number, dx: number, dy: number) => {
-        let lNode = this.leftWrapper.current;
-        let rNode = this.rightWrapper.current;
-        if(lNode && rNode){
-            lNode.style.width = pageX + "px";
-            lNode.style.flexGrow = 0;
-        }
+        this.leftWrapper.current.style.width = pageX + "px";
     }
 
     resetCanvas = (event) => {
@@ -83,7 +81,6 @@ class App extends React.Component<Props, State> {
     
     getTransform(){
         return " translate(" + this.state.currentTranslate[0] + "px, " + this.state.currentTranslate[1] + "px) " + "scale(" + this.state.scale + ")";
-        
     }
 
     downloadCanvas = () => {
@@ -185,17 +182,14 @@ class App extends React.Component<Props, State> {
                         <div  
                             onWheel={this.zoomCanvas} 
                             className="view-flex min-max zoomRelative"
-                            style={{transform: this.getTransform()}}
-
-                            >
+                            style={{transform: this.getTransform()}}>
                             <svg 
                                 ref={this.canvasWrapper}
                                 width={this.props.dimensions[0]} 
                                 height={this.props.dimensions[1]} 
                                 className='canvas shadow' 
                                 viewBox={this.getViewBox()}
-                                onMouseMove={this.recordMousePosition}
-                            >
+                                onMouseMove={this.recordMousePosition}>
                                 {this.props.frame.map(item => {
                                     return <Shape key={item.id} defs={item}></Shape>
                                 })}
