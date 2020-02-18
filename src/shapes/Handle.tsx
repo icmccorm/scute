@@ -4,26 +4,32 @@ import "./style/Handle.scss";
 type Props = {adjust: Function, cx: number, cy: number};
 
 const Handle = ({adjust, cx, cy}:Props) => {
-	const [mousePosition, setMouse] = React.useState([0, 0]);
+	let mousePosition = [0, 0];
+	let mouseOffset = [0, 0];
 
 	const resizeComponents = (event) => {
 		event.preventDefault();
-		adjust(event.pageX - mousePosition[0], event.pageY - mousePosition[1]);
-		setMouse([event.pageX, event.pageY]);
+		let dx = event.pageX - mousePosition[0];
+		let dy = event.pageY - mousePosition[1];
+		adjust(dx - mouseOffset[0], dy - mouseOffset[1]);
+		mouseOffset = [dx, dy];
 	}
 
 	const recordMousePosition = (event) =>{
+		mousePosition = [event.pageX, event.pageY];
 		event.preventDefault();
 		event.stopPropagation();
 
 		document.body.style.cursor = "grabbing";
-		setMouse([event.pageX, event.pageY]);
 		window.addEventListener('mousemove', resizeComponents, false);	
+		window.addEventListener('mouseup', endRecording, false);
+	}
 
-		window.addEventListener('mouseup', ()=>{
-			document.body.style.cursor = "grab";
-			window.removeEventListener('mousemove', resizeComponents, false);
-		}, false);
+	const endRecording = () => {
+		document.body.style.cursor = "grab";
+		window.removeEventListener('mousemove', resizeComponents, false);
+		window.removeEventListener('mosueup', endRecording, false);
+		mouseOffset = [0, 0];
 	}
 
 	return (
