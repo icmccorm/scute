@@ -1,85 +1,71 @@
 import * as React from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import './style/Editor.scss';
-import { RefObject } from 'react';
+import { createAction, ActionType } from 'src/redux/Actions';
+import { scuteStore } from 'src/redux/ScuteStore';
 
 type Props = {handleChange: Function, value: string}
-type State = {lineNums: any, scrollTop: number}
 
-export class Editor extends React.Component<Props, State> { 
-    readonly props: Props;
-    wrapper: any;
-    nums: any;
-    text: RefObject<HTMLTextAreaElement>;;
+export const Editor = React.memo(({value, handleChange}:Props) => {
+    const [lineNums, setLineNums] = React.useState([<span key={1}>1</span>]);
+    const [scrollTop, setScrollTop] = React.useState(0);
 
-    constructor(props){
-        super(props);
-        this.state = {
-            lineNums: [<span key={1}>1</span>],
-            scrollTop: 0,
-        }
+    const sourceText = useSelector((store:scuteStore) => {
+        store.root.code
+    });
 
-        this.wrapper = React.createRef();
-        this.nums = React.createRef();
-        this.text = React.createRef<HTMLTextAreaElement>();
-    }
+    const dispatch = useDispatch();
 
-    render = () => {
-        return (
-            <div ref={this.wrapper} id="code" className='editor-wrapper' onScroll={this.syncScroll}>
-                <div
-                    ref={this.nums} 
-                    className='lineNums textPadding'
-                >
-                {this.state.lineNums}
-                </div>
-                <textarea
-                    ref={this.text}
-                    spellCheck={false}
-                    className='dark textArea textPadding'
-                    value={this.props.value}
-                    onChange={this.handleChange}
-                    onKeyDown={this.handleSpecialCharacters}
-                />
-            </div>
-        );
-    }
-    
-    handleChange = (evt: any) => {
-        this.props.handleChange(evt.target.value);
-        this.syncLineNumbers(evt.target.value);
-    }
-    
-    syncLineNumbers(txt: string) {
-        let numLines:number = txt.split('\n').length;
+    const wrapper:React.RefObject<HTMLDivElement> = React.createRef();
+    const area:React.RefObject<HTMLTextAreaElement> = React.createRef();
+    const nums:React.RefObject<HTMLDivElement> = React.createRef();
+
+    const syncText = (evt) => {
+        let text:string = evt.target.value;
+        dispatch(createAction(ActionType.UPDATE_CODE, text));
+        let numLines:number = text.split('\n').length;
         let displayData = [];
 
         for(let i = 0; i<numLines; ++i){
             displayData.push(<span key={i+1}>{i+1}</span>);
         }
-        this.setState({lineNums: displayData});
+        setLineNums(displayData);       
     }
 
-    syncScroll = (evt) =>{
-        this.setState({scrollTop: evt.target.scrollTop});
+    const syncScroll = (evt) => {
+        setScrollTop(evt.target.scrollTop);
+        wrapper.current.scrollTop = scrollTop;
+        nums.current.scrollTop = scrollTop;
     }
 
-    componentDidUpdate(){
-        this.wrapper.current.scrollTop = this.state.scrollTop;
-        this.nums.current.scrollTop = this.state.scrollTop;
-    }
-
-    handleSpecialCharacters = async (evt: any) => {
-        switch(evt.keyCode){
-            case 9: //tab
-                evt.preventDefault();
-                let start = evt.currentTarget.selectionStart;
-                let newVal = this.props.value ?
-                this.props.value.substring(0, start) + '\t' + this.props.value.substring(start) 
-                : '\t';
-                this.props.handleChange(newVal);
-                this.text.current.setSelectionRange(start + 1, start + 1);
-                break;
+    var handleSpecialCharacters = (evt) => {
+        let text:string = evt.target.value;
+        if(evt.keyCode == 9){
+            evt.preventDefault();
+            let start = evt.currentTarget.selectionStart;
+            let newVal = text.substring(0, start) + '\t' + text.substring(start);
+            area.current.value = newVal;
+            area.current.setSelectionRange(start+1, start+1);
         }
+        return true;
     }
-}
-export default Editor;
+
+    return(
+        <div ref={wrapper} id="code" className='editor-wrapper' onScroll={syncScroll}>
+            <div
+                ref={nums} 
+                className='lineNums textPadding'
+            >
+            {lineNums}
+            </div>
+            <textarea
+                ref={area}
+                spellCheck={false}
+                className='dark textArea textPadding'
+                onChange={syncText}
+                onKeyDown={handleSpecialCharacters}
+                value={sourceText}
+            />
+      </div>
+    );
+});
