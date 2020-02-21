@@ -2,14 +2,23 @@ import { ActionType, createAction } from "./Actions";
 
 export type ValueMeta = {value: any, inlineOffset: number, length: number};
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
-export type ValueLink = {type: number, lineIndex: number, inlineIndex};
+export type ValueLink = {type: number, status: number, lineIndex: number, inlineIndex};
 export type Manipulation = {delta: number, lineIndex: number, inlineIndex}
 
+export enum StatusType{
+	CONST = 0,
+	COMP,
+	OPEN
+}
 
 export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
-	let lineValues = lines[link.lineIndex].values;
-	let inline = lineValues[link.inlineIndex];
-	return inline;
+	if(link.status == StatusType.COMP){
+		return link;
+	}else{
+		let lineValues = lines[link.lineIndex].values;
+		let inline = lineValues[link.inlineIndex];
+		return inline;
+	}
 }
 
 export function manipulation(delta: number, link: ValueLink){
