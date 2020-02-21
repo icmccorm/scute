@@ -41,7 +41,9 @@ export function reduceUI(store = initialStore, action: Action){
 			break;
 		case ActionType.FIN_COMPILE:
 			let response: CompilationResponse = action.payload;
+			
 			store = Object.assign({}, store, {
+				frame: [],
 				lines: response.lines,
 				maxFrameIndex: response.maxFrameIndex,
 			});

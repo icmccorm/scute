@@ -10,8 +10,9 @@ import {Shape} from 'src/shapes/Shape';
 
 import './style/AppContainer.scss';
 import {ActionType, createAction } from 'src/redux/Actions';
+import { getTranslate, getScale, UnitType } from 'src/shapes/StyleUtilities';
 
-type State = {
+type AppState = {
     currentLeftWidth: number,
     currentTranslate: Array<number>,
     initialTranslate: Array<number>,
@@ -22,7 +23,7 @@ type State = {
     mouseY: number,
 };
 
-type Props = {
+type AppProps = {
     dimensions: Array<number>,
     origin: Array<number>,
     log: string, 
@@ -34,9 +35,9 @@ type Props = {
     runCode: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void, 
 };
 
-class App extends React.Component<Props, State> { 
-    readonly state: State;
-    readonly props: Props;
+class App extends React.Component<AppProps, AppState> { 
+    readonly state: AppState;
+    readonly props: AppProps;
     leftWrapper: React.RefObject<HTMLDivElement>; 
     rightWrapper: React.RefObject<HTMLDivElement>;
     canvasWrapper: React.RefObject<SVGSVGElement>;
@@ -80,7 +81,7 @@ class App extends React.Component<Props, State> {
     }
     
     getTransform(){
-        return " translate(" + this.state.currentTranslate[0] + "px, " + this.state.currentTranslate[1] + "px) " + "scale(" + this.state.scale + ")";
+        return getTranslate(this.state.currentTranslate, UnitType.PX) + getScale(this.state.scale);
     }
 
     downloadCanvas = () => {

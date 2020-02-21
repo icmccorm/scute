@@ -10,15 +10,14 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
     const [lineNums, setLineNums] = React.useState([<span key={1}>1</span>]);
     const [scrollTop, setScrollTop] = React.useState(0);
 
-    const sourceText = useSelector((store:scuteStore) => {
-        store.root.code
-    });
-
-    const dispatch = useDispatch();
-
     const wrapper:React.RefObject<HTMLDivElement> = React.createRef();
     const area:React.RefObject<HTMLTextAreaElement> = React.createRef();
     const nums:React.RefObject<HTMLDivElement> = React.createRef();
+
+    const sourceText:string = useSelector((store:scuteStore) => store.root.code);
+
+    const dispatch = useDispatch();
+
 
     const syncText = (evt) => {
         let text:string = evt.target.value;
