@@ -1,7 +1,7 @@
 import {createStore, combineReducers} from 'redux';
 import {ActionType, Action} from './Actions';
 import {requestCompile, requestFrame} from './ScuteWorker';
-import { LineMeta, numberCharLength, ValueMeta, Manipulation } from './Manipulation';
+import { LineMeta, ValueMeta, Manipulation, RoleType } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number, lines: []};
 
@@ -77,25 +77,43 @@ export function reduceUI(store = initialStore, action: Action){
 			let meta: ValueMeta = line.values[change.inlineIndex];
 
 			let startIndex = line.charIndex + meta.inlineOffset;
+			meta.mouseDelta += change.mouseDelta;
+
+
+			let newValue;
+			let newValueString;
+			switch(meta.role){
+				
+				case RoleType.TIMES:{
+					let factor = change.originalValue / meta.targetValue;
+					newValue = (change.originalValue + meta.mouseDelta) / factor;
+					newValueString = newValue.toFixed(3);
+				} break;
+				
+				case RoleType.DIVIDE: {
+					let dividend = change.originalValue * meta.targetValue;
+					newValue = dividend / (change.originalValue + meta.mouseDelta);
+					newValueString = newValue.toFixed(3);
+				} break;
+				
+				case RoleType.MINUS:
+				case RoleType.PLUS:
+				default:{
+					newValue = meta.targetValue + meta.mouseDelta;
+					newValueString = newValue.toFixed(3);
+				 }break;
+			}
+
+			let lengthDifference = newValueString.length - meta.length;
+			let start = store.code.substring(0, startIndex-1);
+			let end = store.code.substring(startIndex-1 + meta.length);
 			
-			let newValue = meta.value + change.delta;
-			let newValueLength = numberCharLength(newValue);
-			let oldValueLength = numberCharLength(meta.value);
-
-			let lengthDifference = newValueLength - oldValueLength;
-			
-
-			let start = store.code.substring(0, startIndex);
-			let end = store.code.substring(startIndex + meta.length);
-			meta.length += lengthDifference;
-
-
 			store = Object.assign({}, store, {
-				code: start + (meta.value + change.delta) + end,
+				code: start + newValueString + end,
 			});
 
-			meta.value = newValue;
-
+			meta.length = newValueString.length;
+		
 			if(lengthDifference != 0){
 				for(let i = change.inlineIndex + 1; i< line.values.length; ++i){
 					line.values[i].inlineOffset += lengthDifference;
@@ -119,4 +137,5 @@ export function reduceUI(store = initialStore, action: Action){
 var rootReducer = combineReducers({
 	root: reduceUI,
 })
+
 export const scuteStore = createStore(rootReducer);

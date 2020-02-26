@@ -19,7 +19,7 @@ export type Tag = {
 	id: number;
 	tag: ShapeType;
 	attrs: Array<ValueLink>;
-	style: {
+	styles: {
 		values: object,
 		loc: object
 	}
@@ -57,4 +57,4 @@ export const Shape = ({defs}:ShapeProps) => {
 		default:
 			return null;
 	}
-}
+};

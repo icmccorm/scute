@@ -3,18 +3,18 @@ import {useDispatch} from 'react-redux';
 import {ShapeProps} from './Shape';
 import {useSelector} from 'react-redux';
 import Handle from './Handle';
-import { ValueLink, ValueMeta, getLinkedValue, manipulation } from 'src/redux/Manipulation';
+import { getLinkedValue, manipulation } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
 
 
 export const Rect = ({defs}:ShapeProps) => {
-    let attrs: Array<ValueLink> = defs.attrs;
+    let attrs = defs.attrs;
     const dispatch = useDispatch();
 
-    const xValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['x']));
-    const yValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['y']));
-    const widthValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['width']));
-    const heightValue:ValueMeta = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['height']));
+    const xValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['x']));
+    const yValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['y']));
+    const widthValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['width']));
+    const heightValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['height']));
 
     const[hovering, setHover] = React.useState(false);
 
@@ -32,29 +32,29 @@ export const Rect = ({defs}:ShapeProps) => {
     }
 
     return (
-        
         <g className="hoverGroup" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
             <rect className={(hovering ? 'hover' : '')}
-                x={xValue.value} 
-                y={yValue.value} 
-                width={widthValue.value} 
-                height={heightValue.value}
+                x={xValue} 
+                y={yValue} 
+                width={widthValue} 
+                height={heightValue}
+              //  style={styleValues}
             ></rect>
             {hovering ?
                 <g>
                     <Handle
-                        cx={xValue.value + 0.5*widthValue.value}
-                        cy={yValue.value + heightValue.value}
+                        cx={xValue + 0.5*widthValue}
+                        cy={yValue + heightValue}
                         adjust={setHeight}
                     ></Handle>
                     <Handle
-                        cx={xValue.value + 0.5*widthValue.value}
-                        cy={yValue.value + 0.5*heightValue.value}
+                        cx={xValue + 0.5*widthValue}
+                        cy={yValue + 0.5*heightValue}
                         adjust={setPosition}
                     ></Handle>
                     <Handle
-                        cx={xValue.value + widthValue.value}
-                        cy={yValue.value + 0.5*heightValue.value}
+                        cx={xValue + widthValue}
+                        cy={yValue + 0.5*heightValue}
                         adjust={setWidth}
                     ></Handle>
                 </g>

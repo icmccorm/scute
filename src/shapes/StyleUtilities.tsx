@@ -8,5 +8,9 @@ export function getTranslate(translate: Array<number>, units:UnitType ) {
 }
 
 export function getScale(scale: number){
-	return "scale(" + scale + ")"
+	return "scale(" + scale + ")";
+}
+
+export function getRGBA(r: number, g: number, b: number, a:number){
+	return " rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
 }

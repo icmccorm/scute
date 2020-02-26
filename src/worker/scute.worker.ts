@@ -22,12 +22,8 @@ class ScuteWrapper {
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
-
-		try{
-			this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
-		}catch(e){
-			this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + e.message + "\n");
-		}
+		this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
+//		this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + e.message + "\n");
 		this.module._free(codePtr);
 		
 		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, lines: this.module._lines});

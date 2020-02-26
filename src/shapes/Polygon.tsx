@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import Handle from './Handle';
 import {Segment, SegmentType} from './PathUtilities';
 
-export const Polygon = React.memo(({defs, children}:ShapeProps) => {
+export const Polygon = ({defs, children}:ShapeProps) => {
     let segments: Array<Segment> = defs.segments;
     const[hovering, setHover] = React.useState(false);
 
@@ -42,4 +42,4 @@ export const Polygon = React.memo(({defs, children}:ShapeProps) => {
             : null}
         </g>
     );
- });
+ };
