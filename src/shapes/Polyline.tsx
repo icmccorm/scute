@@ -3,6 +3,7 @@ import {ShapeProps} from './Shape';
 import {useSelector} from 'react-redux';
 import Handle from './Handle';
 import {Segment, SegmentType} from './PathUtilities';
+import { getColorFromArray } from './StyleUtilities';
 
 export const Polyline = React.memo(({defs, children}:ShapeProps) => {
     let segments: Array<Segment> = defs.segments;
@@ -31,12 +32,18 @@ export const Polyline = React.memo(({defs, children}:ShapeProps) => {
             <Handle key={i} cx={point[0]} cy={point[1]} adjust={(dx, dy) => adjustPoint(dx, dy, segments[i])}/>
         );
     }
-
+    
+    const styles = {
+        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
+        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : null,
+        strokeWidth: defs.styles['strokeWidth'],
+    }
 
     return (
         <g className="hoverGroup" onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
             <polyline className={(hovering ? 'hover' : '')}
                 points={points} 
+                style={styles}
             ></polyline>
             {hovering ? 
                 handles

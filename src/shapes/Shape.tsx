@@ -5,14 +5,15 @@ import { Polyline } from './Polyline';
 import { Polygon } from './Polygon';
 import { Segment } from './PathUtilities';
 import { ValueLink } from "src/redux/Manipulation";
+import { Path } from "./Path";
 
 enum ShapeType{
-	SP_RECT = 62,
+	SP_RECT = 68,
 	SP_CIRC,
-	SP_LINE,
-	SP_POLYL,
 	SP_POLYG,
+	SP_POLYL,
 	SP_PATH,
+	SP_ELLIP,
 }
 
 export type Tag = {
@@ -46,13 +47,9 @@ export const Shape = ({defs}:ShapeProps) => {
 			return(
 				<Polygon defs={defs}></Polygon>
 			);
-		case ShapeType.SP_LINE:
-			return(
-				null
-			);
 		case ShapeType.SP_PATH:
 			return(
-				null
+				<Path defs={defs}></Path>
 			);
 		default:
 			return null;

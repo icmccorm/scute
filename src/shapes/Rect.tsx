@@ -5,16 +5,22 @@ import {useSelector} from 'react-redux';
 import Handle from './Handle';
 import { getLinkedValue, manipulation } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
+import { getColorFromArray } from './StyleUtilities';
 
 
 export const Rect = ({defs}:ShapeProps) => {
     let attrs = defs.attrs;
     const dispatch = useDispatch();
-
     const xValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['x']));
     const yValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['y']));
     const widthValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['width']));
     const heightValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['height']));
+
+    const styles = {
+        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
+        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : null,
+        strokeWidth: defs.styles['strokeWidth'],
+    }
 
     const[hovering, setHover] = React.useState(false);
 
@@ -38,7 +44,7 @@ export const Rect = ({defs}:ShapeProps) => {
                 y={yValue} 
                 width={widthValue} 
                 height={heightValue}
-              //  style={styleValues}
+                style={styles}
             ></rect>
             {hovering ?
                 <g>

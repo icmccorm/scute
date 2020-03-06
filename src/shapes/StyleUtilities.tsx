@@ -14,3 +14,7 @@ export function getScale(scale: number){
 export function getRGBA(r: number, g: number, b: number, a:number){
 	return " rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
 }
+
+export function getColorFromArray(rgba: Array<any>){
+	return " rgba(" + rgba[0].value + ", " + rgba[1].value + ", " + rgba[2].value + ", " + rgba[3].value + ")";
+}

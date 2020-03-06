@@ -10,6 +10,7 @@ export enum ActionType{
 	SHIFT,
 	UPDATE_CODE,
 	END_MANIPULATION,
+	SCALE,
 }
 
 export type Action = {type: ActionType, payload: any};

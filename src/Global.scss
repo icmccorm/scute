@@ -20,16 +20,6 @@ html, body, #root, .root{
     font-family: "Roboto", sans-serif
 }
 
-polyline, polygon, path {
-    stroke: black;
-    stroke-width: 3px;
-}
-
-circle {
-    stroke: black;
-    stroke-width: 1px;
-    fill: transparent;
-}
 
 .max {
     width: 100%;
@@ -39,6 +29,10 @@ circle {
 .outer {
     width: 100%;
     height: calc(100%);
+}
+
+path {
+    pointer-events: bounding-box;
 }
 
 /* shadows */

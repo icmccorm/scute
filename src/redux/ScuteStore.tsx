@@ -15,6 +15,7 @@ export type scuteStore = {
 		frameIndex: number,
 		maxFrameIndex: number,
 		lines: Array<LineMeta>
+		scale: number,
 	}
 }
 
@@ -27,6 +28,7 @@ var initialStore = {
 	maxFrameIndex: 0,
 	frameIndex: 0,
 	lines: [],
+	scale: 1.0,
 }
 
 export function reduceUI(store = initialStore, action: Action){
@@ -49,6 +51,12 @@ export function reduceUI(store = initialStore, action: Action){
 			});
 
 			requestFrame();
+			break;
+		
+		case ActionType.SCALE:
+			store = Object.assign({}, store, {
+				scale: action.payload,
+			});
 			break;
 
 		case ActionType.PRINT_ERROR:
@@ -79,7 +87,6 @@ export function reduceUI(store = initialStore, action: Action){
 			let startIndex = line.charIndex + meta.inlineOffset;
 			meta.mouseDelta += change.mouseDelta;
 
-
 			let newValue;
 			let newValueString;
 			switch(meta.role){
@@ -105,8 +112,8 @@ export function reduceUI(store = initialStore, action: Action){
 			}
 
 			let lengthDifference = newValueString.length - meta.length;
-			let start = store.code.substring(0, startIndex-1);
-			let end = store.code.substring(startIndex-1 + meta.length);
+			let start = store.code.substring(0, startIndex);
+			let end = store.code.substring(startIndex + meta.length);
 			
 			store = Object.assign({}, store, {
 				code: start + newValueString + end,

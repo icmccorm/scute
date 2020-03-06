@@ -33,6 +33,7 @@ type AppProps = {
     updateCode: Function, 
     manipulate: Function,
     runCode: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void, 
+    scale: Function,
 };
 
 class App extends React.Component<AppProps, AppState> { 
@@ -56,7 +57,6 @@ class App extends React.Component<AppProps, AppState> {
             mouseX: 0,
             mouseY: 0,
         }
-
     }
 
     adjustLeft = (pageX: number, pageY: number, dx: number, dy: number) => {
@@ -128,7 +128,7 @@ class App extends React.Component<AppProps, AppState> {
             currentTranslate: [newTransX, newTransY],
             initialTranslate: [newTransX, newTransY],
         });
-     
+        this.props.scale(newScale);
     }
 
     dragCanvas = (pageX: number, pageY: number, dx: number, dy: number) => {
@@ -203,13 +203,12 @@ class App extends React.Component<AppProps, AppState> {
     }
 }
 
-function mapStateToProps(store, ownProps: Props){
+function mapStateToProps(store, ownProps){
     return {
         dimensions: store.root.dimensions,
         origin: store.root.origin,
         log: store.root.log,
         frame: store.root.frame,
-        shiftClient: store.root.shiftClient,
         code: store.root.code,
     };
 }
@@ -218,6 +217,7 @@ function mapDispatchToProps(dispatch){
     return {
         runCode: (event: any) => dispatch(createAction(ActionType.REQ_COMPILE, null)),
         updateCode: (code: string) => dispatch(createAction(ActionType.UPDATE_CODE, code)),
+        scale: (scale: number) => dispatch(createAction(ActionType.SCALE, scale)),
     }
 }
 

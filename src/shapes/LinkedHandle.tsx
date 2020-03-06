@@ -1,28 +1,31 @@
 import * as React from 'react';
 import "./style/Handle.scss";
-import {useSelector} from 'react-redux';
-import { scuteStore } from 'src/redux/ScuteStore';
+import { useDispatch } from 'react-redux';
+import { manipulation, ValueLink } from 'src/redux/Manipulation';
 
-type Props = {adjust: Function, cx: number, cy: number};
+type Props = {linkX?: ValueLink, linkY?: ValueLink, cx: number, cy: number};
 
-
-const Handle = React.memo(({adjust, cx, cy}:Props) => {
+const LinkedHandle = ({linkX, linkY, cx, cy}:Props) => {
 	let mousePosition = [0, 0];
 	let mouseOffset = [0, 0];
 
-	const scale = useSelector((store:scuteStore) => store.root.scale);
+	const dispatch = useDispatch();
 
 	const resizeComponents = (event) => {
 		event.preventDefault();
 		let dx = event.pageX - mousePosition[0];
 		let dy = event.pageY - mousePosition[1];
-		adjust((1/scale)*(dx - mouseOffset[0]), (1/scale)*(dy - mouseOffset[1]));
+		adjust(dx - mouseOffset[0], dy - mouseOffset[1]);
 		mouseOffset = [dx, dy];
+	}
+
+	const adjust = (dx: number, dy: number) => {
+		if(linkX) dispatch(manipulation(dx, linkX));
+		if(linkY) dispatch(manipulation(dy, linkY));
 	}
 
 	const recordMousePosition = (event) =>{
 		mousePosition = [event.pageX, event.pageY];
-		
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -47,6 +50,6 @@ const Handle = React.memo(({adjust, cx, cy}:Props) => {
 			onMouseDown={recordMousePosition}
 		></circle>
 	);
-});
+}
 
-export default Handle;
+export default LinkedHandle;
