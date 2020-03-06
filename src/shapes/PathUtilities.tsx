@@ -72,6 +72,26 @@ export const generatePath = (links, segmentArray: Array<Segment>) => {
 	return path;
 }
 
+export const generatePoints = (links, segmentArray: Segment[]) => {
+	let points = "";
+	const link = (vl:ValueLink) => getLinkedValue(links, vl);
+
+	for(let i = 0; i<segmentArray.length; ++i){
+		switch(segmentArray[i].type){
+			case SegmentType.SG_JUMP:
+			case SegmentType.SG_VERTEX: {
+				let segment: Vertex | Jump = segmentArray[i] as (Vertex | Jump);
+				points += link(segment.point[0]) + ", " + link(segment.point[1]) + " ";
+			} break;
+			case SegmentType.SG_TURTLE:
+				let segment: Turtle = segmentArray[i] as Turtle;
+				points += segment.x + ", " + segment.y + " ";	
+				break;
+		}
+	}
+	return points;
+}
+
 export const getPathSyntax = (links, segment: Segment) => {
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
 	switch(segment.type){

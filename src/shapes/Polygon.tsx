@@ -1,37 +1,17 @@
 import * as React from 'react';
 import {ShapeProps} from './Shape';
-import {useSelector} from 'react-redux';
-import Handle from './Handle';
-import {Segment, SegmentType} from './PathUtilities';
+import {useSelector, useDispatch} from 'react-redux';
+import {Segment, generateHandles, generatePoints} from './PathUtilities';
 import { getColorFromArray } from './StyleUtilities';
+import { scuteStore } from 'src/redux/ScuteStore';
 
-export const Polygon = ({defs, children}:ShapeProps) => {
+export const Polygon = React.memo(({defs, children}:ShapeProps) => {
     let segments: Array<Segment> = defs.segments;
     const[hovering, setHover] = React.useState(false);
+    const dispatch = useDispatch();
 
-    const adjustPoint = (dx: number, dy: number, segment: Segment) => {
-        switch(segment.type){
-            case SegmentType.SG_JUMP:
-                
-                break;
-            case SegmentType.SG_TURTLE:
+    const links = useSelector((store: scuteStore) => store.root.lines);
 
-                break;
-            case SegmentType.SG_VERTEX:
-
-                break;
-        }
-    }
-
-    let points = '';
-    let handles: Array<any> = [];
-    for(let i = 0; i<defs.segments.length; ++i){
-        let point = segments[i].point;
-        points += point[0] + "," + point[1] + ' ';
-        handles.push(
-            <Handle key={i} cx={point[0]} cy={point[1]} adjust={(dx, dy) => adjustPoint(dx, dy, segments[i])}/>
-        );
-    }
     const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
         stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : null,
@@ -40,12 +20,13 @@ export const Polygon = ({defs, children}:ShapeProps) => {
     return (
         <g className="hoverGroup" onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
             <polygon className={(hovering ? 'hover' : '')}
-                points={points} 
+                points={generatePoints(links, segments)} 
                 style={styles}
             ></polygon>
             {hovering ? 
-                handles
-            : null}
+                generateHandles(links, dispatch, segments)    
+            : null} 
+            {children}
         </g>
     );
- };
+ });
