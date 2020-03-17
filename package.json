@@ -46,7 +46,8 @@
     "webpack": "^4.42.0",
     "webpack-dev-server": "^3.10.3",
     "webpack-merge": "^4.2.2",
-    "worker-loader": "^2.0.0"
+    "worker-loader": "^2.0.0",
+    "minimist": ">=1.2.2"
   },
   "dependencies": {
     "@types/redux": "^3.6.0",
