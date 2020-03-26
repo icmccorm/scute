@@ -127,6 +127,7 @@ export const generatePoints = (links, segmentArray: Segment[]) => {
 				let segment: Turtle = segmentArray[i] as Turtle;
 				
 				let distance = link(segment.move)
+				segment.horizontal = angle;
 				angle += link(segment.turn)
 
 				let cosine = Math.cos(toRadians(angle));
@@ -181,8 +182,12 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, segments: S
 
 	let manipulations: Array<Manipulation> = [];
 
+
+
 	if(currentSegment.type == SegmentType.SG_TURTLE){
 		let turtle = currentSegment as Turtle;
+		let originHorizontal = turtle.horizontal;
+		let manipHorizontal = originHorizontal;
 
 		let move = link(turtle.move);
 		let turn = link(turtle.turn) + (prevSegment && prevSegment.type == SegmentType.SG_TURTLE? link((prevSegment as Turtle).turn) : 0);
@@ -222,22 +227,33 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, segments: S
 			manipulations.push(manipulation(moveManip - nextMove, nextTurtle.move));
 			manipulations.push(manipulation(newAngle - nextTurn, nextTurtle.turn));
 
-			if(segments[index + 2] && segments[index + 2].type == SegmentType.SG_TURTLE){
-				let finalTurtle: Turtle = segments[index + 2] as Turtle
 
-				let finalTurn = link(finalTurtle.turn);
-				let finalMove = link(finalTurtle.move);
+			let originHorizontal = turn + nextTurn;
+			let manipHorizontal = newAngle + angleManip;
+			index = index + 2;
 
-				let finalX = xEnd + (Math.cos(toRadians(turn + nextTurn + finalTurn))*nextMove);
-				let finalY = yEnd + (Math.sin(toRadians(turn + nextTurn + finalTurn))*nextMove);
-		
+			while(segments[index] && segments[index].type == SegmentType.SG_TURTLE){
+				let currentTurtle:Turtle = segments[index] as Turtle;
+
+				let move = link(currentTurtle.move);
+				let turn = link(currentTurtle.turn);
+
+				let finalX = xEnd + (Math.cos(toRadians(turn + originHorizontal))*move);
+				let finalY = yEnd + (Math.sin(toRadians(turn + originHorizontal))*move);
+
 				let opposite = finalY - yEnd;
 				let adjacent = finalX - xEnd;
 
 				let angleOffset = adjacent > 0 ? 0 : 180;
-				let finalAngle = toDegrees(Math.atan(opposite / adjacent)) - newAngle - angleManip + angleOffset;
-				
-				if(finalTurtle.turn) manipulations.push(manipulation(finalAngle - link(finalTurtle.turn), finalTurtle.turn));
+				let newAngle = toDegrees(Math.atan(opposite / adjacent)) - manipHorizontal + angleOffset;
+
+				if(currentTurtle.turn) manipulations.push(manipulation(newAngle - link(currentTurtle.turn), currentTurtle.turn));
+
+				xEnd = finalX
+				yEnd = finalY;
+				originHorizontal += turn;
+				manipHorizontal += newAngle;
+				++index;
 			}
 		}
 	}else{			
