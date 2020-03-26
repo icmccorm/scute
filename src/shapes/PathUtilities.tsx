@@ -22,13 +22,13 @@ export type Arc = Segment & {center: Array<ValueLink>, degrees: ValueLink};
 export const generateHandles = (links, dispatch, segmentArray: Array<Segment>) => {
 	let handles = [];
 	let prevPoint: Array<number> = [0, 0];
-	for(let key = 0; key<segmentArray.length; ++key){
+	for(let key = 0; key<segmentArray.length; ++key){ 
 		let segment = segmentArray[key];
 		const link = (vl:ValueLink) => getLinkedValue(links, vl);
 		switch(segment.type){
 			case SegmentType.SG_JUMP:
 				let jump = segment as Jump;
-				handles = handles.concat([<Handle key={key} cx={link(jump.point[0])} cy={link(jump.point[1])} adjust={(dx, dy) => manipTurtle(dispatch, links, 0, 100, segmentArray, key)}/>]);
+				handles = handles.concat([<Handle key={key} cx={link(jump.point[0])} cy={link(jump.point[1])} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segmentArray, key)}/>]);
 				prevPoint = [jump.point[0].value, jump.point[1].value];
 				break;
 			case SegmentType.SG_TURTLE:
@@ -78,7 +78,7 @@ export const generatePath = (links, segmentArray: Array<Segment>) => {
 
 
 export function generatePolyHandles (links, dispatch, segmentArray: Segment[]) {
-	let handles = [];
+	let handles = [];0
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
 	let prevPoint: Array<number> = [0, 0];
 	let angle = 0;
@@ -112,10 +112,9 @@ export function generatePolyHandles (links, dispatch, segmentArray: Segment[]) {
 export const generatePoints = (links, segmentArray: Segment[]) => {
 	let points = "";
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
-	const delta = (vl:ValueLink) => getLinkedDelta(links, vl);
-
 	let prevPoint: Array<number> = [0, 0];
 	let angle = 0;
+
 	for(let i = 0; i<segmentArray.length; ++i){
 		switch(segmentArray[i].type){
 			case SegmentType.SG_JUMP:
@@ -173,13 +172,10 @@ export const manipVector = (dispatch, dx: number, dy: number, vector: ValueLink[
 	dispatch(manipulate([manipulation(dx, vector[0]), manipulation(dy, vector[1])]));
 }
 
-
-//TODO: Add method for finding angle relative to the horizontal. Compile time?
 export const manipTurtle = (dispatch, links, dx: number, dy: number, segments: Segment[], index: number,) => {
 	let currentSegment = segments[index];
-	let previousSegment = segments[index-1];
 	let nextSegment = segments[index + 1];
-
+	let prevSegment = segments[index - 1];
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
 	const delta = (vl: ValueLink) => getLinkedDelta(links, vl);
 
@@ -189,41 +185,68 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, segments: S
 		let turtle = currentSegment as Turtle;
 
 		let move = link(turtle.move);
-		let turn = link(turtle.turn);
+		let turn = link(turtle.turn) + (prevSegment && prevSegment.type == SegmentType.SG_TURTLE? link((prevSegment as Turtle).turn) : 0);
 
-		let xNought = Math.cos(turn) * move;
-		let yNought = Math.sin(turn) * move; 
+		let xNought = Math.cos(toRadians(turn)) * move;
+		let yNought = Math.sin(toRadians(turn)) * move; 
 
 		let xNoughtManip = xNought + dx;
-		let yNoughtManip = xNought + dy;
+		let yNoughtManip = yNought + dy;
+		
+		let manipDistance = Math.sqrt(Math.pow(xNoughtManip, 2) + Math.pow(yNoughtManip, 2));
 
-		let moveManip = distance(xNought, yNought, xNoughtManip, yNoughtManip);
-		let angleManip = Math.acos(xNoughtManip/moveManip);
+		let angleOffset = (xNoughtManip > 0) ? 0 : 180;
+		let angleManip = angleOffset + toDegrees(Math.atan(yNoughtManip/xNoughtManip));
 
-		manipulations.push((manipulation(moveManip - move, turtle.move)));
+		manipulations.push((manipulation(manipDistance - move, turtle.move)));
 		manipulations.push((manipulation(angleManip - turn, turtle.turn)));
 
+		//beginning of cascade
 		if(nextSegment && nextSegment.type == SegmentType.SG_TURTLE){
-			let turtle = nextSegment as Turtle;
+			let nextTurtle = nextSegment as Turtle;
+			
+			let nextMove = link(nextTurtle.move);
+			let nextTurn = link(nextTurtle.turn);
 
-			let move = link(turtle.move);
-			let turn = link(turtle.turn);
+			let xEnd = xNought + (Math.cos(toRadians(turn + nextTurn))*nextMove);
+			let yEnd = yNought + (Math.sin(toRadians(turn + nextTurn))*nextMove);
 
-			let xEnd = (Math.cos(turn)*move);
-			let yEnd = (Math.sin(turn)*move);
+			let moveManip = distance(xNoughtManip, yNoughtManip, xEnd, yEnd);
+		
+			let opposite = yEnd - yNoughtManip;
+			let adjacent = xEnd - xNoughtManip;
 
-			moveManip = (distance(dx, dy, xEnd, yEnd));
-			angleManip = (Math.acos((xEnd - dx)/moveManip));
+			let angleOffset = adjacent > 0 ? 0 : 180;
+				
+			let newAngle = toDegrees(Math.atan(opposite / adjacent)) - angleManip + angleOffset;
+			manipulations.push(manipulation(moveManip - nextMove, nextTurtle.move));
+			manipulations.push(manipulation(newAngle - nextTurn, nextTurtle.turn));
 
-			manipulations.push(manipulation(moveManip - move, turtle.move));
-			manipulations.push(manipulation(angleManip - turn, turtle.turn));
+			if(segments[index + 2] && segments[index + 2].type == SegmentType.SG_TURTLE){
+				let finalTurtle: Turtle = segments[index + 2] as Turtle
+
+				let finalTurn = link(finalTurtle.turn);
+				let finalMove = link(finalTurtle.move);
+
+				let finalX = xEnd + (Math.cos(toRadians(turn + nextTurn + finalTurn))*nextMove);
+				let finalY = yEnd + (Math.sin(toRadians(turn + nextTurn + finalTurn))*nextMove);
+		
+				let opposite = finalY - yEnd;
+				let adjacent = finalX - xEnd;
+
+				let angleOffset = adjacent > 0 ? 0 : 180;
+				let finalAngle = toDegrees(Math.atan(opposite / adjacent)) - newAngle - angleManip + angleOffset;
+				
+				if(finalTurtle.turn) manipulations.push(manipulation(finalAngle - link(finalTurtle.turn), finalTurtle.turn));
+			}
 		}
-
 	}else{			
 		let handle: Jump = currentSegment as Jump;
 		manipulations.push(manipulation(dx, handle.point[0]));
 		manipulations.push(manipulation(dy, handle.point[1]));
 	
+		//beginning of cascade
+		
 		if(currentSegment.type == SegmentType.SG_VERTEX || currentSegment.type == SegmentType.SG_JUMP){
 
 			if(nextSegment && nextSegment.type == SegmentType.SG_TURTLE){
@@ -231,35 +254,30 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, segments: S
 				
 				let move = link(turtle.move);
 				let turn = link(turtle.turn);
-
-				let originTurn = turtle.turn ? turtle.turn.value : 0;
-				let originMove = turtle.move ? turtle.move.value : 0;
 				
-				let xNought = Math.cos(toRadians(originTurn))*originMove;
-		 		let yNought = Math.sin(toRadians(originTurn))*originMove;
+				let xNought = Math.cos(toRadians(turn))*move;
+		 		let yNought = Math.sin(toRadians(turn))*move;
 
-				let opposite = yNought - (dy + delta(handle.point[1]));
-				let adjacent = xNought - (dx + delta(handle.point[0]));
+				let opposite = yNought - (dy);
+				let adjacent = xNought - (dx);
 
 				let angleOffset = (adjacent > 0) ? 0 : 180;
 
-				let moveManip = distance(dx + delta(handle.point[0]), dy + delta(handle.point[1]), xNought, yNought);
+				let moveManip = distance(dx, dy, xNought, yNought);
 
-				let angleManip = (adjacent != 0 ? angleOffset + toDegrees(Math.atan(opposite / adjacent)) : 90 * Math.sin(opposite));
+				let angleManip = (adjacent != 0 ? angleOffset + toDegrees(Math.atan(opposite / adjacent)) : 90 * Math.sign(opposite));
 
 				if(turtle.move) manipulations.push(manipulation(moveManip - move, turtle.move));
 				if(turtle.turn) manipulations.push(manipulation(angleManip - turn, turtle.turn));
 
 				if(segments[index + 2] && segments[index + 2].type == SegmentType.SG_TURTLE){
 					let nextTurtle: Turtle = segments[index + 2] as Turtle;
-					if(nextTurtle.turn){
-						if(turtle.turn) manipulations.push(manipulation(-(angleManip - turn), nextTurtle.turn));
-					}
+					if(nextTurtle.turn) manipulations.push(manipulation(-(angleManip - turn), nextTurtle.turn));
 				}
 			}
 		}
-		dispatch(manipulate(manipulations));
 	}
+	dispatch(manipulate(manipulations));
 }
 
 function distance(x1, y1, x2, y2){
