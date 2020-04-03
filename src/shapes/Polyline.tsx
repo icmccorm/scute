@@ -1,16 +1,15 @@
 import * as React from 'react';
 import {ShapeProps} from './Shape';
 import {useSelector, useDispatch} from 'react-redux';
-import {Segment, generateHandles, generatePoints} from './PathUtilities';
+import {PolyPathDefinition, generatePoly} from './PathUtilities';
 import { getColorFromArray } from './StyleUtilities';
 import { scuteStore } from 'src/redux/ScuteStore';
 
 export const Polyline = React.memo(({defs, children}:ShapeProps) => {
-    let segments: Array<Segment> = defs.segments;
     const[hovering, setHover] = React.useState(false);
 
     const dispatch = useDispatch();
-    const links = useSelector((store: scuteStore) => store.root.lines);
+    const polyDefn:PolyPathDefinition = useSelector((store:scuteStore) => generatePoly(store.root.lines, dispatch, defs.segments));
 
     const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
@@ -21,11 +20,11 @@ export const Polyline = React.memo(({defs, children}:ShapeProps) => {
     return (
         <g className="hoverGroup" onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
             <polyline className={(hovering ? 'hover' : '')}
-                points={generatePoints(links, segments)} 
+                points={polyDefn.defn} 
                 style={styles}
             ></polyline>
             {hovering ? 
-                generateHandles(links, dispatch, segments)
+                polyDefn.handles
             : null}
         </g>
     );

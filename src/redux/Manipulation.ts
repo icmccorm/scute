@@ -1,10 +1,9 @@
-import { ActionType, createAction } from "./Actions";
-import { getRGBA } from "src/shapes/StyleUtilities";
+import { ActionType, createAction, Action } from "./Actions";
 
-export type ValueMeta = {mouseDelta: number, valueDelta: number, role: RoleType, targetValue: number, inlineOffset: number, length: number};
+export type ValueMeta = {delta: number, valueDelta: number, role: RoleType, targetValue: number, inlineOffset: number, length: number};
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
 export type ValueLink = {lineIndex: number, inlineIndex: number, value?: any};
-export type Manipulation = {mouseDelta: number, originalValue: number, lineIndex: number, inlineIndex}
+export type Manipulation = {delta: number, originalValue: number, lineIndex: number, inlineIndex}
 
 export enum StatusType{
 	CONST = 0,
@@ -20,35 +19,47 @@ export enum RoleType {
 	MODULO
 }
 
+export function getLinkedDelta(lines: Array<LineMeta>, link: ValueLink){
+	let delta = 0;
+	let line:LineMeta = lines[link.lineIndex];
+	if(link && line){
+		let meta = line.values[link.inlineIndex];
+		if(meta){
+			delta = meta.delta;
+		}
+	}
+	return delta;
+}
+
 export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
 	let value = 0;
 	let line:LineMeta = lines[link.lineIndex];
-	if(line){
+	if(link && line){
 		let meta = line.values[link.inlineIndex];
 		if(meta){
-			if(meta.mouseDelta != 0){
+			if(meta.delta != 0){
 				switch(meta.role){
 					case RoleType.PLUS: {
 						let term = link.value - meta.targetValue;
-						value = term + (meta.targetValue + meta.mouseDelta);
+						value = term + (meta.targetValue + meta.delta);
 					} break;
 					case RoleType.MINUS: {
 						let term = link.value - meta.targetValue;
-						value = term + (meta.targetValue + meta.mouseDelta);
+						value = term + (meta.targetValue + meta.delta);
 					} break;
 					case RoleType.TIMES: {
 						let factor = link.value / meta.targetValue;						
-						value = factor * (meta.targetValue + meta.mouseDelta);
+						value = factor * (meta.targetValue + meta.delta);
 					} break;
 					case RoleType.DIVIDE: {
 						let quotient = link.value * meta.targetValue;
-						value = quotient / (meta.targetValue + meta.mouseDelta);
+						value = quotient / (meta.targetValue + meta.delta);
 					} break;
 					case RoleType.MODULO:
 					default:
-						value = link.value + meta.mouseDelta;
+						value = link.value + meta.delta;
 				}
-				value = link.value + meta.mouseDelta;
+				value = link.value + meta.delta;
 			}else{
 				value = link.value;
 			}
@@ -70,11 +81,15 @@ export function getLinkedColor(lines: Array<LineMeta>, color: Array<ValueLink>){
 	}
 }*/
 
-export function manipulation(mouseDelta: number, link: ValueLink){
-	return createAction(ActionType.MANIPULATION, {
-		mouseDelta: mouseDelta,
+export function manipulation(delta: number, link: ValueLink){
+	return {
+		delta: delta,
 		originalValue: link.value,
 		lineIndex: link.lineIndex,
 		inlineIndex: link.inlineIndex,
-	});
+	};
+}
+
+export function manipulate(manips: Manipulation[]){
+	return createAction(ActionType.MANIPULATION, manips);
 }

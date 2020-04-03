@@ -41,7 +41,7 @@ const Handle = React.memo(({adjust, cx, cy}:Props) => {
 	return (
 		<circle
 			className={'handle'} 
-			r="5px" 
+			r={Math.abs((1/scale*5)) + "px"} 
 			cx={cx}
 			cy={cy}
 			onMouseDown={recordMousePosition}

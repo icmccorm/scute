@@ -18,3 +18,11 @@ export function requestCompile(code: string){
 	ScuteWorkerObject.postMessage([ActionType.REQ_COMPILE, code]);
 }
 
+export function reloadRuntime(){
+	ScuteWorkerObject.terminate();
+	ScuteWorkerObject = new ScuteWorker();
+	ScuteWorkerObject.onmessage = async (event) => {
+		let action: Action = event.data;
+		scuteStore.dispatch(action);
+	}
+}

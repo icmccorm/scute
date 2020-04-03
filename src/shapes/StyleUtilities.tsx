@@ -3,7 +3,7 @@ export enum UnitType {
 	PX = "px"
 }
 
-export function getTranslate(translate: Array<number>, units:UnitType ) {
+export function getTranslate(translate: Array<number>, units:UnitType) {
 	return " translate(" + translate[0] + "px, " + translate[1] + units + ") ";
 }
 

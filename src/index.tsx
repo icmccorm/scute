@@ -1,14 +1,14 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import AppContainer from './containers/AppContainer';
 import './Global.scss';
 
 import {Provider} from 'react-redux';
 import {scuteStore} from './redux/ScuteStore';
+import AppRoot from './containers/AppRoot';
 
 ReactDOM.render(
 	<Provider store={scuteStore}>
-    	<AppContainer/>
+    	<AppRoot/>
 	</Provider>,
     document.getElementById('root')
 );

@@ -2,7 +2,7 @@ import * as React from 'react';
 import {ShapeProps} from './Shape';
 import {useSelector, useDispatch} from 'react-redux';
 import Handle from './Handle';
-import { ValueLink, getLinkedValue, ValueMeta, manipulation, StatusType } from 'src/redux/Manipulation';
+import { ValueLink, getLinkedValue, ValueMeta, manipulation, StatusType, manipulate } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
 import { getColorFromArray } from './StyleUtilities';
 
@@ -23,12 +23,11 @@ export const Circ = ({defs}:ShapeProps) => {
     const[hovering, setHover] = React.useState(false);
 
     const setRadius = (dx: number, dy: number) => {
-        dispatch(manipulation(dx, attrs['r']));
+        dispatch(manipulate([manipulation(dx, attrs['r'])]));
     }
 
     const setPosition = (dx: number, dy: number) => {
-        dispatch(manipulation(dx, attrs['cx']));
-        dispatch(manipulation(dy, attrs['cy']));
+        dispatch(manipulate([manipulation(dx, attrs['cx']), manipulation(dy, attrs['cy'])]))
     }
 
     return (

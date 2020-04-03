@@ -3,7 +3,7 @@ import {useDispatch} from 'react-redux';
 import {ShapeProps} from './Shape';
 import {useSelector} from 'react-redux';
 import Handle from './Handle';
-import { getLinkedValue, manipulation } from 'src/redux/Manipulation';
+import { getLinkedValue, manipulation, manipulate } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
 import { getColorFromArray } from './StyleUtilities';
 
@@ -25,16 +25,16 @@ export const Rect = ({defs}:ShapeProps) => {
     const[hovering, setHover] = React.useState(false);
 
     const setHeight = (dx: number, dy:number) => {
-        dispatch(manipulation(dy, attrs['height']));
+        dispatch(manipulate([manipulation(dy, attrs['height'])]));
     }
 
     const setPosition = (dx: number, dy:number) => {
-        dispatch(manipulation(dx, attrs['x']));
-        dispatch(manipulation(dy, attrs['y']))
+        dispatch(manipulate([manipulation(dx, attrs['x']), manipulation(dy, attrs['y'])]))
+
     }
 
     const setWidth = (dx: number, dy:number) => {
-        dispatch(manipulation(dx, attrs['width']));
+        dispatch(manipulate([manipulation(dy, attrs['width'])]));
     }
 
     return (

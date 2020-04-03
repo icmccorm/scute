@@ -1,7 +1,7 @@
 button {
     border-radius: .25rem;
     border:none;
-    border-bottom: 3px solid;
+    box-shadow:  0px 3px 5px -1px #00000086;
     outline: none;
     vertical-align: center;
 
@@ -15,15 +15,22 @@ button {
     color: white;
     font-family: "Roboto:400", sans-serif;
     font-size: 10pt;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, .65);
 
-}
+    transition: box-shadow .35s;
+    transition: background-color .35s;
 
-button:hover{
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, .65);
-}
 
-button:active{
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, .65) inset;
-    border:none
+    &:hover{
+        box-shadow:  0px 5px 5px -1px #00000086;
+    }
+    
+    &:active{
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, .65) inset;
+        border:none
+    }
+    &:disabled{
+        box-shadow: none!important;
+        background-color: #565656c7!important;
+        border-color: #565656!important;
+    }
 }
