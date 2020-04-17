@@ -9,10 +9,10 @@
   },
   "scripts": {
     "test": "npx mocha -r ts-node/register ./test/**/*.test.ts",
-    "build": "npm run scute ; NODE_ENV=production webpack --config ./config/webpack.prod.js",
+    "build": "make -C ./src/lang-c/ web-prod ; NODE_ENV=production webpack --config ./config/webpack.prod.js",
     "dev": "NODE_ENV=development webpack-dev-server --config ./config/webpack.dev.js --mode=development --verbose",
     "start": "npm run scute --quiet ; npm run dev --quiet",
-    "scute": "./src/lang-c/embuild.sh",
+    "scute": "make -C ./src/lang-c/ web",
     "deploy": "npm run build ; gh-pages -d dist"
   },
   "author": "",
