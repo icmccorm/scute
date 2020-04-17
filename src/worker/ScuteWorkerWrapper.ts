@@ -1,7 +1,9 @@
-import Scute from 'src/lang-c/scute.js';
-import { ActionType } from './redux/Actions';
+import Scute from '../lang-c/scute.js';
+import {ActionType, createAction} from '../redux/Actions';
 
-class ScuteWrapper {
+var scuteModule = require('../lang-c/scute.wasm');
+
+export class ScuteWorkerWrapper {
 	currentIndex: number;
 	compiledPtr: number;
 	module: any;
@@ -10,19 +12,22 @@ class ScuteWrapper {
 	constructor(scuteModule: any, worker: any){
 		this.compiledPtr = scuteModule._compiledPtr;
 		this.module = scuteModule;
+		this.module._printFunction = worker.postMessage;
 		this.worker = worker;
 	}
 
 	compileCode(code: string){
 		this.module._frames = [];
 		this.module._maxFrameIndex = 0;
+		this.module._lines = [];
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
 		this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
+//		this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + e.message + "\n");
 		this.module._free(codePtr);
 		
-		this.sendCommand(ActionType.FIN_COMPILE, this.module._maxFrameIndex);
+		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, lines: this.module._lines});
 		this.currentIndex = 0;
 	}
 
@@ -41,23 +46,32 @@ class ScuteWrapper {
 		return charArrayPtr;
 	}
 	
-	sendCommand(cmd: ActionType, obj: any) {
-		let message = {code: cmd, payload: obj};
-		this.worker.postMessage(message, null, null);
+	sendCommand(type: ActionType, payload: any) {
+		this.worker.postMessage(createAction(type, payload), null, null);
 	}
 }
 
-Scute().then((em_module) => {
-	var scute = new ScuteWrapper(em_module, self);
+Scute({
+	locateFile(path) {
+	  if(path.endsWith('.wasm')) {
+		return scuteModule;
+	  }
+	  return path;
+	},
+}).then((em_module) => {
+	var scute = new ScuteWorkerWrapper(em_module, self);
 	self.onmessage = event => {
 		let message: any[] = event.data;
 		switch(message[0]){
-			case 0:
+			case ActionType.REQ_COMPILE:
 				scute.compileCode(message[1])
 				break;
-			case 1:
+			case ActionType.REQ_FRAME:
 				scute.runCode();
 				break;
 		}
 	}
-})
+	em_module.onAbort = () =>{
+		scute.sendCommand(ActionType.PRINT_OUT, "Runtime aborted.\n");
+	}
+});
