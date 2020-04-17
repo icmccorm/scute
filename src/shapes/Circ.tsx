@@ -2,7 +2,12 @@ import * as React from 'react';
 import {ShapeProps} from './Shape';
 import {useSelector, useDispatch} from 'react-redux';
 import Handle from './Handle';
-import { ValueLink, getLinkedValue, ValueMeta, manipulation, StatusType, manipulate } from 'src/redux/Manipulation';
+import { ValueLink, 
+        getLinkedValue, 
+        manipulation, 
+        manipulate, 
+        getLinkedVector, 
+        vecManipulation } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
 import { getColorFromArray } from './StyleUtilities';
 
@@ -10,9 +15,8 @@ export const Circ = ({defs}:ShapeProps) => {
     let attrs: Array<ValueLink> = defs.attrs;
     let dispatch = useDispatch();
 
-    const cxValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['cx']));
-    const cyValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['cy']));
-    const rValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['r']));
+    const position:number = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
+    const radius:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['radius']));
     
     const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
@@ -23,31 +27,31 @@ export const Circ = ({defs}:ShapeProps) => {
     const[hovering, setHover] = React.useState(false);
 
     const setRadius = (dx: number, dy: number) => {
-        dispatch(manipulate([manipulation(dx, attrs['r'])]));
+        dispatch(manipulate(manipulation(dx, attrs['radius'])));
     }
 
     const setPosition = (dx: number, dy: number) => {
-        dispatch(manipulate([manipulation(dx, attrs['cx']), manipulation(dy, attrs['cy'])]))
+        dispatch(manipulate(vecManipulation(dx, dy, attrs['position'])));
     }
 
     return (
 		<g className="hoverGroup" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
 			<circle className={(hovering ? 'hover' : '')}
-				cx={cxValue} 
-				cy={cyValue} 
-                r={rValue} 
+				cx={position[0]} 
+				cy={position[1]} 
+                r={radius} 
                 style={styles}
 			></circle>
             {hovering ?
                 <g>         
                     <Handle
-                        cx={cxValue + rValue}
-                        cy={cyValue}
+                        cx={position[0] + radius}
+                        cy={position[1]}
                         adjust={setRadius}
                     ></Handle>
                     <Handle
-                        cx={cxValue}
-                        cy={cyValue}
+                        cx={position[0]}
+                        cy={position[1]}
                         adjust={setPosition}
                     ></Handle>
                 </g>

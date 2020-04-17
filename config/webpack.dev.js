@@ -7,5 +7,7 @@ module.exports = merge(common, {
     devServer: {
         contentBase: paths.public
     },
-
+    optimization: {
+        minimize: true
+    }
 })

@@ -3,19 +3,18 @@ import {useDispatch} from 'react-redux';
 import {ShapeProps} from './Shape';
 import {useSelector} from 'react-redux';
 import Handle from './Handle';
-import { getLinkedValue, manipulation, manipulate } from 'src/redux/Manipulation';
+import { manipulation, manipulate, getLinkedVector, vecManipulation } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
 import { getColorFromArray } from './StyleUtilities';
 
 
 export const Rect = ({defs}:ShapeProps) => {
+    
     let attrs = defs.attrs;
     const dispatch = useDispatch();
-    const xValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['x']));
-    const yValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['y']));
-    const widthValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['width']));
-    const heightValue:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['height']));
 
+    const position:Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
+    const size:Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['size']));
     const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
         stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : null,
@@ -25,42 +24,42 @@ export const Rect = ({defs}:ShapeProps) => {
     const[hovering, setHover] = React.useState(false);
 
     const setHeight = (dx: number, dy:number) => {
-        dispatch(manipulate([manipulation(dy, attrs['height'])]));
+        dispatch(manipulate(manipulation(dy, attrs['size'][1])));
     }
 
     const setPosition = (dx: number, dy:number) => {
-        dispatch(manipulate([manipulation(dx, attrs['x']), manipulation(dy, attrs['y'])]))
+        dispatch(manipulate(vecManipulation(dx, dy, attrs['position'])));
 
     }
 
     const setWidth = (dx: number, dy:number) => {
-        dispatch(manipulate([manipulation(dy, attrs['width'])]));
+        dispatch(manipulate(manipulation(dx, attrs['size'][0])));
     }
 
     return (
         <g className="hoverGroup" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
             <rect className={(hovering ? 'hover' : '')}
-                x={xValue} 
-                y={yValue} 
-                width={widthValue} 
-                height={heightValue}
+                x={position[0]} 
+                y={position[1]} 
+                width={size[0]} 
+                height={size[1]}
                 style={styles}
             ></rect>
             {hovering ?
                 <g>
                     <Handle
-                        cx={xValue + 0.5*widthValue}
-                        cy={yValue + heightValue}
+                        cx={position[0] + 0.5*size[0]}
+                        cy={position[1] + size[1]}
                         adjust={setHeight}
                     ></Handle>
                     <Handle
-                        cx={xValue + 0.5*widthValue}
-                        cy={yValue + 0.5*heightValue}
+                        cx={position[0] + 0.5*size[0]}
+                        cy={position[1] + 0.5*size[1]}
                         adjust={setPosition}
                     ></Handle>
                     <Handle
-                        cx={xValue + widthValue}
-                        cy={yValue + 0.5*heightValue}
+                        cx={position[0] + size[0]}
+                        cy={position[1] + 0.5*size[1]}
                         adjust={setWidth}
                     ></Handle>
                 </g>

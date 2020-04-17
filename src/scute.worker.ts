@@ -1,5 +1,5 @@
 import Scute from 'src/lang-c/scute.js';
-import {WorkerResponses} from './redux/ScuteWorker';
+import { ActionType } from './redux/Actions';
 
 class ScuteWrapper {
 	currentIndex: number;
@@ -22,7 +22,7 @@ class ScuteWrapper {
 		this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
 		this.module._free(codePtr);
 		
-		this.sendCommand(WorkerResponses.COMPILED, this.module._maxFrameIndex);
+		this.sendCommand(ActionType.FIN_COMPILE, this.module._maxFrameIndex);
 		this.currentIndex = 0;
 	}
 
@@ -30,7 +30,7 @@ class ScuteWrapper {
 		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
 		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
 		
-		this.sendCommand(WorkerResponses.FRAME, this.module._currentFrame);
+		this.sendCommand(ActionType.FIN_FRAME, this.module._currentFrame);
 		this.module._currentFrame = [];
 	}
 
@@ -41,7 +41,7 @@ class ScuteWrapper {
 		return charArrayPtr;
 	}
 	
-	sendCommand(cmd: WorkerResponses, obj: any) {
+	sendCommand(cmd: ActionType, obj: any) {
 		let message = {code: cmd, payload: obj};
 		this.worker.postMessage(message, null, null);
 	}

@@ -85,11 +85,12 @@ export function reduceRoot(store = initialStore, action: Action){
 	
 				let newValue;
 				let newValueString;
+
 				switch(meta.role){
 					case RoleType.TIMES:{
 						let factor = change.originalValue / meta.targetValue;
 						newValue = (change.originalValue + meta.delta) / factor;
-						newValueString = newValue.toFixed(3);
+						newValueString = newValue.toFixed(3).toString();
 					} break;
 					
 					case RoleType.DIVIDE: {

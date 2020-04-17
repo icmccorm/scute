@@ -67,6 +67,10 @@ export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
 	}
 	return value;
 }
+
+export function getLinkedVector(lines: Array<LineMeta>, links: Array<ValueLink>){
+	return [getLinkedValue(lines, links[0]), getLinkedValue(lines, links[1])];
+}
 /*
 export function getLinkedColor(lines: Array<LineMeta>, color: Array<ValueLink>){
 	if(color){
@@ -82,12 +86,16 @@ export function getLinkedColor(lines: Array<LineMeta>, color: Array<ValueLink>){
 }*/
 
 export function manipulation(delta: number, link: ValueLink){
-	return {
+	return [{
 		delta: delta,
 		originalValue: link.value,
 		lineIndex: link.lineIndex,
 		inlineIndex: link.inlineIndex,
-	};
+	}];
+}
+
+export function vecManipulation(dx: number, dy: number, links: Array<ValueLink>){
+	return manipulation(dx, links[0]).concat(manipulation(dy, links[1]));
 }
 
 export function manipulate(manips: Manipulation[]){
