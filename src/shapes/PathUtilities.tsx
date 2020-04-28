@@ -1,4 +1,4 @@
-import { ValueLink, LineMeta, getLinkedValue, ValueMeta, manipulation, Manipulation, manipulate, getLinkedDelta } from "src/redux/Manipulation";
+import { ValueLink, LineMeta, getLinkedValue, ValueMeta, manipulation, Manipulation, manipulate, getLinkedDelta, vecManipulation } from "src/redux/Manipulation";
 import * as React from "react";
 import Handle from "./Handle";
 
@@ -17,7 +17,7 @@ export type Turtle = Segment & {move: ValueLink, turn: ValueLink, x:number, y:nu
 export type Vertex = Segment & {point: ValueLink[]};
 export type Cubic = Segment & {control1: Array<ValueLink>, control2: Array<ValueLink>, end: Array<ValueLink>};
 export type Quadratic = Segment & {control: Array<ValueLink>, end: Array<ValueLink>};
-export type Arc = Segment & {center: Array<ValueLink>, degrees: ValueLink};
+export type Arc = Segment & {center: Array<ValueLink>, degrees: Array<ValueLink>, radius:Array<ValueLink>};
 
 export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>}
 
@@ -44,7 +44,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						cx={link(jump.point[0])} 
 						cy={link(jump.point[1])} 
 						adjust={(dx, dy) => 
-							manipVector(dispatch, dx, dy, arc.center
+							manipVector(dispatch, dx, dy, jump.point
 					)}/>
 				);
 				
@@ -145,7 +145,22 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 
 			case SegmentType.SG_ARC:
 				let arc = segment as Arc;
+	
+				let rx = link(arc.radius[0]);
+				let ry = link(arc.radius[1]);
+			
+				let cx = link(arc.center[0]);
+				let cy = link(arc.center[1]);
+				
+				let degX = link(arc.degrees[0]);
+				let degArc = link(arc.degrees[1]);
+
+				let endpoint = arcEndpoint(rx, ry, degX, degArc, cx, cy);
+
+				defn += "A " + rx + " " + ry + " " + degX + " " + 1 + " " + 1 + " " + endpoint[0] + " " + endpoint[1] + " ";
+
 				handles = handles.concat([<Handle key={key} cx={link(arc.center[0])} cy={link(arc.center[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, arc.center)}/>])
+				prevPoint = endpoint;
 		}
 		defn += " "
 	}
@@ -192,7 +207,7 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 }
 
 export const manipVector = (dispatch, dx: number, dy: number, vector: ValueLink[]) => {	
-	dispatch(manipulate([manipulation(dx, vector[0]), manipulation(dy, vector[1])]));
+	dispatch(manipulate(vecManipulation(dx, dy, vector)));
 }
 
 export const manipTurtle = (dispatch, links, dx: number, dy: number, turtleSegment: Segment) => {
@@ -232,4 +247,18 @@ function toRadians(deg: number){
 
 function toDegrees(rad: number){
 	return (rad * (180 / Math.PI));
+}
+
+function arcEndpoint(rx, ry, degX, degArc, cx, cy):number[]{
+	let end = [];
+	let xCosine = Math.cos(toRadians(degX));
+	let xSine = Math.sin(toRadians(degX));
+
+	let arcCosine = Math.cos(toRadians(degArc));
+	let arcSine = Math.sin(toRadians(degArc));
+
+	let centerOffsetX = xCosine * (rx * arcCosine) - xSine * (ry * arcSine);
+	let centerOffsetY = xSine * (rx * arcCosine) + xCosine * (ry * arcSine);
+
+	return [centerOffsetX + cx, centerOffsetY + cy];
 }

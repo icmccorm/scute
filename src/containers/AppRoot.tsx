@@ -55,7 +55,7 @@ const AppRoot = () => {
     }
 
 	const downloadCanvas = () => {
-        let svg = this.canvasWrapper.current;
+        let svg = canvasWrapper.current;
         let data = new XMLSerializer().serializeToString(svg);
         let svgBlob = new Blob([data], {
             type: 'image/svg+xml;charset=utf-8'

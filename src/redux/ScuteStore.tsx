@@ -78,51 +78,54 @@ export function reduceRoot(store = initialStore, action: Action){
 			let changes: Manipulation[] = action.payload;
 			for(let i = 0; i < changes.length; ++i){
 				let change = changes[i];
-				let line: LineMeta = store.lines[change.lineIndex];
-				let meta: ValueMeta = line.values[change.inlineIndex];
-				let startIndex = line.charIndex + meta.inlineOffset;
-				meta.delta += change.delta;
-	
-				let newValue;
-				let newValueString;
+				if(change.lineIndex > -1){
+					let line: LineMeta = store.lines[change.lineIndex];
+					let meta: ValueMeta = line.values[change.inlineIndex];
+					let startIndex = line.charIndex + meta.inlineOffset;
+					meta.delta += change.delta;
+		
+					let newValue;
+					let newValueString;
 
-				switch(meta.role){
-					case RoleType.TIMES:{
-						let factor = change.originalValue / meta.targetValue;
-						newValue = (change.originalValue + meta.delta) / factor;
-						newValueString = newValue.toFixed(3).toString();
-					} break;
-					
-					case RoleType.DIVIDE: {
-						let dividend = change.originalValue * meta.targetValue;
-						newValue = dividend / (change.originalValue + meta.delta);
-						newValueString = newValue.toFixed(3);
-					} break;
-					
-					case RoleType.MINUS:
-					case RoleType.PLUS:
-					default:{
-						newValue = meta.targetValue + meta.delta;
-						newValueString = newValue.toFixed(3);
-					 }break;
-				}
-	
-				let lengthDifference = newValueString.length - meta.length;
-				let start = store.code.substring(0, startIndex);
-				let end = store.code.substring(startIndex + meta.length);
-				
-				store = Object.assign({}, store, {
-					code: start + newValueString + end,
-				});
-	
-				meta.length = newValueString.length;
-			
-				if(lengthDifference != 0){
-					for(let i = change.inlineIndex + 1; i< line.values.length; ++i){
-						line.values[i].inlineOffset += lengthDifference;
+					switch(meta.role){
+						case RoleType.TIMES:{
+							let factor = change.originalValue / meta.targetValue;
+							newValue = (change.originalValue + meta.delta) / factor;
+							newValueString = newValue.toFixed(3).toString();
+						} break;
+						
+						case RoleType.DIVIDE: {
+							let dividend = change.originalValue * meta.targetValue;
+							newValue = dividend / (change.originalValue + meta.delta);
+							newValueString = newValue.toFixed(3);
+						} break;
+						
+						case RoleType.MINUS:
+						case RoleType.PLUS:
+						default:{
+							newValue = meta.targetValue + meta.delta;
+							newValueString = newValue.toFixed(3);
+						}break;
+						
 					}
-					for(let i = change.lineIndex + 1; i < store.lines.length; ++i){
-						store.lines[i].charIndex += lengthDifference;
+		
+					let lengthDifference = newValueString.length - meta.length;
+					let start = store.code.substring(0, startIndex);
+					let end = store.code.substring(startIndex + meta.length);
+					
+					store = Object.assign({}, store, {
+						code: start + newValueString + end,
+					});
+		
+					meta.length = newValueString.length;
+				
+					if(lengthDifference != 0){
+						for(let i = change.inlineIndex + 1; i< line.values.length; ++i){
+							line.values[i].inlineOffset += lengthDifference;
+						}
+						for(let i = change.lineIndex + 1; i < store.lines.length; ++i){
+							store.lines[i].charIndex += lengthDifference;
+						}
 					}
 				}
 			}

@@ -12,8 +12,8 @@ export class ScuteWorkerWrapper {
 	constructor(scuteModule: any, worker: any){
 		this.compiledPtr = scuteModule._compiledPtr;
 		this.module = scuteModule;
-		this.module._printFunction = worker.postMessage;
 		this.worker = worker;
+		this.module._printFunction = worker.postMessage.bind(worker);
 	}
 
 	compileCode(code: string){
@@ -23,8 +23,11 @@ export class ScuteWorkerWrapper {
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
-		this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
-//		this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + e.message + "\n");
+		try{
+			this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
+		}catch(error){
+			this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + error.message + "\n");
+		}
 		this.module._free(codePtr);
 		
 		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, lines: this.module._lines});

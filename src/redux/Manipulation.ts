@@ -86,18 +86,19 @@ export function getLinkedColor(lines: Array<LineMeta>, color: Array<ValueLink>){
 }*/
 
 export function manipulation(delta: number, link: ValueLink){
-	return [{
+	return {
 		delta: delta,
 		originalValue: link.value,
 		lineIndex: link.lineIndex,
 		inlineIndex: link.inlineIndex,
-	}];
+	};
 }
 
 export function vecManipulation(dx: number, dy: number, links: Array<ValueLink>){
-	return manipulation(dx, links[0]).concat(manipulation(dy, links[1]));
+	return [manipulation(dx, links[0]), (manipulation(dy, links[1]))];
 }
 
-export function manipulate(manips: Manipulation[]){
-	return createAction(ActionType.MANIPULATION, manips);
+export function manipulate(manips: Manipulation[] | Manipulation){
+	return createAction(ActionType.MANIPULATION, [].concat(manips));
 }
+

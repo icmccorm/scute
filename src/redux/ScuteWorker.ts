@@ -1,4 +1,4 @@
-import ScuteWorker from 'worker-loader!src/worker/scute.worker';
+import ScuteWorker from 'worker-loader!src/worker/ScuteWorkerWrapper';
 import {Action, ActionType} from './Actions';
 import {scuteStore} from './ScuteStore';
 

@@ -14,9 +14,9 @@ before(() => {
   });
 
 describe("print()", () => {
-	it("prints hello world", () => {
+	it("prints strings successfully", () => {
 		scute.compileCode("print('hello!')");
 		scute.runCode();
 		return true;
-	})
+	});
 });
