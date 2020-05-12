@@ -8,6 +8,6 @@ module.exports = merge(common, {
         contentBase: paths.public
     },
     optimization: {
-        minimize: true
+        minimize: false
     }
 })
