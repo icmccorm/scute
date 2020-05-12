@@ -1,6 +1,7 @@
 import * as React from 'react';
 import "./style/Handle.scss";
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import { ActionType, createAction, Action } from "src/redux/Actions";
 import { scuteStore } from 'src/redux/ScuteStore';
 
 type Props = {adjust: Function, cx: number, cy: number};
@@ -11,6 +12,7 @@ const Handle = React.memo(({adjust, cx, cy}:Props) => {
 	let mouseOffset = [0, 0];
 
 	const scale = useSelector((store:scuteStore) => store.root.scale);
+	const dispatch = useDispatch();
 
 	const resizeComponents = (event) => {
 		event.preventDefault();
@@ -27,15 +29,17 @@ const Handle = React.memo(({adjust, cx, cy}:Props) => {
 		event.stopPropagation();
 
 		document.body.style.cursor = "grabbing";
-		window.addEventListener('mousemove', resizeComponents, false);	
-		window.addEventListener('mouseup', endRecording, false);
+		window.addEventListener('mousemove', resizeComponents);	
+		window.addEventListener('mouseup', endRecording, {once: true, capture: false});
 	}
 
-	const endRecording = () => {
+	const endRecording = (event) => {
+		event.stopPropagation();
+
 		document.body.style.cursor = "grab";
 		window.removeEventListener('mousemove', resizeComponents, false);
-		window.removeEventListener('mosueup', endRecording, false);
 		mouseOffset = [0, 0];
+		dispatch(createAction(ActionType.END_MANIPULATION, null));
 	}
 
 	return (

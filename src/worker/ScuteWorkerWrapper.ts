@@ -18,8 +18,8 @@ export class ScuteWorkerWrapper {
 
 	compileCode(code: string){
 		this.module._frames = [];
-		this.module._maxFrameIndex = 0;
 		this.module._lines = [];
+		this.module._maxFrameIndex = 0;
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);
@@ -30,7 +30,7 @@ export class ScuteWorkerWrapper {
 		}
 		this.module._free(codePtr);
 		
-		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex, lines: this.module._lines});
+		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex});
 		this.currentIndex = 0;
 	}
 
@@ -38,7 +38,7 @@ export class ScuteWorkerWrapper {
 		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
 		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
 		
-		this.sendCommand(ActionType.FIN_FRAME, this.module._currentFrame);
+		this.sendCommand(ActionType.FIN_FRAME, {frame: this.module._currentFrame, lines: this.module._lines});
 		this.module._currentFrame = [];
 	}
 
