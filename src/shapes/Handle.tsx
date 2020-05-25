@@ -1,11 +1,10 @@
 import * as React from 'react';
 import "./style/Handle.scss";
 import {useSelector, useDispatch} from 'react-redux';
-import { ActionType, createAction, Action } from "src/redux/Actions";
+import { ActionType, createAction} from "src/redux/Actions";
 import { scuteStore } from 'src/redux/ScuteStore';
 
 type Props = {adjust: Function, cx: number, cy: number};
-
 
 const Handle = React.memo(({adjust, cx, cy}:Props) => {
 	let mousePosition = [0, 0];

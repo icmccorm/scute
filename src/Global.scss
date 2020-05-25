@@ -20,7 +20,6 @@ html, body, #root, .root{
     font-family: "Roboto", sans-serif
 }
 
-
 polygon, polyline{
     stroke: black;
     stroke-width: 3px;
@@ -41,14 +40,13 @@ path {
 }
 
 /* shadows */
-
 .shadow{
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .56);
 }
+
 .inset-shadow{
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .56) inset;
 }
-
 
 textarea {
     outline: none;
@@ -62,6 +60,7 @@ textarea.dark {
     color: white;
     background-color: hsl(210, 3%, 12%);
 }
+
 textarea.light {
     background-color: white;
     color: hsl(210, 3%, 12%);
@@ -107,4 +106,9 @@ textarea.light {
 
 .sky-f {
     color: #a2aebb;
+}
+
+.hidden{
+    display:none;
+    visibility: hidden;
 }

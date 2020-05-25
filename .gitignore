@@ -3,5 +3,5 @@ dist
 .vscode
 
 .DS_STORE
-*.dYSM
+*.dSYM
 

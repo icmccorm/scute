@@ -1,11 +1,12 @@
-import {createStore, combineReducers} from 'redux';
-import {ActionType, Action} from './Actions';
-import {requestCompile, requestFrame} from './ScuteWorker';
+import { createStore, combineReducers } from 'redux';
+import { ActionType, Action } from './Actions';
+import { requestCompile, requestFrame } from './ScuteWorker';
 import { LineMeta, ValueMeta, Manipulation, RoleType } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number};
 export type FrameResponse = {maxFrameIndex: number, frames: Array<Object>};
 export type RuntimeResponse = {frame: [], lines: []};
+
 export type scuteStore = {
 	root: {
 		origin: Array<number>,
@@ -112,7 +113,9 @@ export function reduceRoot(store = initialStore, action: Action){
 						}
 						originValue = goal.value;
 					}
-					let newValueString = newValue.toString();
+
+					let fractional = Math.floor(newValue* 1000) / 1000;
+					let newValueString = (fractional == Math.floor(newValue)) ? (newValue % 1).toString() : fractional.toString();
 
 					let lengthDifference = newValueString.length - meta.length;
 					let start = store.code.substring(0, startIndex);
@@ -132,7 +135,6 @@ export function reduceRoot(store = initialStore, action: Action){
 							store.lines[i].charIndex += lengthDifference;
 						}
 					}
-					//console.log("manipulated value: " + (change.originalValue + meta.delta));
 				}
 			}
 			break;

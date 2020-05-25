@@ -34,15 +34,18 @@ export function getLinkedDelta(lines: Array<LineMeta>, link: ValueLink){
 
 export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
 	let value = 0;
-	let line:LineMeta = lines[link.lineIndex];
-	if(link && line){
-		let meta = line.values[link.inlineIndex];
-		if(meta){
-			value = link.value + meta.delta;
-			//console.log("linked value: " + value);
+	if(link){
+		value = link.value;
+		if(link.lineIndex >= 0){
+			let line:LineMeta = lines[link.lineIndex];
+			if(line){
+				let meta = line.values[link.inlineIndex];
+				if(meta){
+					value += meta.delta;
+				}
+			}
 		}
 	}
-
 	return value;
 }
 

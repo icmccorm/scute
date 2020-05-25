@@ -18,8 +18,10 @@ export type Vertex = Segment & {point: ValueLink[]};
 export type Cubic = Segment & {control1: Array<ValueLink>, control2: Array<ValueLink>, end: Array<ValueLink>};
 export type Quadratic = Segment & {control: Array<ValueLink>, end: Array<ValueLink>};
 export type Arc = Segment & {center: Array<ValueLink>, degrees: Array<ValueLink>, radius:Array<ValueLink>};
+export type BoundingBox = {position:Array<number>, bounds: Array<number>, centroid};
 
-export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>}
+export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>, bbox:BoundingBox};
+let boundingBoxPadding = 12;
 
 export const generatePath = (links, dispatch, segmentArray: Array<Segment>):PolyPathDefinition => {
 	let handles = [];
@@ -27,10 +29,15 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 	let prevPoint: Array<number> = [0, 0];
 	let angle = 0;
 
+	let maxX = null;
+	let minX = null;
+	let maxY = null;
+	let minY = null;
+
 	if(segmentArray.length == 0 || segmentArray[0].type != SegmentType.SG_JUMP){
 		defn += "M 0 0"
 	}
-	
+
 	for(let key = 0; key<segmentArray.length; ++key){ 
 		let segment = segmentArray[key];
 		const link = (vl:ValueLink) => getLinkedValue(links, vl);
@@ -48,8 +55,14 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					)}/>
 				);
 				
-				prevPoint = [jump.point[0].value, jump.point[1].value];
-				defn += "M " + link(jump.point[0]) + " " + link(jump.point[1]);
+				prevPoint = [link(jump.point[0]), link(jump.point[1].value)];
+
+				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
+				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
+				minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
+				minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
+
+				defn += "M " + prevPoint[0] + " " + prevPoint[1];
 				break;
 			
 			case SegmentType.SG_TURTLE:
@@ -64,6 +77,12 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				let dy = Math.round(sine * distance);
 
 				prevPoint = [prevPoint[0] + dx, prevPoint[1] + dy];
+
+				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
+				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
+				minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
+				minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
+
 				defn += "L " + prevPoint[0] + " " + prevPoint[1];
 				
 				handles.push(
@@ -89,8 +108,14 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, vertex.point)}
 					/>
 				);
-				prevPoint = [vertex.point[0].value, vertex.point[1].value];
-				defn += "L " + link(vertex.point[0]) + " " + link(vertex.point[1]);
+				prevPoint = [link(vertex.point[0]), link(vertex.point[1])];
+
+				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
+				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
+				minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
+				minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
+
+				defn += "L " + prevPoint[0] + " " + prevPoint[1];
 				break;
 
 			case SegmentType.SG_QBEZIER:
@@ -110,10 +135,20 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					/>
 				]);
 				defn += "Q " + link(quad.control[0]) + " " + link(quad.control[1]) + ", " + link(quad.end[0]) + " " + link(quad.end[1]);
-				prevPoint = [quad.end[0].value, quad.end[1].value];
+				prevPoint = [link(quad.end[0]), link(quad.end[1])];
+
+				let maxXInvolved = Math.max(link(quad.control[0]), prevPoint[0]);
+				let maxYInvolved = Math.max(link(quad.control[1]), prevPoint[1]);
+				let minXInvolved = Math.min(link(quad.control[0]), prevPoint[0]);
+				let minYInvolved = Math.min(link(quad.control[1]), prevPoint[1]);
+
+				maxX = maxX ? Math.max(maxX, maxXInvolved): maxXInvolved;
+				maxY = maxY ? Math.max(maxY, maxYInvolved): maxYInvolved;
+				minX = minX ? Math.min(minX, minXInvolved): minXInvolved;
+				minY = minY ? Math.min(minY, minYInvolved): minYInvolved;
 				break;
 
-			case SegmentType.SG_CBEZIER:
+			case SegmentType.SG_CBEZIER: {
 				let cubic = segment as Cubic;
 				handles = handles.concat([
 					<Handle key={key} 
@@ -140,10 +175,21 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				let control2 = link(cubic.control2[0]) + " " + link(cubic.control2[1]) + ", ";
 				let end = link(cubic.end[0]) + " " + link(cubic.end[1]);
 				defn += "C " + control1 + control2 + end;
-				prevPoint = [cubic.end[0].value, cubic.end[1].value];
-				break;
 
-			case SegmentType.SG_ARC:
+				prevPoint = [link(cubic.end[0]), link(cubic.end[1])];
+
+				let maxXInvolved = Math.max(link(cubic.control1[0]), link(cubic.control2[0]), prevPoint[0]);
+				let maxYInvolved = Math.max(link(cubic.control1[1]), link(cubic.control2[1]), prevPoint[1]);
+				let minXInvolved = Math.min(link(cubic.control1[0]), link(cubic.control2[0]), prevPoint[0]);
+				let minYInvolved = Math.min(link(cubic.control1[1]), link(cubic.control2[1]), prevPoint[1]);
+				
+				maxX = maxX ? Math.max(maxX, maxXInvolved): maxXInvolved;
+				maxY = maxY ? Math.max(maxY, maxYInvolved): maxYInvolved;
+				minX = minX ? Math.min(minX, minXInvolved): minXInvolved;
+				minY = minY ? Math.min(minY, minYInvolved): minYInvolved;
+
+				}	break;
+			case SegmentType.SG_ARC: {
 				let arc = segment as Arc;
 	
 				let rx = link(arc.radius[0]);
@@ -161,18 +207,37 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 
 				handles = handles.concat([<Handle key={key} cx={link(arc.center[0])} cy={link(arc.center[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, arc.center)}/>])
 				prevPoint = endpoint;
+
+				let maxXInvolved = Math.max(link(arc.center[0]), prevPoint[0]);
+				let maxYInvolved = Math.max(link(arc.center[1]), prevPoint[0]);
+				let minXInvolved = Math.min(link(arc.center[0]), prevPoint[0]);
+				let minYInvolved = Math.min(link(arc.center[1]), prevPoint[0]);
+
+				maxX = maxX ? Math.max(maxX, maxXInvolved): maxXInvolved;
+				maxY = maxY ? Math.max(maxY, maxYInvolved): maxYInvolved;
+				minX = minX ? Math.min(minX, minXInvolved): minXInvolved;
+				minY = minY ? Math.min(minY, minYInvolved): minYInvolved;
+
+			} break;
 		}
-		defn += " "
+		defn += " ";
 	}
-	return {defn, handles};
+
+	let bbox = calculateBounds(minX, maxX, minY, maxY);
+	return {defn, handles, bbox};
 }
 
 export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathDefinition {
-	let handles = [];
-	let defn = "";
-
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
 	let prevPoint: Array<number> = [0, 0];
+
+	let handles = [];
+	let defn = "";
+	let maxX = null;
+	let minX = null;
+	let maxY = null;
+	let minY = null;
+
 	let angle = 0;
 	for(let i = 0; i<segmentArray.length; ++i){
 		switch(segmentArray[i].type){
@@ -198,12 +263,17 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 
 				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
 				handles = handles.concat([<Handle key={i} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
-				defn += (prevPoint[0] + dx) + "," + (prevPoint[1] + dy) + " ";	
-				
+				defn += prevPoint[0] + "," + prevPoint[1] + " ";	
 				break;
 		}
+		maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
+		maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
+		minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
+		minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
 	}
-	return {defn, handles};
+
+	let bbox = calculateBounds(minX, maxX, minY, maxY);
+	return {defn, handles, bbox};
 }
 
 export const manipVector = (dispatch, dx: number, dy: number, vector: ValueLink[]) => {	
@@ -261,4 +331,11 @@ function arcEndpoint(rx, ry, degX, degArc, cx, cy):number[]{
 	let centerOffsetY = xSine * (rx * arcCosine) + xCosine * (ry * arcSine);
 
 	return [centerOffsetX + cx, centerOffsetY + cy];
+}
+
+function calculateBounds(minX, maxX, minY, maxY):BoundingBox{
+	let position = [minX - boundingBoxPadding, minY - boundingBoxPadding];
+	let bounds = [maxX - minX + 2*boundingBoxPadding, maxY - minY + 2*boundingBoxPadding];
+	let centroid = [bounds[0]/2 + position[0], bounds[1]/2 + position[1]];
+	return {bounds, position, centroid};
 }

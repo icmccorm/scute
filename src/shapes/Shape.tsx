@@ -1,13 +1,13 @@
 import {Rect} from "./Rect";
 import {Circ} from "./Circ";
 import * as React from 'react';
-import { Polyline } from './Polyline';
-import { Polygon } from './Polygon';
+import { PolyShape } from './PolyShape';
 import { Segment } from './PathUtilities';
 import { ValueLink } from "src/redux/Manipulation";
 import { Path } from "./Path";
+import { ProgressPlugin } from "webpack";
 
-enum ShapeType{
+export enum ShapeType{
 	SP_RECT = 68,
 	SP_CIRC,
 	SP_POLYG,
@@ -40,12 +40,9 @@ export const Shape = ({defs}:ShapeProps) => {
 				<Circ defs={defs}></Circ>
 			);
 		case ShapeType.SP_POLYL:
-			return(
-				<Polyline defs={defs}></Polyline>
-			);
 		case ShapeType.SP_POLYG:
 			return(
-				<Polygon defs={defs}></Polygon>
+				<PolyShape defs={defs}></PolyShape>
 			);
 		case ShapeType.SP_PATH:
 			return(
