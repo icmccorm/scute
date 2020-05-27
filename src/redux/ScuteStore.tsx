@@ -82,50 +82,63 @@ export function reduceRoot(store = initialStore, action: Action){
 			let changes: Manipulation[] = action.payload;
 			for(let i = 0; i < changes.length; ++i){
 				let change = changes[i];
-				if(change.lineIndex > -1 && change.delta != 0){
+				if(change.lineIndex > -1){
 					let line: LineMeta = store.lines[change.lineIndex];
 					let meta: ValueMeta = line.values[change.inlineIndex];
 					let startIndex = line.charIndex + meta.inlineOffset;
 
-					let originValue = change.originalValue;
 					meta.delta += change.delta;
-				    let newValue = change.originalValue + meta.delta;
+				    let newValue = change.finalValue + meta.delta;
+					let lengthDifference = 0;
 
-					for(let stageIndex = meta.stages.length-1; stageIndex >= 0; --stageIndex){
-						let goal = meta.stages[stageIndex];
-						switch(goal.role){
+					if(meta.length > 0){
+						switch(meta.op){
 							case RoleType.TIMES:{
-								let factor = originValue / goal.value;
+								let factor = change.finalValue / meta.origin;
 								newValue = (newValue) / factor;
 							} break;
 							case RoleType.DIVIDE: {
-								let factor = originValue * goal.value;
+								let factor = change.finalValue * meta.origin;
 								newValue = newValue * factor;
 							} break;
 							case RoleType.MINUS:{
-								let term = originValue + goal.value;
+								let term = change.finalValue + meta.origin;
 								newValue = newValue + term;
 							}break;				
 							case RoleType.PLUS:{
-								let term = originValue - goal.value;
+								let term = change.finalValue - meta.origin;
 								newValue = newValue - term;
 							}break;
-						}
-						originValue = goal.value;
+						}				
+
+						let fractional = Math.floor(newValue* 1000) / 1000;
+						let newValueString = (fractional == Math.floor(newValue)) ? fractional.toString() : newValue.toFixed(3);
+	
+						lengthDifference = newValueString.length - meta.length;
+						let start = store.code.substring(0, startIndex);
+						let end = store.code.substring(startIndex + meta.length);
+						
+						store = Object.assign({}, store, {
+							code: start + newValueString + end,
+						});
+			
+						meta.length = newValueString.length;
+					}else{
+						let newValueString = " + " + meta.delta.toString();
+						meta.length = newValueString.length;
+						meta.inlineOffset += 3;
+						meta.origin = meta.delta;
+
+						let start = store.code.substring(0, startIndex);
+						let end = store.code.substring(startIndex);
+
+						store = Object.assign({}, store, {
+							code: start + newValueString + end,
+						});
+
+						lengthDifference = meta.length;
+						meta.length = newValueString.length - 3;
 					}
-
-					let fractional = Math.floor(newValue* 1000) / 1000;
-					let newValueString = (fractional == Math.floor(newValue)) ? (newValue % 1).toString() : fractional.toString();
-
-					let lengthDifference = newValueString.length - meta.length;
-					let start = store.code.substring(0, startIndex);
-					let end = store.code.substring(startIndex + meta.length);
-					
-					store = Object.assign({}, store, {
-						code: start + newValueString + end,
-					});
-		
-					meta.length = newValueString.length;
 				
 					if(lengthDifference != 0){
 						for(let i = change.inlineIndex + 1; i< line.values.length; ++i){

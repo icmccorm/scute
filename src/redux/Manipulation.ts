@@ -9,10 +9,10 @@ export enum RoleType {
 }
 
 export type Stage = {role: RoleType, value: number};
-export type ValueMeta = {delta: number, stages: Stage[], inlineOffset: number, length: number};
+export type ValueMeta = {delta: number, origin: number, op:RoleType, inlineOffset: number, length: number};
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
 export type ValueLink = {lineIndex: number, inlineIndex: number, value?: any};
-export type Manipulation = {delta: number, originalValue: number, lineIndex: number, inlineIndex}
+export type Manipulation = {delta: number, finalValue: number, lineIndex: number, inlineIndex}
 
 export enum StatusType{
 	CONST = 0,
@@ -56,10 +56,10 @@ export function getLinkedVector(lines: Array<LineMeta>, links: Array<ValueLink>)
 export function manipulation(delta: number, link: ValueLink){
 	return {
 		delta: delta,
-		originalValue: link.value,
+		finalValue: link.value,
 		lineIndex: link.lineIndex,
 		inlineIndex: link.inlineIndex,
-	};
+	};	
 }
 
 export function vecManipulation(dx: number, dy: number, links: Array<ValueLink>){
