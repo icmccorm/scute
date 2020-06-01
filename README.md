@@ -1,6 +1,6 @@
 # Scute
 The ReactJS Web IDE for the Scute programming language.
-Check out the live development [build](https://segfalling.github.io/scute/). 
+Check out the live development [build](https://ian-colcanon.github.io/scute/). 
 
 ## What is Scute?
 Scute is a scripting language designed for producing graphics and animations in the SVG file format. Popular image editors like Adobe Illustrator and Inkscape are difficult to use for creating mathematically-based graphics or highly repetitive designs. Scute solves this problem by allowing complex shapes to be created programmatically while retaining the useful drag-and-drop features of image editors. 
