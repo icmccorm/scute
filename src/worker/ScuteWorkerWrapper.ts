@@ -17,6 +17,7 @@ export class ScuteWorkerWrapper {
 	}
 
 	compileCode(code: string){
+		this.module._canvas = {};
 		this.module._frames = [];
 		this.module._lines = [];
 		this.module._maxFrameIndex = 0;
@@ -38,7 +39,7 @@ export class ScuteWorkerWrapper {
 		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
 		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
 		
-		this.sendCommand(ActionType.FIN_FRAME, {frame: this.module._currentFrame, lines: this.module._lines});
+		this.sendCommand(ActionType.FIN_FRAME, {frame: this.module._currentFrame, lines: this.module._lines, canvas: this.module._canvas});
 		this.module._currentFrame = [];
 	}
 

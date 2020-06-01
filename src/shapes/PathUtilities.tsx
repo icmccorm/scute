@@ -55,7 +55,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					)}/>
 				);
 				
-				prevPoint = [link(jump.point[0]), link(jump.point[1].value)];
+				prevPoint = [link(jump.point[0]), link(jump.point[1])];
 
 				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
 				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];

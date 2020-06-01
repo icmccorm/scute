@@ -1,16 +1,17 @@
 import { createStore, combineReducers } from 'redux';
 import { ActionType, Action } from './Actions';
 import { requestCompile, requestFrame } from './ScuteWorker';
-import { LineMeta, ValueMeta, Manipulation, RoleType } from './Manipulation';
+import { LineMeta, ValueMeta, Manipulation, RoleType, Canvas } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number};
 export type FrameResponse = {maxFrameIndex: number, frames: Array<Object>};
-export type RuntimeResponse = {frame: [], lines: []};
+export type RuntimeResponse = {frame: [], lines: [], canvas:Canvas};
 
 export type scuteStore = {
 	root: {
 		origin: Array<number>,
 		dimensions: Array<number>,
+		canvas: Canvas,
 		code: string,
 		log: string,
 		frame: Array<React.ReactElement>,
@@ -24,8 +25,7 @@ export type scuteStore = {
 
 var initialStore = {
 	frame: null,
-	dimensions: [500, 500],
-	origin: [0,0],
+	canvas: null,
 	code: "",
 	log: "",
 	maxFrameIndex: 0,
@@ -75,6 +75,7 @@ export function reduceRoot(store = initialStore, action: Action){
 					store = Object.assign({}, store, {
 						frame: response.frame,
 						lines: response.lines,
+						canvas: response.canvas
 					});
 			}
 			break;

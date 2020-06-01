@@ -1,4 +1,5 @@
 import { ActionType, createAction, Action } from "./Actions";
+import { Canvas } from "./ScuteStore";
 
 export enum RoleType {
 	PLUS = 0,
@@ -13,6 +14,8 @@ export type ValueMeta = {delta: number, origin: number, op:RoleType, inlineOffse
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
 export type ValueLink = {lineIndex: number, inlineIndex: number, value?: any};
 export type Manipulation = {delta: number, finalValue: number, lineIndex: number, inlineIndex}
+
+export type Canvas = {origin:Array<ValueLink>, size:Array<ValueLink>};
 
 export enum StatusType{
 	CONST = 0,
@@ -30,6 +33,20 @@ export function getLinkedDelta(lines: Array<LineMeta>, link: ValueLink){
 		}
 	}
 	return delta;
+}
+
+export function linkCanvas(lines: Array<LineMeta>, canvas: Canvas){
+	if(canvas){
+		return {
+			size: getLinkedVector(lines, canvas.size),
+			origin: getLinkedVector(lines, canvas.origin)
+		}
+	}else{
+		return {
+			size: [500, 500],
+			origin: [0, 0]
+		}
+	}
 }
 
 export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){

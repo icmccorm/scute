@@ -7,6 +7,7 @@ import { getColorFromArray } from './StyleUtilities';
 import { scuteStore } from 'src/redux/ScuteStore';
 
 import "src/Global.scss";
+import './style/shapes.scss';
 
 export const Path = React.memo(({defs, children}:ShapeProps) => {
     const[hovering, setHover] = React.useState(false);
@@ -24,7 +25,7 @@ export const Path = React.memo(({defs, children}:ShapeProps) => {
     return (
         <g className="hoverGroup" onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
             //This rectangle is present to expand the size of the hoverable area of the group to include all vertices, as well an additional %15 padding.
-            <rect
+            <rect className="boundingBox"
                 x={bbox.position[0]} 
                 y={bbox.position[1]} 
                 width={bbox.bounds[0]} 

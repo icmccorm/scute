@@ -13,15 +13,15 @@ import {ActionType, createAction } from 'src/redux/Actions';
 import {getTranslate, getScale, UnitType} from 'src/shapes/StyleUtilities';
 import {reloadRuntime} from '../redux/ScuteWorker';
 import { scuteStore } from 'src/redux/ScuteStore';
+import { linkCanvas } from 'src/redux/Manipulation';
 
 const AppRoot = () => {
 	const [mouse, setMouse] = React.useState([0, 0]);
 	const [translate, setTranslate] = React.useState([[0, 0], [0, 0]]);
 	const [scale, setScale] = React.useState(1);
 	const [terminateValid, setTerminationValid] = React.useState(false);
-
-	const origin = useSelector((store:scuteStore) => store.root.origin);
-	const dimensions = useSelector((store:scuteStore) => store.root.dimensions);
+	
+	const canvas = useSelector((store:scuteStore) => linkCanvas(store.root.lines, store.root.canvas));
 	const frame = useSelector((store:scuteStore) => store.root.frame);
 	const code = useSelector((store:scuteStore) => store.root.code);
 	const log = useSelector((store:scuteStore) => store.root.log);
@@ -46,11 +46,15 @@ const AppRoot = () => {
 	}
 	
 	const getViewBox = () =>{
+		let lowerX = -(canvas.origin[0]);
+		let lowerY = -(canvas.origin[1]);
+		let upperX = canvas.size[0]
+		let upperY = canvas.size[1]
 		return [
-			origin[0],
-			origin[1], 
-			dimensions[0],
-			dimensions[1],
+			lowerX,
+			lowerY,
+			upperX,
+			upperY
 		].join(" ");
     }
 
@@ -155,9 +159,9 @@ const AppRoot = () => {
 				</Navbar>
 		
 				<div className='infoBox'>
-					<span className="infoText">{"Dimensions: " + dimensions[0] + "x" + dimensions[1]}</span>
+					<span className="infoText">{"Dimensions: " + canvas.size[0] + "x" + canvas.size[1]}</span>
 					<span className="infoText">{"Cursor: (" + (mouse[0]).toFixed(1) + ", " + mouse[1].toFixed(1) + ")"}</span>
-					<span className="infoText">{"Origin: (" + origin[0] + ", " + origin[1] + ")"}</span>
+					<span className="infoText">{"Origin: (" + canvas.origin[0] + ", " + canvas.origin[1] + ")"}</span>
 				</div>     
 
 				<Dragger drag={dragCanvas} drop={dropCanvas}>
@@ -167,8 +171,8 @@ const AppRoot = () => {
 						style={{transform: getTransform()}}>
 						<svg 
 							ref={canvasWrapper}
-							width={dimensions[0]} 
-							height={dimensions[1]} 
+							width={canvas.size[0]} 
+							height={canvas.size[1]} 
 							className='canvas shadow' 
 							viewBox={getViewBox()}
 							onMouseMove={recordMousePosition}>
