@@ -6,6 +6,8 @@ import { Segment } from './PathUtilities';
 import { ValueLink } from "src/redux/Manipulation";
 import { Path } from "./Path";
 import { ProgressPlugin } from "webpack";
+import { Ellipse } from "./Ellipse";
+import { Line } from "./Line";
 
 export enum ShapeType{
 	SP_RECT = 68,
@@ -14,6 +16,8 @@ export enum ShapeType{
 	SP_POLYL,
 	SP_PATH,
 	SP_ELLIP,
+	SP_LINE,
+	SP_UNGON,
 }
 
 export type Tag = {
@@ -48,6 +52,16 @@ export const Shape = ({defs}:ShapeProps) => {
 			return(
 				<Path defs={defs}></Path>
 			);
+		case ShapeType.SP_ELLIP:
+			return(
+				<Ellipse defs={defs}></Ellipse>
+			);
+		case ShapeType.SP_LINE:
+			return (
+				<Line defs={defs}></Line>
+			);
+		case ShapeType.SP_UNGON:
+			return null;
 		default:
 			return null;
 	}

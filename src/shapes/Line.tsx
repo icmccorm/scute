@@ -37,7 +37,7 @@ export const Line = ({defs}:ShapeProps) => {
 
     return (
 		<g className="hoverGroup" onMouseDown={toggleHandle}>
-            <line x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]}></line>
+            <line x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]} style={styles}></line>
             {handleable ?
                 <g>         
                     <Handle
