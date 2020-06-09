@@ -12,7 +12,6 @@ export const PolyShape = React.memo(({defs, children}:ShapeProps) => {
     const[handleable, setHandleable] = React.useState(false);
     const dispatch = useDispatch();
     const polyDefn:PolyPathDefinition = useSelector((store:scuteStore) => generatePoly(store.root.lines, dispatch, defs.segments));
-    let bbox = polyDefn.bbox;
     
     const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
@@ -20,16 +19,22 @@ export const PolyShape = React.memo(({defs, children}:ShapeProps) => {
         strokeWidth: defs.styles['strokeWidth'],
     }
 
+    const toggleHandle = (event:React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setHandleable(!handleable);
+    }
+
     return (
-        <g className="hoverGroup" onMouseDown={()=>setHandleable(!handleable)}>
+        <g className="hoverGroup" onMouseDown={toggleHandle}>
 
             {defs.tag == ShapeType.SP_POLYG ?
-                <polygon className={(handleable ? 'handleable' : '')}
+                <polygon
                     points={polyDefn.defn} 
                     style={styles}
                 ></polygon>
                 :
-                <polyline className={(handleable ? 'handleable' : '')}
+                <polyline
                     points={polyDefn.defn} 
                     style={styles}
                 ></polyline>

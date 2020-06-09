@@ -39,6 +39,8 @@ const AppRoot = () => {
 	const resetCanvas = () => {
 		setTranslate([[0, 0], [0, 0]])
 		setScale(1);
+
+		dispatch(createAction(ActionType.SCALE, 1));
     }
 
 	const getTransform = () => {

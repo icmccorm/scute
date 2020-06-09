@@ -19,7 +19,7 @@ export const Line = ({defs}:ShapeProps) => {
         strokeWidth: defs.styles['strokeWidth'],
     }
 
-    const[hovering, setHover] = React.useState(false);
+    const[handleable, setHandleable] = React.useState(false);
 
     const setStart = (dx: number, dy: number) => {
         dispatch(manipulate(vecManipulation(dx, dy, attrs['start'])));
@@ -29,10 +29,16 @@ export const Line = ({defs}:ShapeProps) => {
         dispatch(manipulate(vecManipulation(dx, dy, attrs['end'])));
     }
 
+    const toggleHandle = (event:React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setHandleable(!handleable);
+    }
+
     return (
-		<g className="hoverGroup" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+		<g className="hoverGroup" onMouseDown={toggleHandle}>
             <line x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]}></line>
-            {hovering ?
+            {handleable ?
                 <g>         
                     <Handle
                         cx={start[0]}

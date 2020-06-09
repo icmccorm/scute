@@ -56,6 +56,8 @@ export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
 			if(line){
 				let meta = line.values[link.inlineIndex];
 				if(meta){
+					return meta.delta + link.value;
+					/*
 					let originalValue = link.value + meta.prevDelta;
 					let goalValue = meta.delta + link.value;
 					let origin = meta.origin;
@@ -76,7 +78,7 @@ export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
 							let term = originalValue - origin;
 							value = goalValue - term;
 						}break;
-					}
+					}*/
 				}
 			}
 		}

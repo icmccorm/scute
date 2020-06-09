@@ -107,6 +107,10 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						key={key} 
 						cx={link(quad.control[0])} 
 						cy={link(quad.control[1])} 
+						ex={prevPoint[0]} 
+						ey={prevPoint[1]} 
+						sx={link(quad.end[0])}
+						sy={link(quad.end[1])} 
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, quad.control)}
 					/>,
 					
@@ -126,6 +130,8 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					<Handle key={key} 
 						cx={link(cubic.control1[0])} 
 						cy={link(cubic.control1[1])} 
+						ex={prevPoint[0]} 
+						ey={prevPoint[1]} 
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, cubic.control1)}
 					/>,
 					
@@ -133,6 +139,8 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						key={segmentArray.length + key + 1} 
 						cx={link(cubic.control2[0])} 
 						cy={link(cubic.control2[1])} 
+						ex={link(cubic.end[0])} 
+						ey={link(cubic.end[1])} 
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, cubic.control2)}
 					/>,
 					
@@ -184,10 +192,6 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 
 	let handles = [];
 	let defn = "";
-	let maxX = null;
-	let minX = null;
-	let maxY = null;
-	let minY = null;
 
 	let angle = 0;
 	for(let i = 0; i<segmentArray.length; ++i){
@@ -234,7 +238,7 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, turtleSegme
 	let turtle = turtleSegment as Turtle;
 
 	let move = link(turtle.move);
-	let turn = link(turtle.turn) + turtle.horizontal;
+	let turn = link(turtle.turn);
 
 	let xNought = Math.cos(toRadians(turn)) * move;
 	let yNought = Math.sin(toRadians(turn)) * move; 
@@ -266,7 +270,6 @@ function toDegrees(rad: number){
 }
 
 function arcEndpoint(rx, ry, degX, degArc, cx, cy):number[]{
-	let end = [];
 	let xCosine = Math.cos(toRadians(degX));
 	let xSine = Math.sin(toRadians(degX));
 

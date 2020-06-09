@@ -36,9 +36,15 @@ export const Circ = ({defs}:ShapeProps) => {
         dispatch(manipulate(vecManipulation(dx, dy, attrs['position'])));
     }
 
+    const toggleHandle = (event:React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setHandleable(!handleable);
+    }
+
     return (
         <g className="hoverGroup" 
-            onMouseDown={() => setHandleable(!handleable)} 
+            onMouseDown={toggleHandle} 
         >
 			<circle className={(handleable ? 'handleable' : '')}
 				cx={position[0]} 

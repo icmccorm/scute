@@ -36,9 +36,16 @@ export const Rect = ({defs}:ShapeProps) => {
         dispatch(manipulate(manipulation(dx, attrs['size'][0])));
     }
 
+    
+    const toggleHandle = (event:React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setHandleable(!handleable);
+    }
+
     return (
         <g className="hoverGroup" 
-            onMouseDown={() => setHandleable(!handleable)} 
+            onMouseDown={toggleHandle} 
         >
             <rect className={(handleable ? 'hover' : '')}
                 x={position[0]} 

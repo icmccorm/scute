@@ -31,8 +31,14 @@ export const Ellipse = ({defs}:ShapeProps) => {
         dispatch(manipulate(vecManipulation(dx, dy, attrs["position"])));
     }
 
+    const toggleHandle = (event:React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setHandleable(!handleable);
+    }
+
     return (
-		<g className="hoverGroup" onMouseDown={() => setHandleable(!handleable)}>
+		<g className="hoverGroup" onMouseDown={toggleHandle}>
 			<ellipse className={(handleable ? 'handleable' : '')}
 				cx={position[0]} 
 				cy={position[1]} 

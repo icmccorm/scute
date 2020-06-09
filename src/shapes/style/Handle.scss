@@ -9,3 +9,10 @@
 .hoverGroup{
 	pointer-events: "bounding-box";
 }
+
+.handleTrail {
+	stroke: black;
+	stroke-width: 3px;
+	stroke-dasharray: 2,2;
+	stroke-linejoin: round;
+}
