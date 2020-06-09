@@ -20,8 +20,7 @@ export type Quadratic = Segment & {control: Array<ValueLink>, end: Array<ValueLi
 export type Arc = Segment & {center: Array<ValueLink>, degrees: Array<ValueLink>, radius:Array<ValueLink>};
 export type BoundingBox = {position:Array<number>, bounds: Array<number>, centroid};
 
-export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>, bbox:BoundingBox};
-let boundingBoxPadding = 12;
+export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>};
 
 export const generatePath = (links, dispatch, segmentArray: Array<Segment>):PolyPathDefinition => {
 	let handles = [];
@@ -56,12 +55,6 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				);
 				
 				prevPoint = [link(jump.point[0]), link(jump.point[1])];
-
-				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
-				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
-				minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
-				minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
-
 				defn += "M " + prevPoint[0] + " " + prevPoint[1];
 				break;
 			
@@ -77,12 +70,6 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				let dy = Math.round(sine * distance);
 
 				prevPoint = [prevPoint[0] + dx, prevPoint[1] + dy];
-
-				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
-				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
-				minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
-				minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
-
 				defn += "L " + prevPoint[0] + " " + prevPoint[1];
 				
 				handles.push(
@@ -110,11 +97,6 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				);
 				prevPoint = [link(vertex.point[0]), link(vertex.point[1])];
 
-				maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
-				maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
-				minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
-				minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
-
 				defn += "L " + prevPoint[0] + " " + prevPoint[1];
 				break;
 
@@ -136,16 +118,6 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				]);
 				defn += "Q " + link(quad.control[0]) + " " + link(quad.control[1]) + ", " + link(quad.end[0]) + " " + link(quad.end[1]);
 				prevPoint = [link(quad.end[0]), link(quad.end[1])];
-
-				let maxXInvolved = Math.max(link(quad.control[0]), prevPoint[0]);
-				let maxYInvolved = Math.max(link(quad.control[1]), prevPoint[1]);
-				let minXInvolved = Math.min(link(quad.control[0]), prevPoint[0]);
-				let minYInvolved = Math.min(link(quad.control[1]), prevPoint[1]);
-
-				maxX = maxX ? Math.max(maxX, maxXInvolved): maxXInvolved;
-				maxY = maxY ? Math.max(maxY, maxYInvolved): maxYInvolved;
-				minX = minX ? Math.min(minX, minXInvolved): minXInvolved;
-				minY = minY ? Math.min(minY, minYInvolved): minYInvolved;
 				break;
 
 			case SegmentType.SG_CBEZIER: {
@@ -178,16 +150,6 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 
 				prevPoint = [link(cubic.end[0]), link(cubic.end[1])];
 
-				let maxXInvolved = Math.max(link(cubic.control1[0]), link(cubic.control2[0]), prevPoint[0]);
-				let maxYInvolved = Math.max(link(cubic.control1[1]), link(cubic.control2[1]), prevPoint[1]);
-				let minXInvolved = Math.min(link(cubic.control1[0]), link(cubic.control2[0]), prevPoint[0]);
-				let minYInvolved = Math.min(link(cubic.control1[1]), link(cubic.control2[1]), prevPoint[1]);
-				
-				maxX = maxX ? Math.max(maxX, maxXInvolved): maxXInvolved;
-				maxY = maxY ? Math.max(maxY, maxYInvolved): maxYInvolved;
-				minX = minX ? Math.min(minX, minXInvolved): minXInvolved;
-				minY = minY ? Math.min(minY, minYInvolved): minYInvolved;
-
 				}	break;
 			case SegmentType.SG_ARC: {
 				let arc = segment as Arc;
@@ -208,23 +170,12 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				handles = handles.concat([<Handle key={key} cx={link(arc.center[0])} cy={link(arc.center[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, arc.center)}/>])
 				prevPoint = endpoint;
 
-				let maxXInvolved = Math.max(link(arc.center[0]), prevPoint[0]);
-				let maxYInvolved = Math.max(link(arc.center[1]), prevPoint[0]);
-				let minXInvolved = Math.min(link(arc.center[0]), prevPoint[0]);
-				let minYInvolved = Math.min(link(arc.center[1]), prevPoint[0]);
-
-				maxX = maxX ? Math.max(maxX, maxXInvolved): maxXInvolved;
-				maxY = maxY ? Math.max(maxY, maxYInvolved): maxYInvolved;
-				minX = minX ? Math.min(minX, minXInvolved): minXInvolved;
-				minY = minY ? Math.min(minY, minYInvolved): minYInvolved;
-
 			} break;
 		}
 		defn += " ";
 	}
 
-	let bbox = calculateBounds(minX, maxX, minY, maxY);
-	return {defn, handles, bbox};
+	return {defn, handles};
 }
 
 export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathDefinition {
@@ -266,14 +217,9 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 				defn += prevPoint[0] + "," + prevPoint[1] + " ";	
 				break;
 		}
-		maxX = maxX ? Math.max(maxX, prevPoint[0]): prevPoint[0];
-		maxY = maxY ? Math.max(maxY, prevPoint[1]): prevPoint[1];
-		minX = minX ? Math.min(minX, prevPoint[0]): prevPoint[0];
-		minY = minY ? Math.min(minY, prevPoint[1]): prevPoint[1];
 	}
 
-	let bbox = calculateBounds(minX, maxX, minY, maxY);
-	return {defn, handles, bbox};
+	return {defn, handles};
 }
 
 export const manipVector = (dispatch, dx: number, dy: number, vector: ValueLink[]) => {	
@@ -331,11 +277,4 @@ function arcEndpoint(rx, ry, degX, degArc, cx, cy):number[]{
 	let centerOffsetY = xSine * (rx * arcCosine) + xCosine * (ry * arcSine);
 
 	return [centerOffsetX + cx, centerOffsetY + cy];
-}
-
-function calculateBounds(minX, maxX, minY, maxY):BoundingBox{
-	let position = [minX - boundingBoxPadding, minY - boundingBoxPadding];
-	let bounds = [maxX - minX + 2*boundingBoxPadding, maxY - minY + 2*boundingBoxPadding];
-	let centroid = [bounds[0]/2 + position[0], bounds[1]/2 + position[1]];
-	return {bounds, position, centroid};
 }

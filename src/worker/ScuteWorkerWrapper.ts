@@ -13,14 +13,14 @@ export class ScuteWorkerWrapper {
 		this.compiledPtr = scuteModule._compiledPtr;
 		this.module = scuteModule;
 		this.worker = worker;
-		this.module._printFunction = worker.postMessage.bind(worker);
+		this.module["_printFunction"] = worker.postMessage.bind(worker);
 	}
 
 	compileCode(code: string){
-		this.module._canvas = {};
-		this.module._frames = [];
-		this.module._lines = [];
-		this.module._maxFrameIndex = 0;
+		this.module["_canvas"] = {};
+		this.module["_frames"] = [];
+		this.module["_lines"] = [];
+		this.module["_maxFrameIndex"] = 0;
 		if(this.compiledPtr) this.module._freeCompilationPackage(this.compiledPtr);
 
 		let codePtr = this.stringToCharPtr(code);

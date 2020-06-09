@@ -11,10 +11,12 @@ import { ValueLink,
 import { scuteStore } from 'src/redux/ScuteStore';
 import { getColorFromArray } from './StyleUtilities';
 
+import './style/shapes.scss';
+
 export const Circ = ({defs}:ShapeProps) => {
     let attrs: Array<ValueLink> = defs.attrs;
     let dispatch = useDispatch();
-
+    
     const position:number = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
     const radius:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['radius']));
     
@@ -24,7 +26,7 @@ export const Circ = ({defs}:ShapeProps) => {
         strokeWidth: defs.styles['strokeWidth'],
     }
 
-    const[hovering, setHover] = React.useState(false);
+    const[handleable, setHandleable] = React.useState(false);
 
     const setRadius = (dx: number, dy: number) => {
         dispatch(manipulate(manipulation(dx, attrs['radius'])));
@@ -35,14 +37,16 @@ export const Circ = ({defs}:ShapeProps) => {
     }
 
     return (
-		<g className="hoverGroup" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-			<circle className={(hovering ? 'hover' : '')}
+        <g className="hoverGroup" 
+            onMouseDown={() => setHandleable(!handleable)} 
+        >
+			<circle className={(handleable ? 'handleable' : '')}
 				cx={position[0]} 
 				cy={position[1]} 
                 r={radius} 
                 style={styles}
 			></circle>
-            {hovering ?
+            {handleable ?
                 <g>         
                     <Handle
                         cx={position[0] + radius}

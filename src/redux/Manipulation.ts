@@ -1,6 +1,4 @@
 import { ActionType, createAction, Action } from "./Actions";
-import { Canvas } from "./ScuteStore";
-
 export enum RoleType {
 	PLUS = 0,
 	MINUS,
@@ -10,7 +8,7 @@ export enum RoleType {
 }
 
 export type Stage = {role: RoleType, value: number};
-export type ValueMeta = {delta: number, origin: number, op:RoleType, inlineOffset: number, length: number};
+export type ValueMeta = {delta: number, prevDelta: number, origin: number, op:RoleType, inlineOffset: number, length: number};
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
 export type ValueLink = {lineIndex: number, inlineIndex: number, value?: any};
 export type Manipulation = {delta: number, finalValue: number, lineIndex: number, inlineIndex}
@@ -58,7 +56,27 @@ export function getLinkedValue(lines: Array<LineMeta>, link: ValueLink){
 			if(line){
 				let meta = line.values[link.inlineIndex];
 				if(meta){
-					value += meta.delta;
+					let originalValue = link.value + meta.prevDelta;
+					let goalValue = meta.delta + link.value;
+					let origin = meta.origin;
+					switch(meta.op){
+						case RoleType.TIMES:{
+							let factor =  originalValue / origin;
+							value = (origin) * factor;
+						} break;
+						case RoleType.DIVIDE: {
+							let divisor = originalValue * origin;
+							value = goalValue / divisor;
+						} break;
+						case RoleType.MINUS:{
+							let term = originalValue + origin;
+							value = goalValue + term;
+						}break;				
+						case RoleType.PLUS:{
+							let term = originalValue - origin;
+							value = goalValue - term;
+						}break;
+					}
 				}
 			}
 		}

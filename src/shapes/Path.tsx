@@ -10,7 +10,7 @@ import "src/Global.scss";
 import './style/shapes.scss';
 
 export const Path = React.memo(({defs, children}:ShapeProps) => {
-    const[hovering, setHover] = React.useState(false);
+    const[handleable, setHandleable] = React.useState(false);
     const dispatch = useDispatch();
 
     const pathDefn: PolyPathDefinition = useSelector((store:scuteStore) => generatePath(store.root.lines, dispatch, defs.segments));
@@ -23,21 +23,14 @@ export const Path = React.memo(({defs, children}:ShapeProps) => {
     }
 
     return (
-        <g className="hoverGroup" onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
-            //This rectangle is present to expand the size of the hoverable area of the group to include all vertices, as well an additional %15 padding.
-            <rect className="boundingBox"
-                x={bbox.position[0]} 
-                y={bbox.position[1]} 
-                width={bbox.bounds[0]} 
-                height={bbox.bounds[1]}>
-            </rect>
-            <path className={(hovering ? 'hover' : '')}
+        <g className="hoverGroup" onMouseDown={()=>setHandleable(!handleable)}>
+            <path className={(handleable ? 'handleable' : '')}
                 d={pathDefn.defn} 
                 style={styles}
             ></path>
-            {
+            { hovering ?
                 pathDefn.handles
-            }
+            : false}
         </g>
     );
  });

@@ -88,6 +88,7 @@ export function reduceRoot(store = initialStore, action: Action){
 					let meta: ValueMeta = line.values[change.inlineIndex];
 					let startIndex = line.charIndex + meta.inlineOffset;
 
+					meta.prevDelta = meta.delta;
 					meta.delta += change.delta;
 				    let newValue = change.finalValue + meta.delta;
 					let lengthDifference = 0;
@@ -112,9 +113,10 @@ export function reduceRoot(store = initialStore, action: Action){
 							}break;
 						}				
 
-						let fractional = Math.floor(newValue* 1000) / 1000;
+						let fractional = Math.floor(newValue * 1000) / 1000;
 						let newValueString = (fractional == Math.floor(newValue)) ? fractional.toString() : newValue.toFixed(3);
-	
+						if(newValueString == "NaN") throw Error("NaNaNaNaNaNa... batman? " + " " + newValue);
+						
 						lengthDifference = newValueString.length - meta.length;
 						let start = store.code.substring(0, startIndex);
 						let end = store.code.substring(startIndex + meta.length);

@@ -18,7 +18,7 @@ export const Ellipse = ({defs}:ShapeProps) => {
         strokeWidth: defs.styles['strokeWidth'],
     }
 
-    const[hovering, setHover] = React.useState(false);
+    const[handleable, setHandleable] = React.useState(false);
 
     const setRadX = (dx: number, dy: number) => {
         dispatch(manipulate(manipulation(dx, attrs['radius'][0])));
@@ -32,15 +32,15 @@ export const Ellipse = ({defs}:ShapeProps) => {
     }
 
     return (
-		<g className="hoverGroup" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-			<ellipse className={(hovering ? 'hover' : '')}
+		<g className="hoverGroup" onMouseDown={() => setHandleable(!handleable)}>
+			<ellipse className={(handleable ? 'handleable' : '')}
 				cx={position[0]} 
 				cy={position[1]} 
                 rx={radius[0]} 
 				ry={radius[1]}
 				style={styles}
 			></ellipse>
-            {hovering ?
+            {handleable ?
                 <g>         
                     <Handle
                         cx={position[0] + radius[0]}

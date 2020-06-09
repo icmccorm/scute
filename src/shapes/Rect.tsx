@@ -21,7 +21,7 @@ export const Rect = ({defs}:ShapeProps) => {
         strokeWidth: defs.styles['strokeWidth'],
     }
 
-    const[hovering, setHover] = React.useState(false);
+    const[handleable, setHandleable] = React.useState(false);
 
     const setHeight = (dx: number, dy:number) => {
         dispatch(manipulate(manipulation(dy, attrs['size'][1])));
@@ -37,15 +37,17 @@ export const Rect = ({defs}:ShapeProps) => {
     }
 
     return (
-        <g className="hoverGroup" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-            <rect className={(hovering ? 'hover' : '')}
+        <g className="hoverGroup" 
+            onMouseDown={() => setHandleable(!handleable)} 
+        >
+            <rect className={(handleable ? 'hover' : '')}
                 x={position[0]} 
                 y={position[1]} 
                 width={size[0]} 
                 height={size[1]}
                 style={styles}
             ></rect>
-            {hovering ?
+            {handleable ?
                 <g>
                     <Handle
                         cx={position[0] + 0.5*size[0]}
