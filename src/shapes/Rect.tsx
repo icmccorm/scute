@@ -5,22 +5,15 @@ import {useSelector} from 'react-redux';
 import Handle from './Handle';
 import { manipulation, manipulate, getLinkedVector, vecManipulation } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
-import { getColorFromArray } from './StyleUtilities';
 
 
-export const Rect = ({defs}:ShapeProps) => {
+export const Rect = ({defs, style}:ShapeProps) => {
     
     let attrs = defs.attrs;
     const dispatch = useDispatch();
 
     const position:Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
     const size:Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['size']));
-
-    const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
-    }
 
     const[handleable, setHandleable] = React.useState(false);
 
@@ -53,7 +46,7 @@ export const Rect = ({defs}:ShapeProps) => {
                 y={position[1]} 
                 width={size[0]} 
                 height={size[1]}
-                style={styles}
+                style={style}
             ></rect>
             {handleable ?
                 <g>

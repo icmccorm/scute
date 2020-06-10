@@ -45,6 +45,12 @@ const Handle = React.memo(({adjust, cx, cy, ex, ey, sx, sy}:Props) => {
 
 	return (
 		<g>
+			{ex && ey ? 
+				<line className={'handleTrail'} x1={cx} y1={cy} x2={ex} y2={ey}></line>
+			: null}
+			{sx && sy ? 
+				<line className={'handleTrail'} x1={cx} y1={cy} x2={sx} y2={sy}></line>
+			: null}
 			<circle
 				className={'handle'} 
 				r={Math.abs((1/scale*5)) + "px"} 
@@ -52,12 +58,6 @@ const Handle = React.memo(({adjust, cx, cy, ex, ey, sx, sy}:Props) => {
 				cy={cy}
 				onMouseDown={recordMousePosition}
 			></circle>
-			{ex && ey ? 
-				<line className={'handleTrail'} x1={cx} y1={cy} x2={ex} y2={ey}></line>
-			: null}
-			{sx && sy ? 
-				<line className={'handleTrail'} x1={cx} y1={cy} x2={sx} y2={sy}></line>
-			: null}
 		</g>
 
 	);

@@ -3,23 +3,16 @@ import {ShapeProps} from './Shape';
 import {useSelector, useDispatch} from 'react-redux';
 
 import { generatePath, PolyPathDefinition } from './PathUtilities';
-import { getColorFromArray } from './StyleUtilities';
 import { scuteStore } from 'src/redux/ScuteStore';
 
 import "src/Global.scss";
 import './style/shapes.scss';
 
-export const Path = React.memo(({defs, children}:ShapeProps) => {
+export const Path = React.memo(({defs, style, children}:ShapeProps) => {
     const[handleable, setHandleable] = React.useState(false);
     const dispatch = useDispatch();
 
     const pathDefn: PolyPathDefinition = useSelector((store:scuteStore) => generatePath(store.root.lines, dispatch, defs.segments));
-
-    const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
-    }
 
     const toggleHandle = (event:React.MouseEvent) => {
         event.stopPropagation();
@@ -31,7 +24,7 @@ export const Path = React.memo(({defs, children}:ShapeProps) => {
         <g className="hoverGroup" onMouseDown={toggleHandle}>
             <path
                 d={pathDefn.defn} 
-                style={styles}
+                style={style}
             ></path>
             { handleable ?
                 pathDefn.handles

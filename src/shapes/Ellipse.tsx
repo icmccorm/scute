@@ -4,19 +4,12 @@ import {useSelector, useDispatch} from 'react-redux';
 import Handle from './Handle';
 import { ValueLink, manipulation, manipulate, getLinkedVector, vecManipulation } from 'src/redux/Manipulation';
 import { scuteStore } from 'src/redux/ScuteStore';
-import { getColorFromArray } from './StyleUtilities';
 
-export const Ellipse = ({defs}:ShapeProps) => {
+export const Ellipse = ({defs, style}:ShapeProps) => {
     let attrs: Array<ValueLink> = defs.attrs;
 	let dispatch = useDispatch();
     const position:Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
     const radius: Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['radius']));
-
-    const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
-    }
 
     const[handleable, setHandleable] = React.useState(false);
 
@@ -44,7 +37,7 @@ export const Ellipse = ({defs}:ShapeProps) => {
 				cy={position[1]} 
                 rx={radius[0]} 
 				ry={radius[1]}
-				style={styles}
+				style={style}
 			></ellipse>
             {handleable ?
                 <g>         

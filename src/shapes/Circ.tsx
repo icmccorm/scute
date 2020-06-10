@@ -13,18 +13,13 @@ import { getColorFromArray } from './StyleUtilities';
 
 import './style/shapes.scss';
 
-export const Circ = ({defs}:ShapeProps) => {
+export const Circ = ({defs, style}:ShapeProps) => {
     let attrs: Array<ValueLink> = defs.attrs;
     let dispatch = useDispatch();
     
     const position:number = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
     const radius:number = useSelector((store:scuteStore) => getLinkedValue(store.root.lines, attrs['radius']));
-    
-    const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
-    }
+
 
     const[handleable, setHandleable] = React.useState(false);
 
@@ -50,7 +45,7 @@ export const Circ = ({defs}:ShapeProps) => {
 				cx={position[0]} 
 				cy={position[1]} 
                 r={radius} 
-                style={styles}
+                style={style}
 			></circle>
             {handleable ?
                 <g>         

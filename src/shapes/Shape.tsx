@@ -8,6 +8,7 @@ import { Path } from "./Path";
 import { ProgressPlugin } from "webpack";
 import { Ellipse } from "./Ellipse";
 import { Line } from "./Line";
+import { getColorFromArray } from "./StyleUtilities";
 
 export enum ShapeType{
 	SP_RECT = 68,
@@ -31,34 +32,41 @@ export type Tag = {
 	segments: Array<Segment>
 }
 
-export type ShapeProps = {defs: Tag, children?: any}
+export type ShapeProps = {defs: Tag, style: React.CSSProperties, children?: any}
 
 export const Shape = ({defs}:ShapeProps) => {
+
+	const styles = {
+        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
+        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
+        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
+    }
+
 	switch(defs.tag){
 		case ShapeType.SP_RECT:
 			return(
-				<Rect defs={defs}></Rect>
+				<Rect defs={defs} style={styles}></Rect>
 			);
 		case ShapeType.SP_CIRC:
 			return(
-				<Circ defs={defs}></Circ>
+				<Circ defs={defs} style={styles}></Circ>
 			);
 		case ShapeType.SP_POLYL:
 		case ShapeType.SP_POLYG:
 			return(
-				<PolyShape defs={defs}></PolyShape>
+				<PolyShape defs={defs} style={styles}></PolyShape>
 			);
 		case ShapeType.SP_PATH:
 			return(
-				<Path defs={defs}></Path>
+				<Path defs={defs} style={styles}></Path>
 			);
 		case ShapeType.SP_ELLIP:
 			return(
-				<Ellipse defs={defs}></Ellipse>
+				<Ellipse defs={defs} style={styles}></Ellipse>
 			);
 		case ShapeType.SP_LINE:
 			return (
-				<Line defs={defs}></Line>
+				<Line defs={defs} style={styles}></Line>
 			);
 		case ShapeType.SP_UNGON:
 			return null;

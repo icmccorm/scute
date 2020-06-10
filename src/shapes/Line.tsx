@@ -6,19 +6,12 @@ import { ValueLink, manipulate, vecManipulation, getLinkedVector } from 'src/red
 import { scuteStore } from 'src/redux/ScuteStore';
 import { getColorFromArray } from './StyleUtilities';
 
-export const Line = ({defs}:ShapeProps) => {
+export const Line = ({defs, style}:ShapeProps) => {
     let attrs: Array<ValueLink> = defs.attrs;
     let dispatch = useDispatch();
 
     const start:number = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['start']));
     const end:number = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['end']));
-    
-
-    const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
-    }
 
     const[handleable, setHandleable] = React.useState(false);
 
@@ -38,7 +31,7 @@ export const Line = ({defs}:ShapeProps) => {
 
     return (
 		<g className="hoverGroup" onMouseDown={toggleHandle}>
-            <line x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]} style={styles}></line>
+            <line x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]} style={style}></line>
             {handleable ?
                 <g>         
                     <Handle
