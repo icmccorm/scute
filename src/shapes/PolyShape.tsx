@@ -13,10 +13,11 @@ export const PolyShape = React.memo(({defs, children}:ShapeProps) => {
     const dispatch = useDispatch();
     const polyDefn:PolyPathDefinition = useSelector((store:scuteStore) => generatePoly(store.root.lines, dispatch, defs.segments));
     
+
     const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : null,
-        strokeWidth: defs.styles['strokeWidth'],
+        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
+        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
+        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
     }
 
     const toggleHandle = (event:React.MouseEvent) => {

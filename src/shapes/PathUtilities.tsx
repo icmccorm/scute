@@ -9,6 +9,7 @@ export enum SegmentType {
 	SG_CBEZIER,
 	SG_QBEZIER,
 	SG_ARC,
+	SG_MIRR,
 }
 
 export type Segment = {type: SegmentType}

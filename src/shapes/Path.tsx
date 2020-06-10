@@ -18,7 +18,7 @@ export const Path = React.memo(({defs, children}:ShapeProps) => {
     const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
         stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'] : "3px",
+        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
     }
 
     const toggleHandle = (event:React.MouseEvent) => {

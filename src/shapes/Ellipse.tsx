@@ -11,11 +11,11 @@ export const Ellipse = ({defs}:ShapeProps) => {
 	let dispatch = useDispatch();
     const position:Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['position']));
     const radius: Array<number> = useSelector((store:scuteStore) => getLinkedVector(store.root.lines, attrs['radius']));
-    
+
     const styles = {
-        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : null,
-        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : null,
-        strokeWidth: defs.styles['strokeWidth'],
+        fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
+        stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
+        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
     }
 
     const[handleable, setHandleable] = React.useState(false);
