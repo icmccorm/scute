@@ -6,6 +6,8 @@ import { scuteStore } from 'src/redux/ScuteStore';
 
 type Props = {handleChange: Function, value: string}
 
+const CODE_COOKIE = "scute_src=";
+
 export const Editor = React.memo(({value, handleChange}:Props) => {
     const [lineNums, setLineNums] = React.useState([<span key={1}>1</span>]);
     const [scrollTop, setScrollTop] = React.useState(0);
@@ -18,9 +20,14 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
 
     const dispatch = useDispatch();
 
+    React.useEffect(() => {
+        let cookieCode = getCookie();
+        if(cookieCode != ""){
+            syncText(cookieCode);
+        }
+    }, []);
 
-    const syncText = (evt) => {
-        let text:string = evt.target.value;
+    const syncText = (text) => {
         dispatch(createAction(ActionType.UPDATE_CODE, text));
         let numLines:number = text.split('\n').length;
         let displayData = [];
@@ -28,13 +35,38 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
         for(let i = 0; i<numLines; ++i){
             displayData.push(<span key={i+1}>{i+1}</span>);
         }
-        setLineNums(displayData);       
+        setLineNums(displayData);    
+        setCookie(text);   
     }
 
     const syncScroll = (evt) => {
         setScrollTop(evt.target.scrollTop);
         wrapper.current.scrollTop = scrollTop;
         nums.current.scrollTop = scrollTop;
+    }
+
+    const setCookie = (text) => {
+        let encodedText = encodeURI(text);
+        let d = new Date();
+        d.setTime(d.getTime() + (7*24*60*60*100));
+        let cookie = CODE_COOKIE + encodedText + ";expires=" + d.toUTCString() + ";path=/";
+        document.cookie = cookie; 
+    }
+
+    const getCookie = () => {
+        let name = CODE_COOKIE;
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let decoded = decodedCookie.split(';');
+        for(let i = 0; i<decoded.length; ++i){
+            let dVal = decoded[i];
+            while(dVal.charAt(0) == ' '){
+                dVal = dVal.substring(1);
+            }
+            if(dVal.indexOf(name) == 0){
+                return dVal.substring(name.length, dVal.length);
+            }
+        }
+        return "";
     }
 
     var handleSpecialCharacters = (evt) => {
@@ -61,7 +93,7 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
                 ref={area}
                 spellCheck={false}
                 className='dark textArea textPadding'
-                onChange={syncText}
+                onChange={(evt) => {syncText(evt.target.value)}}
                 onKeyDown={handleSpecialCharacters}
                 value={sourceText}
             />

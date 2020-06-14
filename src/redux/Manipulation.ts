@@ -34,7 +34,7 @@ export function getLinkedDelta(lines: Array<LineMeta>, link: ValueLink){
 }
 
 export function linkCanvas(lines: Array<LineMeta>, canvas: Canvas){
-	if(canvas){
+	if(canvas && canvas.size && canvas.origin){
 		return {
 			size: getLinkedVector(lines, canvas.size),
 			origin: getLinkedVector(lines, canvas.origin)
