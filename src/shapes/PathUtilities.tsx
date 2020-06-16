@@ -13,7 +13,7 @@ export enum SegmentType {
 }
 
 export enum AxisType {
-	X = 0,
+	X = 30,
 	Y,
 	XY
 }
@@ -24,8 +24,8 @@ export type Turtle = Segment & {move: ValueLink, turn: ValueLink, x:number, y:nu
 export type Vertex = Segment & {point: ValueLink[]};
 export type Cubic = Segment & {control1: Array<ValueLink>, control2: Array<ValueLink>, end: Array<ValueLink>};
 export type Quadratic = Segment & {control: Array<ValueLink>, end: Array<ValueLink>};
-export type Arc = Segment & {center: Array<ValueLink>, degrees: Array<ValueLink>, radius:Array<ValueLink>};
-export type Mirror = Segment & {axis: AxisType, point: Array<ValueLink>, index: number};
+export type Arc = Segment & {center: Array<ValueLink>, degrees: ValueLink, radius:Array<ValueLink>};
+export type Mirror = Segment & {axis: AxisType, origin: Array<ValueLink>, index: number};
 export type MirrorTag = {index: number, prevPoint: Array<number>};
 export type BoundingBox = {position:Array<number>, bounds: Array<number>, centroid};
 export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>};
@@ -56,14 +56,14 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 		const linkVec = (vlv:Array<ValueLink>) => [link(vlv[0]), link(vlv[1])];
 
 		switch(segment.type){
-			case SegmentType.SG_JUMP:
+			case SegmentType.SG_JUMP: {
 				let jump = segment as Jump;
 				let jPoint = linkVec(jump.point);
 	
 				if(peek(mirrorStack)){
 					let tag = peek(mirrorStack) as MirrorTag;
 					let mirr:Mirror = segmentArray[tag.index] as Mirror;
-					let mirrorPoint = linkVec(mirr.point);
+					let mirrorPoint = linkVec(mirr.origin);
 					jPoint = mirrorCoordinate(mirr.axis, mirrorPoint, jPoint);
 				}else{
 					handles.push(
@@ -79,23 +79,30 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 
 				prevPoint = jPoint;
 				defn += "M " + prevPoint[0] + " " + prevPoint[1];
-				break;
+				} break;
 			
-			case SegmentType.SG_TURTLE:
+			case SegmentType.SG_TURTLE: {
 				let turtle = segment as Turtle;
 				
 				let distance = link(turtle.move);
-				angle += link(turtle.turn);
 
 				let cosine = Math.cos(toRadians(angle));
 				let sine = Math.sin(toRadians(angle));
-				let dx = Math.round(cosine * distance);
-				let dy = Math.round(sine * distance);
 
-				prevPoint = [prevPoint[0] + dx, prevPoint[1] + dy];
+				let diff = [Math.round(cosine * distance), Math.round(sine * distance)];
+
+				let topMirror = peek(mirrorStack);
+				if(topMirror){
+					let tag = peek(mirrorStack) as MirrorTag;
+					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirrorPoint = linkVec(mirr.origin);
+					diff = mirrorCoordinate(mirr.axis, mirrorPoint, diff);
+				}
+
+				prevPoint = [prevPoint[0] + diff[0], prevPoint[1] + diff[1]];
 				defn += "L " + prevPoint[0] + " " + prevPoint[1];
 				
-				handles.push(
+				if(!topMirror) handles.push(
 					<Handle 
 						key={key} 
 						cx={prevPoint[0]} 
@@ -106,7 +113,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				);
 				
 				if(segmentArray[key + 1] && segmentArray[key + 1].type != SegmentType.SG_TURTLE) angle = 0;
-				break;
+				} break;
 
 			case SegmentType.SG_VERTEX: {
 				let vertex = segment as Vertex;
@@ -115,7 +122,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				if(peek(mirrorStack)){
 					let tag = peek(mirrorStack) as MirrorTag;
 					let mirr:Mirror = segmentArray[tag.index] as Mirror;
-					let mirrorPoint = linkVec(mirr.point);
+					let mirrorPoint = linkVec(mirr.origin);
 					vPoint = mirrorCoordinate(mirr.axis, mirrorPoint, vPoint);
 				}else{
 					handles.push(
@@ -124,92 +131,165 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 							cx={vPoint[0]} 
 							cy={vPoint[1]} 
 							adjust={(dx, dy) => 
-								manipVector(dispatch, dx, dy, jump.point
+								manipVector(dispatch, dx, dy, vertex.point
 						)}/>
 					);
 				}
 				prevPoint = vPoint;
 				defn += "L " + prevPoint[0] + " " + prevPoint[1];
-			} break;
+				} break;
 
-			case SegmentType.SG_QBEZIER:
+			case SegmentType.SG_QBEZIER: {
 				let quad = segment as Quadratic;
-				handles = handles.concat([ 
+
+				let control = linkVec(quad.control);
+				let end = linkVec(quad.end);
+
+				let topMirror = peek(mirrorStack);
+				if(topMirror){
+					let tag = peek(mirrorStack) as MirrorTag;
+					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirrorPoint = linkVec(mirr.origin);
+					control = mirrorCoordinate(mirr.axis, mirrorPoint, control);
+					end = mirrorCoordinate(mirr.axis, mirrorPoint, end);
+				}
+
+				if(!topMirror) handles = handles.concat([ 
 					<Handle 
 						key={key} 
-						cx={link(quad.control[0])} 
-						cy={link(quad.control[1])} 
+						cx={control[0]} 
+						cy={control[1]} 
 						ex={prevPoint[0]} 
 						ey={prevPoint[1]} 
-						sx={link(quad.end[0])}
-						sy={link(quad.end[1])} 
+						sx={end[0]}  
+						sy={end[1]}  
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, quad.control)}
 					/>,
 					
-					<Handle key={key+1}
-						cx={link(quad.end[0])}
-						cy={link(quad.end[1])} 
+					<Handle key={segmentArray.length + key}
+						cx={end[0]}  
+						cy={end[1]}  
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, quad.end)}
 					/>
 				]);
-				defn += "Q " + link(quad.control[0]) + " " + link(quad.control[1]) + ", " + link(quad.end[0]) + " " + link(quad.end[1]);
-				prevPoint = [link(quad.end[0]), link(quad.end[1])];
-				break;
+				defn += "Q " + control[0] + " " + control[1] + ", " + end[0] + " " + end[1];
+				prevPoint = end;
+				} break;
 
 			case SegmentType.SG_CBEZIER: {
 				let cubic = segment as Cubic;
-				handles = handles.concat([
+
+				let control1 = linkVec(cubic.control1);
+				let control2 = linkVec(cubic.control2);
+				let end = linkVec(cubic.end);
+
+				let topMirror = peek(mirrorStack);
+				if(topMirror){
+					let tag = peek(mirrorStack) as MirrorTag;
+					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirrorPoint = linkVec(mirr.origin);
+					control1 = mirrorCoordinate(mirr.axis, mirrorPoint, control1);
+					control2 = mirrorCoordinate(mirr.axis, mirrorPoint, control2);
+					end = mirrorCoordinate(mirr.axis, mirrorPoint, end);
+				}
+
+				if(!topMirror) handles = handles.concat([
 					<Handle key={key} 
-						cx={link(cubic.control1[0])} 
-						cy={link(cubic.control1[1])} 
+						cx={control1[0]} 
+						cy={control1[1]} 
 						ex={prevPoint[0]} 
 						ey={prevPoint[1]} 
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, cubic.control1)}
 					/>,
 					
 					<Handle 
-						key={segmentArray.length + key + 1} 
-						cx={link(cubic.control2[0])} 
-						cy={link(cubic.control2[1])} 
-						ex={link(cubic.end[0])} 
-						ey={link(cubic.end[1])} 
+						key={segmentArray.length + key} 
+						cx={control2[0]} 
+						cy={control2[1]} 
+						ex={end[0]} 
+						ey={end[1]} 
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, cubic.control2)}
 					/>,
 					
 					<Handle 
-						key={segmentArray.length + key + 2} 
-						cx={link(cubic.end[0])} 
-						cy={link(cubic.end[1])} 
+						key={segmentArray.length + 2*key} 
+						cx={end[0]}  
+						cy={end[1]}  
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, cubic.end)}
 					/>				
 				]);
-				let control1 = link(cubic.control1[0]) + " " + link(cubic.control1[1]) + ", ";
-				let control2 = link(cubic.control2[0]) + " " + link(cubic.control2[1]) + ", ";
-				let end = link(cubic.end[0]) + " " + link(cubic.end[1]);
-				defn += "C " + control1 + control2 + end;
+				let control1Str = control1[0] + " " + control1[1] + ", ";
+				let control2Str = control2[0] + " " + control2[1] + ", ";
+				let endStr = end[0] + " " + end[1] + ", ";
+				defn += "C " + control1Str + control2Str + endStr;
 
-				prevPoint = [link(cubic.end[0]), link(cubic.end[1])];
-
+				prevPoint = end;
 				}	break;
 			case SegmentType.SG_ARC: {
 				let arc = segment as Arc;
-	
-				let rx = link(arc.radius[0]);
-				let ry = link(arc.radius[1]);
-			
-				let cx = link(arc.center[0]);
-				let cy = link(arc.center[1]);
-				
-				let degX = link(arc.degrees[0]);
-				let degArc = link(arc.degrees[1]);
+				let center  = linkVec(arc.center);
+				let radius = distance(prevPoint, center);
+				let deg = link(arc.degrees);
 
-				let endpoint = arcEndpoint(rx, ry, degX, degArc, cx, cy);
+				let topMirror = peek(mirrorStack);
+				if(topMirror){
+					let tag = peek(mirrorStack) as MirrorTag;
+					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirrorPoint = linkVec(mirr.origin);
+					center = mirrorCoordinate(mirr.axis, mirrorPoint, center);
+					deg = -deg;
+				}
 
-				defn += "A " + rx + " " + ry + " " + degX + " " + 1 + " " + 1 + " " + endpoint[0] + " " + endpoint[1] + " ";
+				deg = Math.sign(deg) * (Math.abs(deg) % 360);
+				let endpoint = arcEndpoint(radius, deg, prevPoint, center);
 
-				handles = handles.concat([<Handle key={key} cx={link(arc.center[0])} cy={link(arc.center[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, arc.center)}/>])
+				defn += "A " 
+					+ radius 
+					+ " " 
+					+ radius 
+					+ " " 
+					+ 0 
+					+ " "
+					+ (Math.abs(deg) > 180 ? 1 : 0)
+					+ " " 
+					+ (Math.abs(deg) > 0 ? 1 : 0) 
+					+ " " 
+					+ endpoint[0] 
+					+ " " 
+					+ endpoint[1] 
+					+ " ";
+
+				if(!topMirror) handles = handles.concat([
+					<Handle key={key} 
+						cx={center[0]} 
+						cy={center[1]} 
+						ex={prevPoint[0]} 
+						ey={prevPoint[1]} 
+						sx={endpoint[0]}  
+						sy={endpoint[1]} 
+						adjust={(dx, dy) => manipVector(dispatch, dx, dy, arc.center)}
+					/>,
+					<Handle key={segmentArray.length + key} 
+						cx={endpoint[0]} 
+						cy={endpoint[1]} 
+						adjust={(dx, dy) => {
+							endpoint = [endpoint[0] + dx, endpoint[1] + dy];
+							
+							let tanDegreesEnd = toDegrees(Math.atan((endpoint[1] - center[1])/(endpoint[0] - center[0])));
+
+							let tanDegreesStart = toDegrees(Math.atan((originalPrevPoint[1] - center[1])/(originalPrevPoint[0] - center[0])));
+
+							if(tanDegreesEnd < 0) tanDegreesEnd += 180;
+							if(endpoint[1] > center[1]) tanDegreesEnd += 180;
+
+							let newDegrees = (tanDegreesEnd - tanDegreesStart);
+							manip(dispatch, newDegrees - link(arc.degrees), arc.degrees);
+						}}
+					/>
+				]);
+				let originalPrevPoint = prevPoint;
 				prevPoint = endpoint;
-			} break;
+				} break;
 			case SegmentType.SG_MIRR:{
 				let top:MirrorTag = peek(mirrorStack);
 				if(top && top.index != key){					
@@ -218,11 +298,11 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				}else if(top){
 					mirrorStack.pop();	
 				}else{
-					mirrorStack.push();
+					mirrorStack.push({index: key, prevPoint: prevPoint});
 					prevPoint = [0, 0];
 					key = -1;
 				}
-			}break;
+				}break;
 		}
 		defn += " ";
 	}
@@ -231,28 +311,46 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 }
 
 
+export function arcLengthToDegrees(start: Array<number> ){
+
+}
+
+
+export function wraparound(low, high, val){
+	if(val < low){
+		return high + (val % low);
+	}else if (val > high){
+		return low + (val % high);
+	}
+	return val;
+}
+
+export function distance(pt1: Array<number>, pt2: Array<number>): number{
+	return Math.sqrt(Math.pow((pt2[0] - pt1[0]), 2) + Math.pow((pt2[1] - pt1[1]), 2));
+}
 
 export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathDefinition {
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
-	let prevPoint: Array<number> = [0, 0];
 
+	let prevPoint: Array<number> = [0, 0];
 	let handles = [];
 	let defn = "";
-
 	let angle = 0;
-	for(let i = 0; i<segmentArray.length; ++i){
-		switch(segmentArray[i].type){
+	let mirrorStack:Array<MirrorTag> = []
+
+	for(let key = 0; key<segmentArray.length; ++key){
+		switch(segmentArray[key].type){
 			case SegmentType.SG_JUMP:
 			case SegmentType.SG_VERTEX: {
-				let segment: Vertex | Jump = segmentArray[i] as (Vertex | Jump);
+				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);
 
 				defn += link(segment.point[0]) + "," + link(segment.point[1]) + " ";
-				handles = handles.concat([<Handle key={i} cx={link(segment.point[0])} cy={link(segment.point[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, segment.point)}/>]);
+				handles = handles.concat([<Handle key={key} cx={link(segment.point[0])} cy={link(segment.point[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, segment.point)}/>]);
 				
 				prevPoint = [link(segment.point[0]), link(segment.point[1])];
 			} break;
-			case SegmentType.SG_TURTLE:
-				let segment: Turtle = segmentArray[i] as Turtle;
+			case SegmentType.SG_TURTLE: {
+				let segment: Turtle = segmentArray[key] as Turtle;
 				
 				let distance = link(segment.move);
 				angle += link(segment.turn);
@@ -263,18 +361,32 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 				let dy = Math.round(sine * distance);
 
 				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
-				handles = handles.concat([<Handle key={i} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
+				handles = handles.concat([<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
 				defn += prevPoint[0] + "," + prevPoint[1] + " ";	
-				break;
+				} break;
+			case SegmentType.SG_MIRR:{
+				let top:MirrorTag = peek(mirrorStack);
+				if(top && top.index != key){					
+					mirrorStack.push({index: key, prevPoint: prevPoint});
+					prevPoint = top.prevPoint;
+				}else if(top){
+					mirrorStack.pop();	
+				}else{
+					mirrorStack.push({index: key, prevPoint: prevPoint});
+					prevPoint = [0, 0];
+					key = -1;
+				}
+				} break;
 		}
 	}
-
 	return {defn, handles};
 }
 
-
 export const manipVector = (dispatch, dx: number, dy: number, vector: ValueLink[]) => {	
 	dispatch(manipulate(vecManipulation(dx, dy, vector)));
+}
+export const manip = (dispatch, diff: number, link: ValueLink) => {	
+	dispatch(manipulate(manipulation(diff, link)));
 }
 
 export const manipTurtle = (dispatch, links, dx: number, dy: number, turtleSegment: Segment) => {
@@ -316,17 +428,36 @@ function toDegrees(rad: number): number{
 	return (rad * (180 / Math.PI));
 }
 
-function arcEndpoint(rx, ry, degX, degArc, cx, cy): number[]{
-	let xCosine = Math.cos(toRadians(degX));
-	let xSine = Math.sin(toRadians(degX));
+function arcEndpoint(rad:number, deg:number, start: Array<number>, center:Array<number>): number[]{
+	let sin = Math.sin;
+	let cos = Math.cos;
 
-	let arcCosine = Math.cos(toRadians(degArc));
-	let arcSine = Math.sin(toRadians(degArc));
+	let bCosine = (start[0] - center[0])/rad;
+	let bSine = (start[1] - center[1])/rad;
+	let aCosine = cos(toRadians(deg));
+	let aSine = sin(toRadians(deg));
 
-	let centerOffsetX = xCosine * (rx * arcCosine) - xSine * (ry * arcSine);
-	let centerOffsetY = xSine * (rx * arcCosine) + xCosine * (ry * arcSine);
+	//cos(B-A)
+	let dx = rad*(aCosine*bCosine - aSine*bSine);
 
-	return [centerOffsetX + cx, centerOffsetY + cy];
+	//sin(B-A)
+	let dy = rad*(bSine*aCosine + bCosine*aSine);
+
+	return [center[0] + dx, center[1] + dy];
+}
+
+
+export function arcDegrees(rad:number, start: Array<number>, center:Array<number>, endPoint: Array<number>){
+	let dx = (endPoint[0] - center[0])/rad;
+	let dy = (endPoint[1] - center[1])/rad;
+
+	let bCosine = (start[0] - center[0])/rad;
+	let bSine = (start[1] - center[1])/rad;
+	let angleB = toDegrees(Math.atan(bSine/bCosine));
+	
+	let angleDiff = toDegrees(Math.atan(dy/dx));
+	let angleA = angleB - angleDiff;
+	return angleA;
 }
 
 function mirrorCoordinate(mirrorAxis: AxisType, mirrorPoint: Array<number>, point: Array<number>): Array<number>{
@@ -335,11 +466,13 @@ function mirrorCoordinate(mirrorAxis: AxisType, mirrorPoint: Array<number>, poin
 			return [
 				mirrorValue(mirrorPoint[0], point[0]),
 				point[1]
-			];		case AxisType.Y:
+			];		
+		case AxisType.Y:
 			return [
 				point[0],
 				mirrorValue(mirrorPoint[1], point[1])
-			];		case AxisType.XY:
+			];		
+		case AxisType.XY:
 			return [
 				mirrorValue(mirrorPoint[0], point[0]),
 				mirrorValue(mirrorPoint[1], point[1])

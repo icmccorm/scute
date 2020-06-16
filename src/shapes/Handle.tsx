@@ -4,9 +4,9 @@ import {useSelector, useDispatch} from 'react-redux';
 import { ActionType, createAction} from "src/redux/Actions";
 import { scuteStore } from 'src/redux/ScuteStore';
 
-type Props = {adjust: Function, cx: number, cy: number, ex?: number, ey?:number, sx?: number, sy?:number};
+type Props = {adjust?: Function, adjustDirect?: Function, cx: number, cy: number, ex?: number, ey?:number, sx?: number, sy?:number};
 
-const Handle = React.memo(({adjust, cx, cy, ex, ey, sx, sy}:Props) => {
+const Handle = React.memo(({adjust, adjustDirect, cx, cy, ex, ey, sx, sy}:Props) => {
 	let mousePosition = [0, 0];
 	let mouseOffset = [0, 0];
 
@@ -19,7 +19,14 @@ const Handle = React.memo(({adjust, cx, cy, ex, ey, sx, sy}:Props) => {
 
 		let dx = event.pageX - mousePosition[0];
 		let dy = event.pageY - mousePosition[1];
-		adjust((1/scale)*(dx - mouseOffset[0]), (1/scale)*(dy - mouseOffset[1]));
+
+		if(adjust) {		
+			adjust((1/scale)*(dx - mouseOffset[0]), (1/scale)*(dy - mouseOffset[1]));
+		}
+		if(adjustDirect){
+			adjustDirect((1/scale)*(mousePosition[0] + dx), (1/scale)*(mousePosition[1] + dy));
+		}
+
 		mouseOffset = [dx, dy];
 	}
 

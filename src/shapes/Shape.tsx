@@ -5,7 +5,6 @@ import { PolyShape } from './PolyShape';
 import { Segment } from './PathUtilities';
 import { ValueLink } from "src/redux/Manipulation";
 import { Path } from "./Path";
-import { ProgressPlugin } from "webpack";
 import { Ellipse } from "./Ellipse";
 import { Line } from "./Line";
 import { getColorFromArray } from "./StyleUtilities";
@@ -14,11 +13,11 @@ export enum ShapeType{
 	SP_RECT = 68,
 	SP_CIRC,
 	SP_POLYG,
+	SP_UNGON,
 	SP_POLYL,
 	SP_PATH,
 	SP_ELLIP,
 	SP_LINE,
-	SP_UNGON,
 }
 
 export type Tag = {
@@ -31,10 +30,11 @@ export type Tag = {
 	}
 	segments: Array<Segment>
 }
+export type ShapeWrapperProps = {defs: Tag, children?: any}
 
 export type ShapeProps = {defs: Tag, style: React.CSSProperties, children?: any}
 
-export const Shape = ({defs}:ShapeProps) => {
+export const Shape = ({defs}:ShapeWrapperProps) => {
 
 	const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
@@ -52,6 +52,7 @@ export const Shape = ({defs}:ShapeProps) => {
 				<Circ defs={defs} style={styles}></Circ>
 			);
 		case ShapeType.SP_POLYL:
+		case ShapeType.SP_UNGON:
 		case ShapeType.SP_POLYG:
 			return(
 				<PolyShape defs={defs} style={styles}></PolyShape>
@@ -68,8 +69,6 @@ export const Shape = ({defs}:ShapeProps) => {
 			return (
 				<Line defs={defs} style={styles}></Line>
 			);
-		case ShapeType.SP_UNGON:
-			return null;
 		default:
 			return null;
 	}
