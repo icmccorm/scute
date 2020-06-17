@@ -230,6 +230,8 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				let center  = linkVec(arc.center);
 				let radius = distance(prevPoint, center);
 				let deg = link(arc.degrees);
+				let sweepFlag = (deg) > 0;
+				let largeArcFlag = Math.abs(deg) > 180;
 
 				let topMirror = peek(mirrorStack);
 				if(topMirror){
@@ -238,6 +240,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					let mirrorPoint = linkVec(mirr.origin);
 					center = mirrorCoordinate(mirr.axis, mirrorPoint, center);
 					deg = -deg;
+					sweepFlag = false;
 				}
 
 				deg = Math.sign(deg) * (Math.abs(deg) % 360);
@@ -250,9 +253,9 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					+ " " 
 					+ 0 
 					+ " "
-					+ (Math.abs(deg) > 180 ? 1 : 0)
+					+ (largeArcFlag ? 1 : 0)
 					+ " " 
-					+ (Math.abs(deg) > 0 ? 1 : 0) 
+					+ (sweepFlag? 1 : 0) 
 					+ " " 
 					+ endpoint[0] 
 					+ " " 
@@ -273,16 +276,23 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						cx={endpoint[0]} 
 						cy={endpoint[1]} 
 						adjust={(dx, dy) => {
+							let isNegative = deg < 0;
 							endpoint = [endpoint[0] + dx, endpoint[1] + dy];
-							
+							let isNasty = isInNastyQuadrant(originalPrevPoint, deg, center, endpoint);
+
 							let tanDegreesEnd = toDegrees(Math.atan((endpoint[1] - center[1])/(endpoint[0] - center[0])));
 
 							let tanDegreesStart = toDegrees(Math.atan((originalPrevPoint[1] - center[1])/(originalPrevPoint[0] - center[0])));
 
-							if(tanDegreesEnd < 0) tanDegreesEnd += 180;
-							if(endpoint[1] > center[1]) tanDegreesEnd += 180;
-
 							let newDegrees = (tanDegreesEnd - tanDegreesStart);
+
+							if(isNasty){
+								newDegrees += 180;
+							}
+
+							if(newDegrees < 0 && deg > 0) newDegrees = 360 + newDegrees;
+							if(newDegrees > 0 && deg < 0) newDegrees = -360 + newDegrees;
+
 							manip(dispatch, newDegrees - link(arc.degrees), arc.degrees);
 						}}
 					/>
@@ -311,8 +321,15 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 }
 
 
-export function arcLengthToDegrees(start: Array<number> ){
-
+export function isInNastyQuadrant(startOfArc, signOfDegrees, center, endPoint){
+	//is in left quadrant
+	if(startOfArc[0] < center[0]){
+		return endPoint[0] > center[0];	
+		
+	//is in right quadrant
+	}else{
+		return endPoint[0] < center[0];
+	}
 }
 
 
