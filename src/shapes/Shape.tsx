@@ -52,10 +52,13 @@ export const Shape = ({defs}:ShapeWrapperProps) => {
 				<Circ defs={defs} style={styles}></Circ>
 			);
 		case ShapeType.SP_POLYL:
-		case ShapeType.SP_UNGON:
 		case ShapeType.SP_POLYG:
 			return(
 				<PolyShape defs={defs} style={styles}></PolyShape>
+			);
+		case ShapeType.SP_UNGON:
+			return(
+				<Ungon defs={defs} style={styles}></Ungon>
 			);
 		case ShapeType.SP_PATH:
 			return(
