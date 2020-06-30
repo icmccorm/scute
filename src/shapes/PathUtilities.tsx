@@ -82,15 +82,17 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				} break;
 			
 			case SegmentType.SG_TURTLE: {
-				let turtle = segment as Turtle;
-				
-				let distance = link(turtle.move);
+				let segment: Turtle = segmentArray[key] as Turtle;
+				segment.horizontal = angle;
+
+				let distance = link(segment.move);
+				angle += link(segment.turn);
+				angle = wraparound(-360, 360, angle);
 
 				let cosine = Math.cos(toRadians(angle));
 				let sine = Math.sin(toRadians(angle));
-
 				let diff = [Math.round(cosine * distance), Math.round(sine * distance)];
-
+				
 				let topMirror = peek(mirrorStack);
 				if(topMirror){
 					let tag = peek(mirrorStack) as MirrorTag;
@@ -108,7 +110,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						cx={prevPoint[0]} 
 						cy={prevPoint[1]} 
 						adjust={(dx, dy) => {
-							manipTurtle(dispatch, links, dx, dy, turtle)
+							manipTurtle(dispatch, links, dx, dy, segment)
 					}}/>
 				);
 				
@@ -239,6 +241,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					let mirr:Mirror = segmentArray[tag.index] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					center = mirrorCoordinate(mirr.axis, mirrorPoint, center);
+					radius = distance(prevPoint, center);
 					deg = -deg;
 					sweepFlag = false;
 				}
@@ -276,9 +279,8 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 						cx={endpoint[0]} 
 						cy={endpoint[1]} 
 						adjust={(dx, dy) => {
-							let isNegative = deg < 0;
 							endpoint = [endpoint[0] + dx, endpoint[1] + dy];
-							let isNasty = isInNastyQuadrant(originalPrevPoint, deg, center, endpoint);
+							let isNasty = isInNastyQuadrant(originalPrevPoint, center, endpoint);
 
 							let tanDegreesEnd = toDegrees(Math.atan((endpoint[1] - center[1])/(endpoint[0] - center[0])));
 
@@ -312,16 +314,17 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					prevPoint = [0, 0];
 					key = -1;
 				}
+				defn += "Z";
 				}break;
 		}
 		defn += " ";
 	}
-
+	defn += "Z";
 	return {defn, handles};
 }
 
 
-export function isInNastyQuadrant(startOfArc, signOfDegrees, center, endPoint){
+export function isInNastyQuadrant(startOfArc, center, endPoint){
 	//is in left quadrant
 	if(startOfArc[0] < center[0]){
 		return endPoint[0] > center[0];	
@@ -331,7 +334,6 @@ export function isInNastyQuadrant(startOfArc, signOfDegrees, center, endPoint){
 		return endPoint[0] < center[0];
 	}
 }
-
 
 export function wraparound(low, high, val){
 	if(val < low){
@@ -346,6 +348,167 @@ export function distance(pt1: Array<number>, pt2: Array<number>): number{
 	return Math.sqrt(Math.pow((pt2[0] - pt1[0]), 2) + Math.pow((pt2[1] - pt1[1]), 2));
 }
 
+export function interpolate(pt1: Array<number>, pt2: Array<number>, frac: number){
+	return [pt1[0] + (pt2[0] - pt1[0])*frac, pt1[1] + (pt2[1] - pt1[1])*frac]	
+}
+
+export function midpoint(pt1: Array<number>, pt2: Array<number>, frac: number){
+	return interpolate(pt1, pt2, 1/2);
+}
+
+export function quadpoints(pt1: Array<number>, pt2: Array<number>){
+	return [interpolate(pt1, pt2, 1/4), interpolate(pt1, pt2, 3/4)];
+}
+
+function line(point: Array<number>){
+	return "L"
+		+ point[0]
+		+ " "
+		+ point[1]
+		+ " ";
+}
+
+function move(point: Array<number>){
+	return "M"
+		+ point[0]
+		+ " "
+		+ point[1]
+		+ " ";
+}
+
+function quad(control: Array<number>, qEnd: Array<number>){
+	return "Q"
+	+ " "
+	+ control[0]
+	+ " "
+	+ control[1]
+	+ ","
+	+ qEnd[0]
+	+ " "
+	+ qEnd[1]
+	+ " ";
+}
+
+function ungonStep(qStart: Array<number>, control: Array<number>, qEnd: Array<number>):String{
+	return line(qStart) + quad(control, qEnd);
+}
+
+export function generateChaikinized(links, dispatch, segmentArray: Segment[], closed:boolean){
+	const link = (vl:ValueLink) => getLinkedValue(links, vl);
+
+	let corner: Array<Array<number>> = [];
+	let prevPoint: Array<number> = corner.length > 0 ? corner[corner.length - 1] : [0, 0];
+
+	let handles = [];
+	let defn = move([0, 0]);
+	let angle = 0;
+	let mirrorStack:Array<MirrorTag> = [];
+
+	let firstJumpingPoint = null;
+	let firstPoint = null;
+	let firstManipFunction = null;
+
+	let manipFunctions:Array<Function> = [];
+
+	for(let key = 0; key<segmentArray.length; ++key){
+		switch(segmentArray[key].type){
+			case SegmentType.SG_JUMP:
+			case SegmentType.SG_VERTEX: {
+				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);
+				//handles = handles.concat([<Handle key={key} cx={link(segment.point[0])} cy={link(segment.point[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, segment.point)}/>]);
+			
+				manipFunctions.push((dx, dy) => manipVector(dispatch, dx, dy, segment.point));
+				prevPoint = [link(segment.point[0]), link(segment.point[1])];
+			} break;
+			case SegmentType.SG_TURTLE: {
+				let segment: Turtle = segmentArray[key] as Turtle;
+				segment.horizontal = angle;
+
+				let distance = link(segment.move);
+				angle += link(segment.turn);
+				angle = wraparound(-360, 360, angle);
+
+				let cosine = Math.cos(toRadians(angle));
+				let sine = Math.sin(toRadians(angle));
+				let dx = Math.round(cosine * distance);
+				let dy = Math.round(sine * distance);
+
+				manipFunctions.push((dx, dy) => manipTurtle(dispatch, links, dx, dy, segment));
+				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
+				//handles = handles.concat([<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
+				} break;
+			case SegmentType.SG_MIRR:{
+				let top:MirrorTag = peek(mirrorStack);
+				if(top){		
+					if(top.index != key){
+						prevPoint = top.prevPoint;
+						mirrorStack.push({index: key, prevPoint: prevPoint});
+						defn += "Z ";
+					}else{
+						mirrorStack.pop();	
+					}	
+				}else{
+					prevPoint = [0, 0];
+					key = -1;
+					mirrorStack.push({index: key, prevPoint: prevPoint});
+					defn += "Z ";
+				}
+				} break;
+		}
+		if(!firstPoint) firstPoint = prevPoint;
+		if(!firstManipFunction) firstManipFunction = manipFunctions.shift();
+		corner.push(prevPoint);
+
+		if(corner.length >= 3){
+			if(!firstJumpingPoint){
+				firstJumpingPoint = interpolate(corner[0], corner[1], 1/4);
+				defn = move(firstJumpingPoint);
+			}
+			let qStart = interpolate(corner[0], corner[1], 3/4);
+			let control = corner[1];
+			let qEnd = interpolate(corner[1], corner[2], 1/4);
+
+			handles = handles.concat([
+				<Handle 
+					key={key} 
+					cx={control[0]} 
+					cy={control[1]} 
+					ex={qStart[0]}
+					ey={qStart[1]}
+					sx={qEnd[0]}
+					sy={qEnd[1]}
+					adjust={manipFunctions.shift()}/>
+			]);
+
+			defn += ungonStep(qStart, control, qEnd);
+			corner.shift();
+		}
+	}
+	
+	if(firstJumpingPoint){
+		let qStart = interpolate(corner[0], corner[1], 3/4);
+		let control = corner[1];
+		let qEnd = firstJumpingPoint;
+
+		defn += ungonStep(qStart, control, qEnd);
+
+		handles = handles.concat([
+			<Handle
+				key={-1} 
+				cx={control[0]} 
+				cy={control[1]} 
+				ex={qStart[0]}
+				ey={qStart[1]}
+				sx={qEnd[0]}
+				sy={qEnd[1]}
+				adjust={manipFunctions.shift()}
+			/>
+		]);
+	}
+	defn += "Z";
+	return {defn, handles};
+}
+
 export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathDefinition {
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
 
@@ -354,6 +517,7 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 	let defn = "";
 	let angle = 0;
 	let mirrorStack:Array<MirrorTag> = []
+
 
 	for(let key = 0; key<segmentArray.length; ++key){
 		switch(segmentArray[key].type){
@@ -368,14 +532,17 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 			} break;
 			case SegmentType.SG_TURTLE: {
 				let segment: Turtle = segmentArray[key] as Turtle;
-				
+				segment.horizontal = angle;
+
 				let distance = link(segment.move);
+
 				angle += link(segment.turn);
+				angle = wraparound(-360, 360, angle);
 
 				let cosine = Math.cos(toRadians(angle));
 				let sine = Math.sin(toRadians(angle));
-				let dx = Math.round(cosine * distance);
-				let dy = Math.round(sine * distance);
+				let dx = (cosine * distance);
+				let dy = (sine * distance);
 
 				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
 				handles = handles.concat([<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
@@ -383,17 +550,21 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 				} break;
 			case SegmentType.SG_MIRR:{
 				let top:MirrorTag = peek(mirrorStack);
-				if(top && top.index != key){					
-					mirrorStack.push({index: key, prevPoint: prevPoint});
-					prevPoint = top.prevPoint;
-				}else if(top){
-					mirrorStack.pop();	
+				if(top){		
+					if(top.index != key){
+						prevPoint = top.prevPoint;
+						mirrorStack.push({index: key, prevPoint: prevPoint});
+						defn += "Z ";
+					}else{
+						mirrorStack.pop();	
+					}	
 				}else{
-					mirrorStack.push({index: key, prevPoint: prevPoint});
 					prevPoint = [0, 0];
 					key = -1;
+					mirrorStack.push({index: key, prevPoint: prevPoint});
+					defn += "Z ";
 				}
-				} break;
+				}break;
 		}
 	}
 	return {defn, handles};
@@ -402,6 +573,7 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 export const manipVector = (dispatch, dx: number, dy: number, vector: ValueLink[]) => {	
 	dispatch(manipulate(vecManipulation(dx, dy, vector)));
 }
+
 export const manip = (dispatch, diff: number, link: ValueLink) => {	
 	dispatch(manipulate(manipulation(diff, link)));
 }
@@ -414,7 +586,7 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, turtleSegme
 	let turtle = turtleSegment as Turtle;
 
 	let move = link(turtle.move);
-	let turn = link(turtle.turn);
+	let turn = link(turtle.turn) + turtle.horizontal;
 
 	let xNought = Math.cos(toRadians(turn)) * move;
 	let yNought = Math.sin(toRadians(turn)) * move; 
@@ -427,13 +599,15 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, turtleSegme
 	
 	if(xNoughtManip < 0){
 		if(yNoughtManip > 0){
-			angleManip = 180 + angleManip;
-		}else{
 			angleManip = -180 + angleManip;
+		}else{
+			angleManip = 180 + angleManip;
 		}
-	} 
+	}
+
+	let newDegrees = wraparound(-360, 360, angleManip - turtle.horizontal);
 	manipulations.push((manipulation(manipDistance - move, turtle.move)));
-	manipulations.push((manipulation(angleManip - turn, turtle.turn)));
+	manipulations.push(manipulation(newDegrees - link(turtle.turn), turtle.turn));
 	dispatch(manipulate(manipulations));
 }
 
@@ -504,3 +678,5 @@ function mirrorValue(mirrorValue: number, value: number): number{
 	let distanceFromAxis = value - mirrorValue;
 	return mirrorValue - distanceFromAxis;
 }
+
+

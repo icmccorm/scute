@@ -8,6 +8,7 @@ import { Path } from "./Path";
 import { Ellipse } from "./Ellipse";
 import { Line } from "./Line";
 import { getColorFromArray } from "./StyleUtilities";
+import { Ungon } from "./Ungon";
 
 export enum ShapeType{
 	SP_RECT = 68,

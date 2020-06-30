@@ -48,23 +48,36 @@ const Handle = React.memo(({adjust, adjustDirect, cx, cy, ex, ey, sx, sy}:Props)
 		window.removeEventListener('mousemove', resizeComponents, false);
 		mouseOffset = [0, 0];
 		dispatch(createAction(ActionType.END_MANIPULATION, null));
+
 	}
 
+	let scaledRadius = Math.abs(1/scale*15);
+	let scaledStrokeWidth = Math.abs(1/scale*4);
+
+	const strokeStyles = {
+		strokeWidth: scaledStrokeWidth + "px"
+	}
 	return (
 		<g>
 			{ex && ey ? 
-				<line className={'handleTrail'} x1={cx} y1={cy} x2={ex} y2={ey}></line>
+				<line className={'handleTrail'} style={strokeStyles} x1={cx} y1={cy} x2={ex} y2={ey}></line>
 			: null}
 			{sx && sy ? 
-				<line className={'handleTrail'} x1={cx} y1={cy} x2={sx} y2={sy}></line>
+				<line className={'handleTrail'} style={strokeStyles} x1={cx} y1={cy} x2={sx} y2={sy}></line>
 			: null}
-			<circle
-				className={'handle'} 
-				r={Math.abs((1/scale*5)) + "px"} 
-				cx={cx}
-				cy={cy}
-				onMouseDown={recordMousePosition}
-			></circle>
+
+			<svg 
+				onMouseDown={recordMousePosition} 
+				x={cx - 0.5*scaledRadius} 
+				y={cy - 0.5*scaledRadius} 
+				width={scaledRadius} 
+				height={scaledRadius} 
+				viewBox="-50 -50 100 100"
+				style={{zIndex:1}}
+			>
+				<circle className="handleCircle" cx="0" cy="0" r="45"/>
+				<path className="handlePath" d="M -25 0 L 25 0 M 0 -25 L 0 25"/>
+			</svg>
 		</g>
 
 	);
