@@ -23,13 +23,11 @@ export const Rect = ({defs, style}:ShapeProps) => {
 
     const setPosition = (dx: number, dy:number) => {
         dispatch(manipulate(vecManipulation(dx, dy, attrs['position'])));
-
     }
 
     const setWidth = (dx: number, dy:number) => {
         dispatch(manipulate(manipulation(dx, attrs['size'][0])));
     }
-
     
     const toggleHandle = (event:React.MouseEvent) => {
         event.stopPropagation();

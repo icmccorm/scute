@@ -543,9 +543,9 @@ export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathD
 				let sine = Math.sin(toRadians(angle));
 				let dx = (cosine * distance);
 				let dy = (sine * distance);
-
+				
 				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
-				handles = handles.concat([<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
+				if(segment.move && segment.turn) handles.push(<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>);				
 				defn += prevPoint[0] + "," + prevPoint[1] + " ";	
 				} break;
 			case SegmentType.SG_MIRR:{
@@ -610,6 +610,18 @@ export const manipTurtle = (dispatch, links, dx: number, dy: number, turtleSegme
 	manipulations.push(manipulation(newDegrees - link(turtle.turn), turtle.turn));
 	dispatch(manipulate(manipulations));
 }
+
+export const manipTurtleDistance = (dispatch, links, dx: number, dy: number, turtleSegment: Segment) => {
+	const link = (vl:ValueLink) => getLinkedValue(links, vl);
+
+	let turtle = turtleSegment as Turtle;
+	let angle = link(turtle.turn);
+	
+	let delta = Math.sin(angle)*dy + Math.cos(angle)*dx;
+	dispatch(manipulate(manipulation(delta, turtle.move)));
+
+}
+
 
 function toRadians(deg: number): number{
 	return (deg * (Math.PI / 180));
