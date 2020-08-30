@@ -1,6 +1,5 @@
 import Scute from '../lang-c/scute.js';
 import {ActionType, createAction} from '../redux/Actions';
-
 var scuteModule = require('../lang-c/scute.wasm');
 
 export class ScuteWorkerWrapper {

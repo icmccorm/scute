@@ -1,18 +1,16 @@
 import * as React from 'react';
-import {ShapeProps} from './Shape';
-import {useSelector, useDispatch} from 'react-redux';
-
-import { generatePath, PolyPathDefinition } from './PathUtilities';
+import {ShapeProps} from '../Shape';
+import {useSelector} from 'react-redux';
+import { generatePath, SegmentsRendered } from './PathUtilities';
 import { scuteStore } from 'src/redux/ScuteStore';
 
 import "src/Global.scss";
-import './style/shapes.scss';
+import '../style/shapes.scss';
+import { HandleGroup } from '../handles/HandleGroup';
 
 export const Path = React.memo(({defs, style, children}:ShapeProps) => {
     const[handleable, setHandleable] = React.useState(false);
-    const dispatch = useDispatch();
-
-    const pathDefn: PolyPathDefinition = useSelector((store:scuteStore) => generatePath(store.root.lines, dispatch, defs.segments));
+    const pathDefn: SegmentsRendered = useSelector((store:scuteStore) => generatePath(store.root.lines, defs.segments));
 
     const toggleHandle = (event:React.MouseEvent) => {
         event.stopPropagation();
@@ -26,9 +24,7 @@ export const Path = React.memo(({defs, style, children}:ShapeProps) => {
                 d={pathDefn.defn} 
                 style={style}
             ></path>
-            { handleable ?
-                pathDefn.handles
-            : false}
+            <HandleGroup visible={handleable} segments={defs.segments} renders={pathDefn.renders}/>
         </g>
     );
  });
