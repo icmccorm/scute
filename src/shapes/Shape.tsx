@@ -9,21 +9,11 @@ import { Ellipse } from "./Ellipse";
 import { Line } from "./Line";
 import { getColorFromArray } from "./StyleUtilities";
 import { Ungon } from "./Ungon";
-
-export enum ShapeType{
-	SP_RECT = 68,
-	SP_CIRC,
-	SP_POLYG,
-	SP_UNGON,
-	SP_POLYL,
-	SP_PATH,
-	SP_ELLIP,
-	SP_LINE,
-}
+import { Shapes } from 'src/lang-c/scute.js';
 
 export type Tag = {
 	id: number;
-	tag: ShapeType;
+	tag: number;
 	attrs: Array<ValueLink>;
 	styles: {
 		values: object,
@@ -44,32 +34,32 @@ export const Shape = ({defs}:ShapeWrapperProps) => {
     }
 
 	switch(defs.tag){
-		case ShapeType.SP_RECT:
+		case Shapes.RECT:
 			return(
 				<Rect defs={defs} style={styles}></Rect>
 			);
-		case ShapeType.SP_CIRC:
+		case Shapes.CIRC:
 			return(
 				<Circ defs={defs} style={styles}></Circ>
 			);
-		case ShapeType.SP_POLYL:
-		case ShapeType.SP_POLYG:
+		case Shapes.POLYL:
+		case Shapes.POLYG:
 			return(
 				<PolyShape defs={defs} style={styles}></PolyShape>
 			);
-		case ShapeType.SP_UNGON:
+		case Shapes.UNGON:
 			return(
 				<Ungon defs={defs} style={styles}></Ungon>
 			);
-		case ShapeType.SP_PATH:
+		case Shapes.PATH:
 			return(
 				<Path defs={defs} style={styles}></Path>
 			);
-		case ShapeType.SP_ELLIP:
+		case Shapes.ELLIP:
 			return(
 				<Ellipse defs={defs} style={styles}></Ellipse>
 			);
-		case ShapeType.SP_LINE:
+		case Shapes.LINE:
 			return (
 				<Line defs={defs} style={styles}></Line>
 			);

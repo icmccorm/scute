@@ -15,11 +15,11 @@ export type scuteStore = {
 		code: string,
 		log: string,
 		frame: Array<React.ReactElement>,
-		frameIndex: number,
 		maxFrameIndex: number,
 		lines: Array<LineMeta>
 		scale: number,
-		runtimeCounter: 0,
+		frameIndex: number,
+		isPlaying: boolean,
 	}
 }
 
@@ -32,7 +32,7 @@ var initialStore = {
 	frameIndex: 0,
 	lines: [],
 	scale: 1.0,
-	runtimeCounter: 0,
+	isPlaying: false,	
 }
 
 export function reduceRoot(store = initialStore, action: Action){
@@ -160,6 +160,16 @@ export function reduceRoot(store = initialStore, action: Action){
 		case ActionType.UPDATE_CODE:
 			store = Object.assign({}, store, {
 				code: action.payload,
+			});
+			break;
+		case ActionType.TOGGLE_PLAYING:
+			store = Object.assign({}, store, {
+				isPlaying: !store.isPlaying
+			});
+			break;
+		case ActionType.SCRUB:
+			store = Object.assign({}, store, {
+				frameIndex: action.payload
 			});
 			break;
 	}

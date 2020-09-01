@@ -14,6 +14,7 @@ import {getTranslate, getScale, UnitType} from 'src/shapes/StyleUtilities';
 import {reloadRuntime} from '../redux/ScuteWorker';
 import { scuteStore } from 'src/redux/ScuteStore';
 import { linkCanvas } from 'src/redux/Manipulation';
+import { Scrubber } from 'src/components/Scrubber';
 
 const AppRoot = () => {
 	const [mouse, setMouse] = React.useState([0, 0]);
@@ -184,6 +185,7 @@ const AppRoot = () => {
 						</svg>
 					</div>
 				</Dragger>
+				<Scrubber/>
 			</div>
 		</div>
 	);

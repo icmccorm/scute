@@ -12,10 +12,12 @@ export enum ActionType{
 	END_MANIPULATION,
 	SCALE,
 	TERMINATE,
+	TOGGLE_PLAYING,
+	SCRUB
 }
 
-export type Action = {type: ActionType, payload: any};
+export type Action = {type: ActionType, payload?: any};
 
-export function createAction(type: ActionType, payload: any){
+export function createAction(type: ActionType, payload?: any){
 	return {type: type, payload: payload};
 }

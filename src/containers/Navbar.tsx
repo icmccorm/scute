@@ -1,11 +1,11 @@
 import * as React from 'react';
 import './style/Navbar.scss';
 
-type Props = {children: any}
+type Props = {children: any, className?: string}
 
-export const Navbar  = ({children}:Props) => {
+export const Navbar  = ({children, className}:Props) => {
     return (
-        <div className='navbar'>
+        <div className={className ? className + " navbar" : "navbar"}>
             <div className='nav'>
                 {children}
             </div>

@@ -1,13 +1,11 @@
 .navbar {
-    position: sticky;
+    position: absolute;
     z-index: 1;
-    top: 0px;
     display: flex;
     flex-flow: row nowrap;
     height: 3.5rem!important;
     width: 100%;
     align-items: center;
-
 }
 
 .nav{

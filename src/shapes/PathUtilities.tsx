@@ -1,34 +1,19 @@
 import { ValueLink, getLinkedValue, manipulation, Manipulation, manipulate, vecManipulation } from "src/redux/Manipulation";
 import * as React from "react";
 import Handle from "./Handle";
+import {Segments, Axes} from 'src/lang-c/scute.js';
 
-export enum SegmentType {
-	SG_JUMP = 0,
-	SG_TURTLE,
-	SG_VERTEX,
-	SG_CBEZIER,
-	SG_QBEZIER,
-	SG_ARC,
-	SG_MIRR,
-}
-
-export enum AxisType {
-	X = 30,
-	Y,
-	XY
-}
-
-export type Segment = {type: SegmentType}
+export type Segment = {type: number}
 export type Jump = Segment & {point: ValueLink[]};
 export type Turtle = Segment & {move: ValueLink, turn: ValueLink, x:number, y:number, horizontal: number};
 export type Vertex = Segment & {point: ValueLink[]};
 export type Cubic = Segment & {control1: Array<ValueLink>, control2: Array<ValueLink>, end: Array<ValueLink>};
 export type Quadratic = Segment & {control: Array<ValueLink>, end: Array<ValueLink>};
 export type Arc = Segment & {center: Array<ValueLink>, degrees: ValueLink, radius:Array<ValueLink>};
-export type Mirror = Segment & {axis: AxisType, origin: Array<ValueLink>, index: number};
+export type Mirror = Segment & {axis: number, origin: Array<ValueLink>, index: number};
 export type MirrorTag = {index: number, prevPoint: Array<number>};
 export type BoundingBox = {position:Array<number>, bounds: Array<number>, centroid};
-export type PolyPathDefinition = {defn: string, handles: Array<JSX.Element>};
+export type SegmentsRendered = {defn: string, handles: Array<JSX.Element>};
 
 function peek(array:Array<any>, offset?:number) {
 	if(offset && offset <= 0){
@@ -38,7 +23,15 @@ function peek(array:Array<any>, offset?:number) {
 	}
 }
 
-export const generatePath = (links, dispatch, segmentArray: Array<Segment>):PolyPathDefinition => {
+export const renderPolyshape = (links, dispatch, segmentArray) => {
+	return renderSegments(links, dispatch, segmentArray, true);
+}
+
+export const renderPath = (links, dispatch, segmentArray) => {
+	return renderSegments(links, dispatch, segmentArray, false);
+}
+
+export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, isPoly):SegmentsRendered => {
 	let handles = [];
 	let defn = "";
 	let prevPoint: Array<number> = [0, 0];
@@ -46,8 +39,8 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 
 	let mirrorStack:Array<MirrorTag> = []
 
-	if(segmentArray.length == 0 || segmentArray[0].type != SegmentType.SG_JUMP){
-		defn += "M 0 0"
+	if(segmentArray.length == 0 || segmentArray[0].type != Segments.JUMP){
+		defn += isPoly ? "0,0 " : "M 0 0";
 	}
 
 	for(let key = 0; key<segmentArray.length; ++key){ 
@@ -56,7 +49,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 		const linkVec = (vlv:Array<ValueLink>) => [link(vlv[0]), link(vlv[1])];
 
 		switch(segment.type){
-			case SegmentType.SG_JUMP: {
+			case Segments.JUMP: {
 				let jump = segment as Jump;
 				let jPoint = linkVec(jump.point);
 	
@@ -78,10 +71,10 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				}
 
 				prevPoint = jPoint;
-				defn += "M " + prevPoint[0] + " " + prevPoint[1];
+				defn += isPoly ? prevPoint[0] + "," + prevPoint[0] : "M " + prevPoint[0] + " " + prevPoint[1];
 				} break;
 			
-			case SegmentType.SG_TURTLE: {
+			case Segments.TURTLE: {
 				let segment: Turtle = segmentArray[key] as Turtle;
 				segment.horizontal = angle;
 
@@ -102,7 +95,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				}
 
 				prevPoint = [prevPoint[0] + diff[0], prevPoint[1] + diff[1]];
-				defn += "L " + prevPoint[0] + " " + prevPoint[1];
+				defn += isPoly ? prevPoint[0] + "," + prevPoint[0] : "L " + prevPoint[0] + " " + prevPoint[1];
 				
 				if(!topMirror) handles.push(
 					<Handle 
@@ -114,10 +107,10 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					}}/>
 				);
 				
-				if(segmentArray[key + 1] && segmentArray[key + 1].type != SegmentType.SG_TURTLE) angle = 0;
+				if(segmentArray[key + 1] && segmentArray[key + 1].type != Segments.TURTLE) angle = 0;
 				} break;
 
-			case SegmentType.SG_VERTEX: {
+			case Segments.VERTEX: {
 				let vertex = segment as Vertex;
 				let vPoint = linkVec(vertex.point);
 
@@ -138,10 +131,10 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					);
 				}
 				prevPoint = vPoint;
-				defn += "L " + prevPoint[0] + " " + prevPoint[1];
+				defn += isPoly ? prevPoint[0] + "," + prevPoint[0] : "L " + prevPoint[0] + " " + prevPoint[1];
 				} break;
 
-			case SegmentType.SG_QBEZIER: {
+			case Segments.QBEZIER: {
 				let quad = segment as Quadratic;
 
 				let control = linkVec(quad.control);
@@ -178,7 +171,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				prevPoint = end;
 				} break;
 
-			case SegmentType.SG_CBEZIER: {
+			case Segments.CBEZIER: {
 				let cubic = segment as Cubic;
 
 				let control1 = linkVec(cubic.control1);
@@ -227,7 +220,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 
 				prevPoint = end;
 				}	break;
-			case SegmentType.SG_ARC: {
+			case Segments.ARC: {
 				let arc = segment as Arc;
 				let center  = linkVec(arc.center);
 				let radius = distance(prevPoint, center);
@@ -302,7 +295,7 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 				let originalPrevPoint = prevPoint;
 				prevPoint = endpoint;
 				} break;
-			case SegmentType.SG_MIRR:{
+			case Segments.MIRROR:{
 				let top:MirrorTag = peek(mirrorStack);
 				if(top && top.index != key){					
 					mirrorStack.push({index: key, prevPoint: prevPoint});
@@ -314,12 +307,12 @@ export const generatePath = (links, dispatch, segmentArray: Array<Segment>):Poly
 					prevPoint = [0, 0];
 					key = -1;
 				}
-				defn += "Z";
+				if(!isPoly) defn += "Z";
 				}break;
 		}
 		defn += " ";
 	}
-	defn += "Z";
+	if(!isPoly) defn += "Z";
 	return {defn, handles};
 }
 
@@ -412,15 +405,15 @@ export function generateChaikinized(links, dispatch, segmentArray: Segment[], cl
 
 	for(let key = 0; key<segmentArray.length; ++key){
 		switch(segmentArray[key].type){
-			case SegmentType.SG_JUMP:
-			case SegmentType.SG_VERTEX: {
+			case Segments.JUMP:
+			case Segments.VERTEX: {
 				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);
 				//handles = handles.concat([<Handle key={key} cx={link(segment.point[0])} cy={link(segment.point[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, segment.point)}/>]);
 			
 				manipFunctions.push((dx, dy) => manipVector(dispatch, dx, dy, segment.point));
 				prevPoint = [link(segment.point[0]), link(segment.point[1])];
 			} break;
-			case SegmentType.SG_TURTLE: {
+			case Segments.TURTLE: {
 				let segment: Turtle = segmentArray[key] as Turtle;
 				segment.horizontal = angle;
 
@@ -437,7 +430,7 @@ export function generateChaikinized(links, dispatch, segmentArray: Segment[], cl
 				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
 				//handles = handles.concat([<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
 				} break;
-			case SegmentType.SG_MIRR:{
+			case Segments.MIRROR:{
 				let top:MirrorTag = peek(mirrorStack);
 				if(top){		
 					if(top.index != key){
@@ -506,67 +499,6 @@ export function generateChaikinized(links, dispatch, segmentArray: Segment[], cl
 		]);
 	}
 	defn += "Z";
-	return {defn, handles};
-}
-
-export function generatePoly(links, dispatch, segmentArray: Segment[]):PolyPathDefinition {
-	const link = (vl:ValueLink) => getLinkedValue(links, vl);
-
-	let prevPoint: Array<number> = [0, 0];
-	let handles = [];
-	let defn = "";
-	let angle = 0;
-	let mirrorStack:Array<MirrorTag> = []
-
-
-	for(let key = 0; key<segmentArray.length; ++key){
-		switch(segmentArray[key].type){
-			case SegmentType.SG_JUMP:
-			case SegmentType.SG_VERTEX: {
-				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);
-
-				defn += link(segment.point[0]) + "," + link(segment.point[1]) + " ";
-				handles = handles.concat([<Handle key={key} cx={link(segment.point[0])} cy={link(segment.point[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, segment.point)}/>]);
-				
-				prevPoint = [link(segment.point[0]), link(segment.point[1])];
-			} break;
-			case SegmentType.SG_TURTLE: {
-				let segment: Turtle = segmentArray[key] as Turtle;
-				segment.horizontal = angle;
-
-				let distance = link(segment.move);
-
-				angle += link(segment.turn);
-				angle = wraparound(-360, 360, angle);
-
-				let cosine = Math.cos(toRadians(angle));
-				let sine = Math.sin(toRadians(angle));
-				let dx = (cosine * distance);
-				let dy = (sine * distance);
-				
-				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
-				if(segment.move && segment.turn) handles.push(<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>);				
-				defn += prevPoint[0] + "," + prevPoint[1] + " ";	
-				} break;
-			case SegmentType.SG_MIRR:{
-				let top:MirrorTag = peek(mirrorStack);
-				if(top){		
-					if(top.index != key){
-						prevPoint = top.prevPoint;
-						mirrorStack.push({index: key, prevPoint: prevPoint});
-						defn += "Z ";
-					}else{
-						mirrorStack.pop();	
-					}	
-				}else{
-					prevPoint = [0, 0];
-					key = -1;
-					mirrorStack.push({index: key, prevPoint: prevPoint});
-					defn += "Z ";
-				}
-				}break;
-		}
-	}
 	return {defn, handles};
 }
 
@@ -663,19 +595,19 @@ export function arcDegrees(rad:number, start: Array<number>, center:Array<number
 	return angleA;
 }
 
-function mirrorCoordinate(mirrorAxis: AxisType, mirrorPoint: Array<number>, point: Array<number>): Array<number>{
+function mirrorCoordinate(mirrorAxis: number, mirrorPoint: Array<number>, point: Array<number>): Array<number>{
 	switch(mirrorAxis){
-		case AxisType.X:
+		case Axes.X:
 			return [
 				mirrorValue(mirrorPoint[0], point[0]),
 				point[1]
 			];		
-		case AxisType.Y:
+		case Axes.Y:
 			return [
 				point[0],
 				mirrorValue(mirrorPoint[1], point[1])
 			];		
-		case AxisType.XY:
+		case Axes.XY:
 			return [
 				mirrorValue(mirrorPoint[0], point[0]),
 				mirrorValue(mirrorPoint[1], point[1])

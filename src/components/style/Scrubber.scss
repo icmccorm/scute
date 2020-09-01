@@ -1,0 +1,39 @@
+.scrub-wrapper {
+	position: absolute;
+    z-index: 1;
+    height: 3.5rem!important;
+	width: 100%;
+	bottom: 5rem;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+}
+
+.scrub-box{
+	display: flex;
+	width: 100%;
+    flex-flow: row nowrap;
+
+    align-items: center;
+	align-content: center;
+	justify-content: center;
+
+	padding-left: 8rem;
+	padding-right: 8rem;
+}
+
+.scrub-box * {
+	display: inline-block;
+	width: auto;
+	margin-left: 1rem;
+	margin-right: 1rem;	
+}
+
+.scrub-bar{
+	flex-grow: 2;
+}
+
+.scrub-toggle-box{
+	width: auto;
+	margin-right: 2rem;
+}
