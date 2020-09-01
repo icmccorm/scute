@@ -1,38 +1,18 @@
-.editor-wrapper{
+#ace-editor{
     order: 1;
-	flex-basis: 80%;
-	display: flex;
-	flex-flow: ltr nowrap;
-	overflow-x: hidden;
-	overflow-y: auto;
-
-	background-color: hsl(210, 3%, 12%);
-}
-
-.lineNums{
-	flex-basis: auto;
-	background-color: black;
-	overflow-y: hidden;
-	-ms-overflow-style: none; /* IE 10+ */
-    scrollbar-width: none; /* Firefox */
-}
-
-.lineNums::-webkit-scrollbar { 
-    display: none;  /* Safari and Chrome */
-}
-
-.textPadding{
-	padding: 0.5rem;
-	border: none;
-}
-
-.textArea{
 	flex-basis: 100%;
-	width: auto;
-	overflow: auto;
+	display: flex;
+	width: 100% !important;
+	flex-flow: ltr nowrap;
+	padding: 0.5rem !important;
+	box-sizing: border-box !important;
+	font-family: 'Source Code Pro', monospace;
+	font-size: 12pt !important;
+	direction:ltr !important;
 }
 
-.lineNums > span{
-	color: white;
-	display: block;
+#ace-editor * {
+	font-family: 'Source Code Pro', monospace;
+	font-size: 12pt !important;
+	direction:ltr !important;
 }
