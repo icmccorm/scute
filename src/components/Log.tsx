@@ -6,7 +6,7 @@ type Props = {value: string}
 export const Log = ({value}:Props) => { 
     return(
         <div className='console-wrapper'>
-            <textarea className='max dark' disabled value={value}>
+            <textarea className='max' disabled value={value}>
             </textarea>
         </div>
     );

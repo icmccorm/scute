@@ -1,21 +1,18 @@
 import * as React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import './style/Editor.scss';
 import { createAction, ActionType } from 'src/redux/Actions';
 import { scuteStore } from 'src/redux/ScuteStore';
+import AceEditor from "react-ace";
+
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/webpack-resolver";
+import './style/Editor.scss';
 
 type Props = {handleChange: Function, value: string}
 
 const CODE_COOKIE = "scute_src=";
 
 export const Editor = React.memo(({value, handleChange}:Props) => {
-    const [lineNums, setLineNums] = React.useState([<span key={1}>1</span>]);
-    const [scrollTop, setScrollTop] = React.useState(0);
-
-    const wrapper:React.RefObject<HTMLDivElement> = React.createRef();
-    const area:React.RefObject<HTMLTextAreaElement> = React.createRef();
-    const nums:React.RefObject<HTMLDivElement> = React.createRef();
-
     const sourceText:string = useSelector((store:scuteStore) => store.root.code);
 
     const dispatch = useDispatch();
@@ -29,20 +26,7 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
 
     const syncText = (text) => {
         dispatch(createAction(ActionType.UPDATE_CODE, text));
-        let numLines:number = text.split('\n').length;
-        let displayData = [];
-
-        for(let i = 0; i<numLines; ++i){
-            displayData.push(<span key={i+1}>{i+1}</span>);
-        }
-        setLineNums(displayData);    
         setCookie(text);   
-    }
-
-    const syncScroll = (evt) => {
-        setScrollTop(evt.target.scrollTop);
-        wrapper.current.scrollTop = scrollTop;
-        nums.current.scrollTop = scrollTop;
     }
 
     const setCookie = (text) => {
@@ -69,34 +53,12 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
         return "";
     }
 
-    var handleSpecialCharacters = (evt) => {
-        let text:string = evt.target.value;
-        if(evt.keyCode == 9){
-            evt.preventDefault();
-            let start = evt.currentTarget.selectionStart;
-            let newVal = text.substring(0, start) + '\t' + text.substring(start);
-            area.current.value = newVal;
-            area.current.setSelectionRange(start+1, start+1);
-        }
-        return true;
-    }
-
     return(
-        <div ref={wrapper} id="code" className='editor-wrapper' onScroll={syncScroll}>
-            <div
-                ref={nums} 
-                className='lineNums textPadding'
-            >
-            {lineNums}
-            </div>
-            <textarea
-                ref={area}
-                spellCheck={false}
-                className='dark textArea textPadding'
-                onChange={(evt) => {syncText(evt.target.value)}}
-                onKeyDown={handleSpecialCharacters}
-                value={sourceText}
-            />
-      </div>
+        <AceEditor 
+            name="ace-editor"
+            mode="java"
+            onChange={syncText} value={sourceText}
+            setOptions={{useSoftTabs: false}}
+        />
     );
 });

@@ -59,15 +59,12 @@ export function reduceRoot(store = initialStore, action: Action){
 				scale: action.payload,
 			});
 			break;
-
 		case ActionType.PRINT_ERROR:
-			break;
 		case ActionType.PRINT_OUT:
+		case ActionType.PRINT_DEBUG:
 			store = Object.assign({}, store, {
 				log: store.log + action.payload,
 			});
-			break;
-		case ActionType.PRINT_DEBUG:
 			break;
 		case ActionType.FIN_FRAME:
 			if(action.payload){
