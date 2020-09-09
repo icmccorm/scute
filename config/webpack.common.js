@@ -1,7 +1,6 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 var paths = require('./paths.js');
-const isDevelopment = process.env.NODE_ENV === 'development'
 
 module.exports = {
     entry: [paths.indexTSX],
@@ -49,7 +48,6 @@ module.exports = {
                 }
             }
         },
-        runtimeChunk: 'single',
         moduleIds: 'hashed',
     },
     module: {

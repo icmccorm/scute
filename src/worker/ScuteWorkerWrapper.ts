@@ -4,7 +4,6 @@ import {ActionType, createAction} from '../redux/Actions';
 var scuteModule = require('../lang-c/scute.wasm');
 
 export class ScuteWorkerWrapper {
-	currentIndex: number;
 	compiledPtr: number;
 	module: any;
 	worker: any;
@@ -32,13 +31,10 @@ export class ScuteWorkerWrapper {
 		this.module._free(codePtr);
 		
 		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex});
-		this.currentIndex = 0;
 	}
 
-	runCode(){
-		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
-		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
-		
+	runCode(index: number){
+		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, index]);		
 		this.sendCommand(ActionType.FIN_FRAME, {frame: this.module._currentFrame, lines: this.module._lines, canvas: this.module._canvas});
 		this.module._currentFrame = [];
 	}
@@ -71,7 +67,7 @@ Scute({
 				scute.compileCode(message[1])
 				break;
 			case ActionType.REQ_FRAME:
-				scute.runCode();
+				scute.runCode(message[1]);
 				break;
 		}
 	}

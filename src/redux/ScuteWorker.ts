@@ -10,7 +10,11 @@ ScuteWorkerObject.onmessage = async (event) => {
 }
 
 export function requestFrame(){
-	ScuteWorkerObject.postMessage([ActionType.REQ_FRAME]);
+	ScuteWorkerObject.postMessage([ActionType.REQ_FRAME, scuteStore.getState().root.frameIndex]);
+}
+
+export function requestFrameByIndex(index: number){
+	ScuteWorkerObject.postMessage([ActionType.REQ_FRAME, index]);
 }
 
 export function requestCompile(code: string){

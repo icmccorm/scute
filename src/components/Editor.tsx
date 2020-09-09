@@ -2,19 +2,13 @@ import * as React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import { createAction, ActionType } from 'src/redux/Actions';
 import { scuteStore } from 'src/redux/ScuteStore';
-import AceEditor from "react-ace";
-
-import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/webpack-resolver";
 import './style/Editor.scss';
-
-type Props = {handleChange: Function, value: string}
 
 const CODE_COOKIE = "scute_src=";
 
-export const Editor = React.memo(({value, handleChange}:Props) => {
+export const Editor = () => {
     const sourceText:string = useSelector((store:scuteStore) => store.root.code);
-
+    const [ace, loadAce] = React.useState(null);
     const dispatch = useDispatch();
 
     React.useEffect(() => {
@@ -22,6 +16,7 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
         if(cookieCode != ""){
             syncText(cookieCode);
         }
+        import('react-ace').then(ace => loadAce(ace));
     }, []);
 
     const syncText = (text) => {
@@ -53,12 +48,11 @@ export const Editor = React.memo(({value, handleChange}:Props) => {
         return "";
     }
 
-    return(
-        <AceEditor 
+    return ace ? 
+        <ace.default
             name="ace-editor"
-            mode="java"
             onChange={syncText} value={sourceText}
             setOptions={{useSoftTabs: false}}
-        />
-    );
-});
+            /> 
+        : null;
+};

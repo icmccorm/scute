@@ -24,7 +24,6 @@ const AppRoot = () => {
 	
 	const canvas = useSelector((store:scuteStore) => linkCanvas(store.root.lines, store.root.canvas));
 	const frame = useSelector((store:scuteStore) => store.root.frame);
-	const code = useSelector((store:scuteStore) => store.root.code);
 	const log = useSelector((store:scuteStore) => store.root.log);
 
     var leftWrapper: React.RefObject<HTMLDivElement> = React.createRef(); 
@@ -132,12 +131,8 @@ const AppRoot = () => {
         newMousePosition[1] = (event.pageY - Math.floor(eventBounds.top)) / scale;
 
 		setMouse(newMousePosition);
-    }
-
-	const updateCode = () => {
-		dispatch(createAction(ActionType.UPDATE_CODE, code))
 	}
-
+	
 	React.useEffect(() => {
 		setTerminationValid(false);
 	}, [frame]);
@@ -146,7 +141,7 @@ const AppRoot = () => {
 		<div className='root flex outer-flex'>
 			<div className='text-wrapper' ref={leftWrapper}>
 				<div className='inner-text-wrapper flex inner-flex max'>
-					<Editor value={code} handleChange={updateCode}></Editor>
+					<Editor></Editor>
 					<Log value={log}></Log>
 				</div>
 				<Dragger drag={adjustLeft} className="scrubber"/> 

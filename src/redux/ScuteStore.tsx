@@ -1,6 +1,6 @@
 import { createStore, combineReducers } from 'redux';
 import { ActionType, Action } from './Actions';
-import { requestCompile, requestFrame } from './ScuteWorker';
+import { requestCompile, requestFrame, requestFrameByIndex } from './ScuteWorker';
 import { LineMeta, ValueMeta, Manipulation, RoleType, Canvas } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number};
@@ -19,7 +19,7 @@ export type scuteStore = {
 		lines: Array<LineMeta>
 		scale: number,
 		frameIndex: number,
-		isPlaying: boolean,
+		animationLoop: number
 	}
 }
 
@@ -33,27 +33,28 @@ var initialStore = {
 	lines: [],
 	scale: 1.0,
 	isPlaying: false,	
+	animationLoop: null,
 }
 
 export function reduceRoot(store = initialStore, action: Action){
 	switch(action.type){
 		case ActionType.REQ_COMPILE:
+			if(store.animationLoop) clearInterval(store.animationLoop);
 			store = Object.assign({}, store, {
 				log: "",
 				frames: [],
 				lines: [],
+				animationLoop: null
 			})
 			requestCompile(store.code);
 			break;
-
 		case ActionType.FIN_COMPILE:
 			let response: CompilationResponse = action.payload;
 			store = Object.assign({}, store, {
 				maxFrameIndex: response.maxFrameIndex,
+				animationLoop: setInterval(requestFrame, 17)
 			});
-			requestFrame();
 			break;
-		
 		case ActionType.SCALE:
 			store = Object.assign({}, store, {
 				scale: action.payload,
@@ -69,11 +70,12 @@ export function reduceRoot(store = initialStore, action: Action){
 		case ActionType.FIN_FRAME:
 			if(action.payload){
 				let response:RuntimeResponse = action.payload;
-					store = Object.assign({}, store, {
-						frame: response.frame,
-						lines: response.lines,
-						canvas: response.canvas
-					});
+				store = Object.assign({}, store, {
+					frame: response.frame,
+					lines: response.lines,
+					canvas: response.canvas,
+					frameIndex: (store.frameIndex + 1) % (store.maxFrameIndex + 1)
+				});
 			}
 			break;
 		case ActionType.MANIPULATION:
@@ -162,16 +164,23 @@ export function reduceRoot(store = initialStore, action: Action){
 				code: action.payload,
 			});
 			break;
-		case ActionType.TOGGLE_PLAYING:
-			store = Object.assign({}, store, {
-				isPlaying: !store.isPlaying
-			});
-			break;
 		case ActionType.SCRUB:
 			store = Object.assign({}, store, {
 				frameIndex: action.payload
 			});
+			requestFrameByIndex(store.frameIndex);
 			break;
+		case ActionType.TOGGLE_PLAYING:
+			if(store.animationLoop){
+				clearInterval(store.animationLoop);
+				store = Object.assign({}, store, {
+					animationLoop: null
+				})
+			}else{
+				store = Object.assign({}, store, {
+					animationLoop: setInterval(requestFrame, 17)
+				})
+			}
 	}
 	return store;
 }

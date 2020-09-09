@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "npx mocha -r ts-node/register ./test/**/*.test.ts",
-    "build": "make -C ./src/lang-c/ web-prod ; NODE_ENV=production webpack --config ./config/webpack.prod.js",
+    "build": "make -C ./src/lang-c/ web-prod ; NODE_ENV=production webpack --mode production --config ./config/webpack.prod.js",
     "dev": "NODE_ENV=development webpack-dev-server --config ./config/webpack.dev.js --mode=development --verbose",
     "start": "npm run scute --quiet ; npm run dev --quiet",
     "scute": "make -C ./src/lang-c/ web",
@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.11.5",
+    "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
     "@babel/plugin-syntax-import-meta": "^7.10.4",
