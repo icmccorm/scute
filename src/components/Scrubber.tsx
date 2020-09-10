@@ -27,8 +27,8 @@ export const Scrubber = () => {
 					max={maxFrameIndex} 
 					value={currentFrameIndex} 
 					onChange={scrub} 
-					onMouseDown={togglePlaying} 
-					onMouseUp={togglePlaying}>
+					onMouseDown={() => {if(isPlaying) togglePlaying()}} 
+				>	
 				</input>	
 			</div>
 		</div>

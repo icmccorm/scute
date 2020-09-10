@@ -52,8 +52,9 @@ export function reduceRoot(store = initialStore, action: Action){
 			let response: CompilationResponse = action.payload;
 			store = Object.assign({}, store, {
 				maxFrameIndex: response.maxFrameIndex,
-				animationLoop: setInterval(requestFrame, 17)
+				animationLoop: response.maxFrameIndex > 0 ? setInterval(requestFrame, 17) : null,
 			});
+			if(!store.animationLoop) requestFrameByIndex(store.frameIndex);
 			break;
 		case ActionType.SCALE:
 			store = Object.assign({}, store, {
