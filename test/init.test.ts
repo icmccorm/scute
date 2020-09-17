@@ -1,5 +1,4 @@
 import {expect} from 'chai';
-var path = require('path');
 import Scute from '../src/lang-c/scute-test.js';
 import { ScuteTestWrapper } from '../src/worker/ScuteTestWrapper';
 
