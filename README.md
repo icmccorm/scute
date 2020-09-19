@@ -1,4 +1,6 @@
 # Scute
+[![Build Status](https://travis-ci.org/icmcc/scute.svg?branch=master)](https://travis-ci.org/icmcc/scute)
+
 The ReactJS Web IDE for the Scute programming language.
 Check out the live development [build](https://icmcc.github.io/scute/). 
 
