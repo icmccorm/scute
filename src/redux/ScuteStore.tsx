@@ -1,10 +1,10 @@
 import { createStore, combineReducers } from 'redux';
 import { ActionType, Action } from './Actions';
-import { requestCompile, requestFrame, requestFrameByIndex } from './ScuteWorker';
+import { requestCompile, requestFrame, requestFrameByIndex, requestRun} from './ScuteWorker';
 import { LineMeta, ValueMeta, Manipulation, RoleType, Canvas } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number};
-export type FrameResponse = {maxFrameIndex: number, frames: Array<Object>};
+export type FrameResponse = {animations: Object};
 export type RuntimeResponse = {frame: [], lines: [], canvas:Canvas};
 
 export type scuteStore = {
@@ -48,13 +48,21 @@ export function reduceRoot(store = initialStore, action: Action){
 			})
 			requestCompile(store.code);
 			break;
-		case ActionType.FIN_COMPILE:
+		case ActionType.FIN_COMPILE: {
 			let response: CompilationResponse = action.payload;
 			store = Object.assign({}, store, {
-				maxFrameIndex: response.maxFrameIndex,
-				animationLoop: response.maxFrameIndex > 0 ? setInterval(requestFrame, 17) : null,
+				maxFrameIndex: response.maxFrameIndex
 			});
-			if(!store.animationLoop) requestFrameByIndex(store.frameIndex);
+			requestRun();
+		} break;
+		case ActionType.FIN_RUN: {
+			store = Object.assign({}, store, {
+				animationLoop: store.maxFrameIndex > 0 ? setInterval(requestFrame, 17) : null,
+			});
+		} break;
+		case ActionType.FIN_FRAME:
+			let response: FrameResponse = action.payload;
+			
 			break;
 		case ActionType.SCALE:
 			store = Object.assign({}, store, {

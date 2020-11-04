@@ -25,18 +25,31 @@ export class ScuteWorkerWrapper {
 		let codePtr = this.stringToCharPtr(code);
 		try{
 			this.compiledPtr = this.module.ccall('compileCode', 'number', ['number'], [codePtr]);
+			this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex});
 		}catch(error){
-			this.sendCommand(ActionType.PRINT_OUT, "Segmentation fault\nError: " + error.message + "\n");
+			this.sendCommand(ActionType.PRINT_OUT, "Compilation failed.\nError: " + error.message + "\n");
 		}
 		this.module._free(codePtr);
-		
-		this.sendCommand(ActionType.FIN_COMPILE, {maxFrameIndex: this.module._maxFrameIndex});
 	}
 
-	runCode(index: number){
-		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, index]);		
-		this.sendCommand(ActionType.FIN_FRAME, {frame: this.module._currentFrame, lines: this.module._lines, canvas: this.module._canvas});
-		this.module._currentFrame = [];
+	runCode(){
+		try{
+			this.module.ccall('runCode', 'number', ['number'], [this.compiledPtr]);
+			this.sendCommand(ActionType.FIN_RUN, {frame: this.module._currentFrame, lines: this.module._lines, canvas: this.module._canvas});
+			this.module._currentFrame = [];		
+		}catch(error){
+			this.sendCommand(ActionType.PRINT_OUT, "Runtime failed.\nError: " + error.message + "\n");
+		}
+
+	}
+
+	grabFrame(index: number){
+		try{
+			this.module.ccall('renderAnimationBlocks', 'number', ['number', 'number'], [this.compiledPtr, index]);
+			this.sendCommand(ActionType.FIN_FRAME, {animations: this.module._animations});
+		}catch(error){
+			this.sendCommand(ActionType.PRINT_OUT, "Runtime failed on frame " + index + ".\nError: " + error.message + "\n");
+		}
 	}
 
 	stringToCharPtr(s: string) {
@@ -66,8 +79,11 @@ Scute({
 			case ActionType.REQ_COMPILE:
 				scute.compileCode(message[1])
 				break;
+			case ActionType.REQ_RUN:
+				scute.runCode();
+				break;
 			case ActionType.REQ_FRAME:
-				scute.runCode(message[1]);
+				scute.grabFrame(message[1])
 				break;
 		}
 	}

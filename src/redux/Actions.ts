@@ -6,6 +6,8 @@ export enum ActionType{
 	PRINT_ERROR,
 	REQ_FRAME,
 	FIN_FRAME,
+	REQ_RUN,
+	FIN_RUN,
 	MANIPULATION,
 	SHIFT,
 	UPDATE_CODE,

@@ -17,7 +17,7 @@ export class ScuteTestWrapper {
 	}
 
 	runCode(){
-		this.module.ccall('runCode', 'number', ['number', 'number'], [this.compiledPtr, this.currentIndex]);
+		this.module.ccall('runCode', 'number', ['number'], [this.compiledPtr]);
 		this.currentIndex = (this.currentIndex + 1) % this.module._maxFrameIndex;
 		return this.module._currentFrame;
 	}

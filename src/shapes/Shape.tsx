@@ -19,6 +19,7 @@ export type Tag = {
 		values: object,
 		loc: object
 	}
+	animation: number;
 	segments: Array<Segment>
 }
 export type ShapeWrapperProps = {defs: Tag, children?: any}

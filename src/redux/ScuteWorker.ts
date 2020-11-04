@@ -21,6 +21,10 @@ export function requestCompile(code: string){
 	ScuteWorkerObject.postMessage([ActionType.REQ_COMPILE, code]);
 }
 
+export function requestRun(){
+	ScuteWorkerObject.postMessage([ActionType.REQ_RUN]);
+}
+
 export function reloadRuntime(){
 	ScuteWorkerObject.terminate();
 	ScuteWorkerObject = new ScuteWorker();
