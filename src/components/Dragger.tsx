@@ -42,10 +42,7 @@ export class Dragger extends React.Component<Props,State> {
 
 		this.mouseX = event.pageX;
 		this.mouseY = event.pageY;
-		let node:HTMLDivElement = this.draggerDiv.current;
-
 		window.addEventListener('mousemove', this.resizeComponents, false);	
-
 		window.addEventListener('mouseup', this.exitRecording, false);
 	}
 	

@@ -4,8 +4,8 @@ import { requestCompile, requestFrame, requestFrameByIndex, requestRun} from './
 import { LineMeta, ValueMeta, Manipulation, RoleType, Canvas } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number};
-export type FrameResponse = {animations: Object};
-export type RuntimeResponse = {frame: [], lines: [], canvas:Canvas};
+export type FrameResponse = {animations: Object, index: number};
+export type RuntimeResponse = {frame: {shapes: Object, segments: Object}, lines: [], canvas:Canvas};
 
 export type scuteStore = {
 	root: {
@@ -14,7 +14,8 @@ export type scuteStore = {
 		canvas: Canvas,
 		code: string,
 		log: string,
-		frame: Array<React.ReactElement>,
+		shapes: Object,
+		segments: Object,
 		maxFrameIndex: number,
 		lines: Array<LineMeta>
 		scale: number,
@@ -24,7 +25,8 @@ export type scuteStore = {
 }
 
 var initialStore = {
-	frame: null,
+	shapes: null,
+	segments: null,
 	canvas: null,
 	code: "",
 	log: "",
@@ -42,7 +44,7 @@ export function reduceRoot(store = initialStore, action: Action){
 			if(store.animationLoop) clearInterval(store.animationLoop);
 			store = Object.assign({}, store, {
 				log: "",
-				frames: [],
+				frame: {},
 				lines: [],
 				animationLoop: null
 			})
@@ -56,14 +58,36 @@ export function reduceRoot(store = initialStore, action: Action){
 			requestRun();
 		} break;
 		case ActionType.FIN_RUN: {
+			let response: RuntimeResponse = action.payload;
 			store = Object.assign({}, store, {
-				animationLoop: store.maxFrameIndex > 0 ? setInterval(requestFrame, 17) : null,
+				shapes: response.frame.shapes,
+				segments: response.frame.segments,
+				lines: response.lines,
+				animationLoop: store.maxFrameIndex > 0 ? setInterval(requestFrame, 0) : null,
 			});
 		} break;
-		case ActionType.FIN_FRAME:
+		case ActionType.FIN_FRAME: {
 			let response: FrameResponse = action.payload;
-			
-			break;
+			let newShapes = {};
+			let newSegments = {};
+			Object.keys(response.animations).forEach((key) => {
+				let incoming = response.animations[key];
+				if(store.shapes[key]){
+					let currentShape = store.shapes[key];
+					Object.assign(currentShape.attrs, incoming);
+					newShapes[key] = currentShape;
+				}else if(store.segments[key]){
+					let currentSegment = store.segments[key];
+					Object.assign(currentSegment.attrs, incoming);
+					newSegments[key] = currentSegment;					
+				}
+			});
+			store = Object.assign({}, store, {
+				shapes: newShapes,
+				segments: newSegments,
+				frameIndex: (store.frameIndex + 1) % store.maxFrameIndex
+			});
+		}	break;
 		case ActionType.SCALE:
 			store = Object.assign({}, store, {
 				scale: action.payload,
@@ -76,17 +100,16 @@ export function reduceRoot(store = initialStore, action: Action){
 				log: store.log + action.payload,
 			});
 			break;
-		case ActionType.FIN_FRAME:
+		case ActionType.FIN_FRAME: {
 			if(action.payload){
 				let response:RuntimeResponse = action.payload;
 				store = Object.assign({}, store, {
 					frame: response.frame,
-					lines: response.lines,
 					canvas: response.canvas,
 					frameIndex: (store.frameIndex + 1) % (store.maxFrameIndex + 1)
 				});
 			}
-			break;
+		} break;
 		case ActionType.MANIPULATION:
 			let changes: Manipulation[] = action.payload;
 			for(let i = 0; i < changes.length; ++i){
@@ -123,7 +146,6 @@ export function reduceRoot(store = initialStore, action: Action){
 
 						let fractional = Math.floor(newValue * 1000) / 1000;
 						let newValueString = (fractional == Math.floor(newValue)) ? fractional.toString() : newValue.toFixed(3);
-						if(newValueString == "NaN") throw Error("NaNaNaNaNaNa... batman? " + " " + newValue);
 						
 						lengthDifference = newValueString.length - meta.length;
 						let start = store.code.substring(0, startIndex);
@@ -179,7 +201,7 @@ export function reduceRoot(store = initialStore, action: Action){
 			});
 			requestFrameByIndex(store.frameIndex);
 			break;
-		case ActionType.TOGGLE_PLAYING:
+		case ActionType.TOGGLE_PLAYING: {
 			if(store.animationLoop){
 				clearInterval(store.animationLoop);
 				store = Object.assign({}, store, {
@@ -190,7 +212,8 @@ export function reduceRoot(store = initialStore, action: Action){
 					animationLoop: setInterval(requestFrame, 17)
 				})
 			}
-	}
+		}	break;
+	} 
 	return store;
 }
 

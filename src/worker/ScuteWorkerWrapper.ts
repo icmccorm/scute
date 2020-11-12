@@ -7,12 +7,13 @@ export class ScuteWorkerWrapper {
 	compiledPtr: number;
 	module: any;
 	worker: any;
-
+	frameIndex: any;
 	constructor(scuteModule: any, worker: any){
 		this.compiledPtr = scuteModule._compiledPtr;
 		this.module = scuteModule;
 		this.worker = worker;
 		this.module["_printFunction"] = worker.postMessage.bind(worker);
+		this.frameIndex = 0;
 	}
 
 	compileCode(code: string){
@@ -36,19 +37,24 @@ export class ScuteWorkerWrapper {
 		try{
 			this.module.ccall('runCode', 'number', ['number'], [this.compiledPtr]);
 			this.sendCommand(ActionType.FIN_RUN, {frame: this.module._currentFrame, lines: this.module._lines, canvas: this.module._canvas});
-			this.module._currentFrame = [];		
+			this.module._currentFrame = {
+				shapes: {},
+				segments: {},
+			};		
 		}catch(error){
 			this.sendCommand(ActionType.PRINT_OUT, "Runtime failed.\nError: " + error.message + "\n");
 		}
 
 	}
 
-	grabFrame(index: number){
+	grabFrame(index){
+		this.frameIndex = index ? index : (this.frameIndex + 1) % this.module._maxFrameIndex;
 		try{
-			this.module.ccall('renderAnimationBlocks', 'number', ['number', 'number'], [this.compiledPtr, index]);
-			this.sendCommand(ActionType.FIN_FRAME, {animations: this.module._animations});
+			this.module.ccall('renderAnimationBlocks', 'number', ['number', 'number'], [this.compiledPtr, this.frameIndex]);
+			this.sendCommand(ActionType.FIN_FRAME, {animations: this.module._animations, index: this.frameIndex});
+			this.module._animations = {};
 		}catch(error){
-			this.sendCommand(ActionType.PRINT_OUT, "Runtime failed on frame " + index + ".\nError: " + error.message + "\n");
+			this.sendCommand(ActionType.PRINT_OUT, "Runtime failed on frame " + this.frameIndex + ".\nError: " + error.message + "\n");
 		}
 	}
 

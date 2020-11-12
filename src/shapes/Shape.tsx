@@ -31,7 +31,7 @@ export const Shape = ({defs}:ShapeWrapperProps) => {
 	const styles = {
         fill: defs.styles['fill'] ? getColorFromArray(defs.styles['fill']) : "none",
         stroke: defs.styles['stroke'] ? getColorFromArray(defs.styles['stroke']) : "black",
-        strokeWidth: defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
+        strokeWidth: "3"//defs.styles['strokeWidth'] ? defs.styles['strokeWidth'].value + "px" : "3px",
     }
 
 	switch(defs.tag){

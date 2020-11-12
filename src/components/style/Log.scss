@@ -1,6 +1,9 @@
 
 .console-wrapper{
     order: 2;
-    flex-basis: 20%;
+    flex-basis: 200px;
     border-top: 2px solid darkgray;
+    height: 25% !important;
+    min-height: 20%;
+    margin: 0;
 }

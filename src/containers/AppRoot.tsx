@@ -23,7 +23,7 @@ const AppRoot = () => {
 	const [terminateValid, setTerminationValid] = React.useState(false);
 	
 	const canvas = useSelector((store:scuteStore) => linkCanvas(store.root.lines, store.root.canvas));
-	const frame = useSelector((store:scuteStore) => store.root.frame);
+	const shapes = useSelector((store:scuteStore) => store.root.shapes);
 	const log = useSelector((store:scuteStore) => store.root.log);
 
     var leftWrapper: React.RefObject<HTMLDivElement> = React.createRef(); 
@@ -135,7 +135,7 @@ const AppRoot = () => {
 	
 	React.useEffect(() => {
 		setTerminationValid(false);
-	}, [frame]);
+	}, [shapes]);
 	
 	return (     
 		<div className='root flex outer-flex'>
@@ -174,8 +174,9 @@ const AppRoot = () => {
 							className='canvas shadow' 
 							viewBox={getViewBox()}
 							onMouseMove={recordMousePosition}>
-							{frame ? frame.map(item => {
-								return <Shape key={item.id} defs={item}></Shape>
+							{shapes ? Object.keys(shapes).map(key => {
+								let shapeObj = shapes[key]
+								return <Shape key={key} defs={shapeObj}></Shape>
 							}) : null}
 						</svg>
 					</div>

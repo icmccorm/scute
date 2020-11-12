@@ -11,7 +11,12 @@ import './style/Handle.scss';
 export const PolyShape = React.memo(({defs, style, children}:ShapeProps) => {
     const[handleable, setHandleable] = React.useState(false);
     const dispatch = useDispatch();
-    const polyDefn:SegmentsRendered = useSelector((store:scuteStore) => renderPolyshape(store.root.lines, dispatch, defs.segments));
+    const polyDefn:SegmentsRendered = useSelector((store:scuteStore) => renderPolyshape(
+        store.root.lines, 
+        dispatch, 
+        store.root.segments, 
+        defs.segments
+    ));
 
     const toggleHandle = (event:React.MouseEvent) => {
         event.stopPropagation();
@@ -33,7 +38,6 @@ export const PolyShape = React.memo(({defs, style, children}:ShapeProps) => {
                     style={style}
                 ></polyline>
             }
-
             {handleable ?
                 polyDefn.handles
             : null} 

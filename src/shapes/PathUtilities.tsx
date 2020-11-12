@@ -23,15 +23,15 @@ function peek(array:Array<any>, offset?:number) {
 	}
 }
 
-export const renderPolyshape = (links, dispatch, segmentArray) => {
-	return renderSegments(links, dispatch, segmentArray, true);
+export const renderPolyshape = (links, dispatch, segmentMap, segmentArray) => {
+	return renderSegments(links, dispatch, segmentMap, segmentArray, true);
 }
 
-export const renderPath = (links, dispatch, segmentArray) => {
-	return renderSegments(links, dispatch, segmentArray, false);
+export const renderPath = (links, dispatch, segmentMap, segmentArray) => {
+	return renderSegments(links, dispatch, segmentMap, segmentArray, false);
 }
 
-export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, isPoly):SegmentsRendered => {
+export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray: Array<string>, isPoly):SegmentsRendered => {
 	let handles = [];
 	let defn = "";
 	let prevPoint: Array<number> = [0, 0];
@@ -39,12 +39,13 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 
 	let mirrorStack:Array<MirrorTag> = []
 
-	if(segmentArray.length == 0 || segmentArray[0].type != Segments.JUMP){
+
+	if(segmentArray.length == 0 || segmentMap[segmentArray[0]].type != Segments.JUMP){
 		defn += isPoly ? "0,0 " : "M 0 0";
 	}
 
 	for(let key = 0; key<segmentArray.length; ++key){ 
-		let segment = segmentArray[key];
+		let segment = segmentMap[segmentArray[key]];
 		const link = (vl:ValueLink) => getLinkedValue(links, vl);
 		const linkVec = (vlv:Array<ValueLink>) => [link(vlv[0]), link(vlv[1])];
 
@@ -55,7 +56,7 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 	
 				if(peek(mirrorStack)){
 					let tag = peek(mirrorStack) as MirrorTag;
-					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirr:Mirror = segmentMap[segmentArray[tag.index]] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					jPoint = mirrorCoordinate(mirr.axis, mirrorPoint, jPoint);
 				}else{
@@ -71,11 +72,11 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 				}
 
 				prevPoint = jPoint;
-				defn += isPoly ? prevPoint[0] + "," + prevPoint[0] : "M " + prevPoint[0] + " " + prevPoint[1];
+				defn += isPoly ? prevPoint[0] + "," + prevPoint[1] : "M " + prevPoint[0] + " " + prevPoint[1];
 				} break;
 			
 			case Segments.TURTLE: {
-				let segment: Turtle = segmentArray[key] as Turtle;
+				let segment: Turtle = segmentMap[segmentArray[key]] as Turtle;
 				segment.horizontal = angle;
 
 				let distance = link(segment.move);
@@ -89,13 +90,13 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 				let topMirror = peek(mirrorStack);
 				if(topMirror){
 					let tag = peek(mirrorStack) as MirrorTag;
-					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirr:Mirror = segmentMap[segmentArray[tag.index]] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					diff = mirrorCoordinate(mirr.axis, mirrorPoint, diff);
 				}
 
 				prevPoint = [prevPoint[0] + diff[0], prevPoint[1] + diff[1]];
-				defn += isPoly ? prevPoint[0] + "," + prevPoint[0] : "L " + prevPoint[0] + " " + prevPoint[1];
+				defn += isPoly ? prevPoint[0] + "," + prevPoint[1] : "L " + prevPoint[0] + " " + prevPoint[1];
 				
 				if(!topMirror) handles.push(
 					<Handle 
@@ -107,7 +108,7 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 					}}/>
 				);
 				
-				if(segmentArray[key + 1] && segmentArray[key + 1].type != Segments.TURTLE) angle = 0;
+				if(segmentArray[key + 1] && segmentMap[segmentArray[key + 1]].type != Segments.TURTLE) angle = 0;
 				} break;
 
 			case Segments.VERTEX: {
@@ -116,7 +117,7 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 
 				if(peek(mirrorStack)){
 					let tag = peek(mirrorStack) as MirrorTag;
-					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirr:Mirror = segmentMap[segmentArray[tag.index]] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					vPoint = mirrorCoordinate(mirr.axis, mirrorPoint, vPoint);
 				}else{
@@ -143,7 +144,7 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 				let topMirror = peek(mirrorStack);
 				if(topMirror){
 					let tag = peek(mirrorStack) as MirrorTag;
-					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirr:Mirror = segmentMap[segmentArray[tag.index]] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					control = mirrorCoordinate(mirr.axis, mirrorPoint, control);
 					end = mirrorCoordinate(mirr.axis, mirrorPoint, end);
@@ -181,7 +182,7 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 				let topMirror = peek(mirrorStack);
 				if(topMirror){
 					let tag = peek(mirrorStack) as MirrorTag;
-					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirr:Mirror = segmentMap[segmentArray[tag.index]] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					control1 = mirrorCoordinate(mirr.axis, mirrorPoint, control1);
 					control2 = mirrorCoordinate(mirr.axis, mirrorPoint, control2);
@@ -231,7 +232,7 @@ export const renderSegments = (links, dispatch, segmentArray: Array<Segment>, is
 				let topMirror = peek(mirrorStack);
 				if(topMirror){
 					let tag = peek(mirrorStack) as MirrorTag;
-					let mirr:Mirror = segmentArray[tag.index] as Mirror;
+					let mirr:Mirror = segmentMap[segmentArray[tag.index]] as Mirror;
 					let mirrorPoint = linkVec(mirr.origin);
 					center = mirrorCoordinate(mirr.axis, mirrorPoint, center);
 					radius = distance(prevPoint, center);

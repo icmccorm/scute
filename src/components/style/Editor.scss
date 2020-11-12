@@ -1,8 +1,10 @@
 #ace-editor{
     order: 1;
-	flex-basis: 100%;
+	flex-basis: 300px;
 	display: flex;
 	width: 100% !important;
+	height: 75% !important;
+	min-height: 75%;
 	flex-flow: ltr nowrap;
 	padding: 0.5rem !important;
 	box-sizing: border-box !important;
