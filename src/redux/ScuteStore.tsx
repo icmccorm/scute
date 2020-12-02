@@ -64,6 +64,7 @@ export function reduceRoot(store = initialStore, action: Action){
 				segments: response.frame.segments,
 				lines: response.lines,
 				animationLoop: store.maxFrameIndex > 0 ? setInterval(requestFrame, 0) : null,
+				canvas: response.canvas
 			});
 		} break;
 		case ActionType.FIN_FRAME: {
@@ -100,16 +101,6 @@ export function reduceRoot(store = initialStore, action: Action){
 				log: store.log + action.payload,
 			});
 			break;
-		case ActionType.FIN_FRAME: {
-			if(action.payload){
-				let response:RuntimeResponse = action.payload;
-				store = Object.assign({}, store, {
-					frame: response.frame,
-					canvas: response.canvas,
-					frameIndex: (store.frameIndex + 1) % (store.maxFrameIndex + 1)
-				});
-			}
-		} break;
 		case ActionType.MANIPULATION:
 			let changes: Manipulation[] = action.payload;
 			for(let i = 0; i < changes.length; ++i){
