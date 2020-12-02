@@ -162,7 +162,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, quad.control)}
 					/>,
 					
-					<Handle key={segmentArray.length + key}
+					<Handle key={key + "_2"}
 						cx={end[0]}  
 						cy={end[1]}  
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, quad.end)}
@@ -199,7 +199,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 					/>,
 					
 					<Handle 
-						key={segmentArray.length + key} 
+						key={key + "_2"} 
 						cx={control2[0]} 
 						cy={control2[1]} 
 						ex={end[0]} 
@@ -208,7 +208,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 					/>,
 					
 					<Handle 
-						key={segmentArray.length + 2*key} 
+						key={key + "_3"}
 						cx={end[0]}  
 						cy={end[1]}  
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, cubic.end)}
@@ -269,7 +269,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 						sy={endpoint[1]} 
 						adjust={(dx, dy) => manipVector(dispatch, dx, dy, arc.center)}
 					/>,
-					<Handle key={segmentArray.length + key} 
+					<Handle key={key + "_2"} 
 						cx={endpoint[0]} 
 						cy={endpoint[1]} 
 						adjust={(dx, dy) => {
@@ -408,9 +408,7 @@ export function generateChaikinized(links, dispatch, segmentArray: Segment[], cl
 		switch(segmentArray[key].type){
 			case Segments.JUMP:
 			case Segments.VERTEX: {
-				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);
-				//handles = handles.concat([<Handle key={key} cx={link(segment.point[0])} cy={link(segment.point[1])} adjust={(dx, dy) => manipVector(dispatch, dx, dy, segment.point)}/>]);
-			
+				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);			
 				manipFunctions.push((dx, dy) => manipVector(dispatch, dx, dy, segment.point));
 				prevPoint = [link(segment.point[0]), link(segment.point[1])];
 			} break;
@@ -429,7 +427,6 @@ export function generateChaikinized(links, dispatch, segmentArray: Segment[], cl
 
 				manipFunctions.push((dx, dy) => manipTurtle(dispatch, links, dx, dy, segment));
 				prevPoint = [(prevPoint[0] + dx), (prevPoint[1] + dy)];
-				//handles = handles.concat([<Handle key={key} cx={prevPoint[0]} cy={prevPoint[1]} adjust={(dx, dy) => manipTurtle(dispatch, links, dx, dy, segment)}/>]);
 				} break;
 			case Segments.MIRROR:{
 				let top:MirrorTag = peek(mirrorStack);
