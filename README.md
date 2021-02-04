@@ -1,8 +1,8 @@
 # Scute
-[![Build Status](https://travis-ci.org/icmcc/scute.svg?branch=master)](https://travis-ci.org/icmcc/scute)
+[![Build Status](https://travis-ci.org/icmccormack/scute.svg?branch=master)](https://travis-ci.org/icmcc/scute)
 
 The ReactJS Web IDE for the Scute programming language.
-Check out the live development [build](https://icmcc.github.io/scute/). 
+Check out the live development [build](https://icmccormack.github.io/scute/). 
 
 ## What is Scute?
 Scute is a scripting language designed for producing graphics and animations in the SVG file format. Popular image editors like Adobe Illustrator and Inkscape are difficult to use for creating mathematically-based graphics or highly repetitive designs. Scute solves this problem by allowing complex shapes to be created programmatically while retaining the useful drag-and-drop features of image editors. 
@@ -15,7 +15,7 @@ The Scute interpreter is written in C with the help of a useful guide by Bob Nys
 
 The visual IDE for Scute is a React JS web application written in TypeScript. The Scute interpreter is run within a WebWorker, and communicates asynchronously with the IDE to compile and run programs. 
 
-A full repository containing the C code for scute is located [here](https://github.com/ian-colcanon/scute/edit/master/README.md). 
+A full repository containing the C code for scute is located [here](https://github.com/icmccormack/scute/edit/master/README.md). 
 
 ## Why does it exist?
 Scute is part of a research project in domain-specific programming languages, and is one of many designed for creating scalable graphics and animations. Scute is unique because it explores the area of direct manipulation, building from the work of Ravi Chugh and his fellow researchers at the University of Chicago. The technique of trace-based program synthesis is outlined in Chugh's [2016 paper](https://arxiv.org/pdf/1507.02988.pdf) "Programmatic and Direct Manipulation, Together at Last," which features its implementation in the [Sketch-N-Sketch](https://github.com/ravichugh/sketch-n-sketch) programming language.
