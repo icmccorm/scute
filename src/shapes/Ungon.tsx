@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { ShapeProps, ShapeType } from './Shape';
+import { ShapeProps } from './Shape';
 import { useSelector, useDispatch } from 'react-redux';
-import { PolyPathDefinition, generatePoly, generateChaikinized } from './PathUtilities';
+import { SegmentsRendered, generateChaikinized } from './PathUtilities';
 import { scuteStore } from 'src/redux/ScuteStore';
 
 import './style/shapes.scss';
@@ -10,7 +10,13 @@ import './style/Handle.scss';
 export const Ungon = React.memo(({defs, style, children}:ShapeProps) => {
     const[handleable, setHandleable] = React.useState(false);
     const dispatch = useDispatch();
-    const ungonDefn:PolyPathDefinition = useSelector((store:scuteStore) => generateChaikinized(store.root.lines, dispatch, defs.segments, true));
+    const ungonDefn:SegmentsRendered = useSelector((store:scuteStore) => generateChaikinized(
+        store.root.lines, 
+        dispatch, 
+        store.root.segments,
+        defs.segments, 
+        true
+    ));
 
     const toggleHandle = (event:React.MouseEvent) => {
         event.stopPropagation();

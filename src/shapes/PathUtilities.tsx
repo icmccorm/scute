@@ -387,7 +387,7 @@ function ungonStep(qStart: Array<number>, control: Array<number>, qEnd: Array<nu
 	return line(qStart) + quad(control, qEnd);
 }
 
-export function generateChaikinized(links, dispatch, segmentArray: Segment[], closed:boolean){
+export function generateChaikinized(links, dispatch, segmentMap: Object, segmentArray: Array<number>, closed:boolean){
 	const link = (vl:ValueLink) => getLinkedValue(links, vl);
 
 	let corner: Array<Array<number>> = [];
@@ -405,19 +405,20 @@ export function generateChaikinized(links, dispatch, segmentArray: Segment[], cl
 	let manipFunctions:Array<Function> = [];
 
 	for(let key = 0; key<segmentArray.length; ++key){
-		switch(segmentArray[key].type){
+		let segment: Segment = segmentMap[segmentArray[key]];
+		switch(segment.type){
 			case Segments.JUMP:
 			case Segments.VERTEX: {
-				let segment: Vertex | Jump = segmentArray[key] as (Vertex | Jump);			
-				manipFunctions.push((dx, dy) => manipVector(dispatch, dx, dy, segment.point));
-				prevPoint = [link(segment.point[0]), link(segment.point[1])];
+				let vertex: Vertex | Jump = segment as (Vertex | Jump);			
+				manipFunctions.push((dx, dy) => manipVector(dispatch, dx, dy, vertex.point));
+				prevPoint = [link(vertex.point[0]), link(vertex.point[1])];
 			} break;
 			case Segments.TURTLE: {
-				let segment: Turtle = segmentArray[key] as Turtle;
-				segment.horizontal = angle;
+				let turtle: Turtle = segment as Turtle;
+				turtle.horizontal = angle;
 
-				let distance = link(segment.move);
-				angle += link(segment.turn);
+				let distance = link(turtle.move);
+				angle += link(turtle.turn);
 				angle = wraparound(-360, 360, angle);
 
 				let cosine = Math.cos(toRadians(angle));

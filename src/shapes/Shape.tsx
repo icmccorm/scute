@@ -2,7 +2,6 @@ import {Rect} from "./Rect";
 import {Circ} from "./Circ";
 import * as React from 'react';
 import { PolyShape } from './PolyShape';
-import { Segment } from './PathUtilities';
 import { ValueLink } from "src/redux/Manipulation";
 import { Path } from "./Path";
 import { Ellipse } from "./Ellipse";
@@ -20,7 +19,7 @@ export type Tag = {
 		loc: object
 	}
 	animation: number;
-	segments: Array<Segment>
+	segments: Array<number>;
 }
 export type ShapeWrapperProps = {defs: Tag, children?: any}
 
