@@ -1,4 +1,4 @@
-import { ValueLink, getLinkedValue, manipulation, Manipulation, manipulate, vecManipulation } from "src/redux/Manipulation";
+import { ValueLink, getLinkedValue, manipulation, Manipulation, manipulate, vecManipulation, LineMeta } from "src/redux/Manipulation";
 import * as React from "react";
 import Handle from "./Handle";
 import {Segments, Axes} from 'src/lang-c/scute.js';
@@ -14,7 +14,7 @@ export type Mirror = Segment & {axis: number, origin: Array<ValueLink>, index: n
 export type MirrorTag = {index: number, prevPoint: Array<number>};
 export type BoundingBox = {position:Array<number>, bounds: Array<number>, centroid};
 export type SegmentsRendered = {defn: string, handles: Array<JSX.Element>};
-
+export type SegmentProperties = {isPoly: boolean, isClosed: boolean};
 function peek(array:Array<any>, offset?:number) {
 	if(offset && offset <= 0){
 		return array[array.length + offset];
@@ -23,15 +23,15 @@ function peek(array:Array<any>, offset?:number) {
 	}
 }
 
-export const renderPolyshape = (links, dispatch, segmentMap, segmentArray) => {
-	return renderSegments(links, dispatch, segmentMap, segmentArray, true);
+export const renderPolyshape = (links: LineMeta[], dispatch, segmentMap: Object, segmentArray: Array<number>) => {
+	return renderSegments(links, dispatch, segmentMap, segmentArray, {isPoly: true, isClosed: false});
 }
 
-export const renderPath = (links, dispatch, segmentMap, segmentArray) => {
-	return renderSegments(links, dispatch, segmentMap, segmentArray, false);
+export const renderPath = (links, dispatch, segmentMap, defs) => {
+	return renderSegments(links, dispatch, segmentMap, defs.segments, {isPoly: false, isClosed: defs.attrs['closed']});
 }
 
-export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray: Array<string>, isPoly):SegmentsRendered => {
+export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray: Array<number>, properties: SegmentProperties):SegmentsRendered => {
 	let handles = [];
 	let defn = "";
 	let prevPoint: Array<number> = [0, 0];
@@ -41,7 +41,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 
 
 	if(segmentArray.length == 0 || segmentMap[segmentArray[0]].type != Segments.JUMP){
-		defn += isPoly ? "0,0 " : "M 0 0";
+		defn += properties.isPoly ? "0,0 " : "M 0 0";
 	}
 
 	for(let key = 0; key<segmentArray.length; ++key){ 
@@ -72,7 +72,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 				}
 
 				prevPoint = jPoint;
-				defn += isPoly ? prevPoint[0] + "," + prevPoint[1] : "M " + prevPoint[0] + " " + prevPoint[1];
+				defn += properties.isPoly ? prevPoint[0] + "," + prevPoint[1] : "M " + prevPoint[0] + " " + prevPoint[1];
 				} break;
 			
 			case Segments.TURTLE: {
@@ -96,7 +96,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 				}
 
 				prevPoint = [prevPoint[0] + diff[0], prevPoint[1] + diff[1]];
-				defn += isPoly ? prevPoint[0] + "," + prevPoint[1] : "L " + prevPoint[0] + " " + prevPoint[1];
+				defn += properties.isPoly ? prevPoint[0] + "," + prevPoint[1] : "L " + prevPoint[0] + " " + prevPoint[1];
 				
 				if(!topMirror) handles.push(
 					<Handle 
@@ -132,7 +132,7 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 					);
 				}
 				prevPoint = vPoint;
-				defn += isPoly ? prevPoint[0] + "," + prevPoint[0] : "L " + prevPoint[0] + " " + prevPoint[1];
+				defn += properties.isPoly ? prevPoint[0] + "," + prevPoint[0] : "L " + prevPoint[0] + " " + prevPoint[1];
 				} break;
 
 			case Segments.QBEZIER: {
@@ -308,12 +308,12 @@ export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray
 					prevPoint = [0, 0];
 					key = -1;
 				}
-				if(!isPoly) defn += "Z";
+				if(!properties.isPoly && properties.isClosed) defn += "Z";
 				}break;
 		}
 		defn += " ";
 	}
-	if(!isPoly) defn += "Z";
+	if(!properties.isPoly && properties.isClosed) defn += "Z";
 	return {defn, handles};
 }
 
@@ -497,7 +497,7 @@ export function generateChaikinized(links, dispatch, segmentMap: Object, segment
 			/>
 		]);
 	}
-	defn += "Z";
+	if(closed) defn += "Z";
 	return {defn, handles};
 }
 

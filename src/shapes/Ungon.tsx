@@ -15,7 +15,7 @@ export const Ungon = React.memo(({defs, style, children}:ShapeProps) => {
         dispatch, 
         store.root.segments,
         defs.segments, 
-        true
+        defs.attrs['closed']
     ));
 
     const toggleHandle = (event:React.MouseEvent) => {

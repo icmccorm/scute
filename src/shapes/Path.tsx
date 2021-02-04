@@ -12,7 +12,7 @@ export const Path = React.memo(({defs, style, children}:ShapeProps) => {
     const[handleable, setHandleable] = React.useState(false);
     const dispatch = useDispatch();
 
-    const pathDefn: SegmentsRendered = useSelector((store:scuteStore) => renderPath(store.root.lines, dispatch, store.root.segments, defs.segments));
+    const pathDefn: SegmentsRendered = useSelector((store:scuteStore) => renderPath(store.root.lines, dispatch, store.root.segments, defs));
 
     const toggleHandle = (event:React.MouseEvent) => {
         event.stopPropagation();
