@@ -1,14 +1,7 @@
 import { ActionType, createAction, Action } from "./Actions";
-export enum RoleType {
-	PLUS = 0,
-	MINUS,
-	TIMES,
-	DIVIDE,
-	MODULO
-}
 
-export type Stage = {role: RoleType, value: number};
-export type ValueMeta = {delta: number, prevDelta: number, origin: number, op:RoleType, inlineOffset: number, length: number};
+export type Stage = {role: string, value: number};
+export type ValueMeta = {delta: number, prevDelta: number, origin: number, op:string, inlineOffset: number, length: number};
 export type LineMeta = {charIndex: number, values: Array<ValueMeta>};
 export type ValueLink = {lineIndex: number, inlineIndex: number, value?: any};
 export type Manipulation = {delta: number, finalValue: number, lineIndex: number, inlineIndex}

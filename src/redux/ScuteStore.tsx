@@ -1,7 +1,7 @@
 import { createStore, combineReducers } from 'redux';
 import { ActionType, Action } from './Actions';
 import { requestCompile, requestFrame, requestFrameByIndex, requestRun} from './ScuteWorker';
-import { LineMeta, ValueMeta, Manipulation, RoleType, Canvas } from './Manipulation';
+import { LineMeta, ValueMeta, Manipulation, Canvas } from './Manipulation';
 
 export type CompilationResponse = {maxFrameIndex: number};
 export type FrameResponse = {animations: Object, index: number};
@@ -117,19 +117,19 @@ export function reduceRoot(store = initialStore, action: Action){
 
 					if(meta.length > 0){
 						switch(meta.op){
-							case RoleType.TIMES:{
+							case "*":{
 								let factor = change.finalValue / meta.origin;
 								newValue = (newValue) / factor;
 							} break;
-							case RoleType.DIVIDE: {
+							case "/": {
 								let factor = change.finalValue * meta.origin;
 								newValue = newValue * factor;
 							} break;
-							case RoleType.MINUS:{
+							case "-":{
 								let term = change.finalValue + meta.origin;
 								newValue = newValue + term;
 							}break;				
-							case RoleType.PLUS:{
+							case "+":{
 								let term = change.finalValue - meta.origin;
 								newValue = newValue - term;
 							}break;

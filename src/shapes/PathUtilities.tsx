@@ -28,7 +28,7 @@ export const renderPolyshape = (links: LineMeta[], dispatch, segmentMap: Object,
 }
 
 export const renderPath = (links, dispatch, segmentMap, defs) => {
-	return renderSegments(links, dispatch, segmentMap, defs.segments, {isPoly: false, isClosed: defs.attrs['closed']});
+	return renderSegments(links, dispatch, segmentMap, defs.segments, {isPoly: false, isClosed: defs.attrs['closed'].value});
 }
 
 export const renderSegments = (links, dispatch, segmentMap: Object, segmentArray: Array<number>, properties: SegmentProperties):SegmentsRendered => {
